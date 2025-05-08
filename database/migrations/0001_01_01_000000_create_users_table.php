@@ -11,6 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Tabela de roles
+        Schema::create('roles', function (Blueprint $table) {
+            $table->id();
+            $table->string('name'); // Ex: Vendedor, Gerente, etc.
+            $table->timestamps();
+        });
+
+        // Tabela de users
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -18,9 +26,19 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->text('observacoes')->nullable(); // campo customizado
+            $table->foreignId('role_id')->constrained('roles');
             $table->timestamps();
         });
 
+        // Tabela de gerente_vendedor (pivot)
+        Schema::create('gerente_vendedor', function (Blueprint $table) {
+            $table->foreignId('gerente_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('vendedor_id')->constrained('users')->cascadeOnDelete();
+            $table->primary(['vendedor_id', 'gerente_id']);
+        });
+
+        // TABELAS TÉCNICAS
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
@@ -42,7 +60,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('gerente_vendedor');
         Schema::dropIfExists('users');
+        Schema::dropIfExists('roles');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
     }
