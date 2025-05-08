@@ -10,11 +10,10 @@ class Role extends Model
 {
     use HasFactory;
 
+    // Campos permitidos para preenchimento em massa
     protected $fillable = ['name'];
 
-    /**
-     * Retorna os usuários que pertencem a esse papel.
-     */
+    // Relacionamento: Um papel (role) pode ter vários usuários
     public function users(): HasMany
     {
         return $this->hasMany(User::class);

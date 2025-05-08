@@ -20,22 +20,24 @@ return new class extends Migration
 
         // Tabela de users
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // bigint
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
-            $table->text('observacoes')->nullable(); // campo customizado
-            $table->foreignId('role_id')->constrained('roles');
             $table->timestamps();
-        });
 
-        // Tabela de gerente_vendedor (pivot)
-        Schema::create('gerente_vendedor', function (Blueprint $table) {
-            $table->foreignId('gerente_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('vendedor_id')->constrained('users')->cascadeOnDelete();
-            $table->primary(['vendedor_id', 'gerente_id']);
+            // Chave estrangeira para roles
+            $table->foreignId('role_id')->constrained()->cascadeOnDelete();
+
+            // Chave estrangeira recursiva para outro usuário
+            $table->foreignId('gerente_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
+
+            $table->text('observacoes')->nullable();
         });
 
         // TABELAS TÉCNICAS

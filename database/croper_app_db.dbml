@@ -16,20 +16,13 @@ Table users {
   created_at timestamp
   updated_at timestamp
   role_id int [ref: > roles.id]
+  gerente_id int [ref: > users.id, unique]
   observacoes text // Renomeado de userscol para observacoes por clareza
 }
 
 Table roles { 
   id int [pk, increment]
   name varchar //Vendedor, Gerente Comercial, Gerente Nacional, Administrador
-}
-
-Table gerente_vendedor {
-  gerente_id bigint [ref: > users.id] // Renomeado para clareza
-  vendedor_id bigint [ref: > users.id] // Renomeado para clareza
-  indexes {
-    (vendedor_id, gerente_id) [pk]
-  }
 }
 
 //Tabela nativa do Laravel
