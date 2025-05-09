@@ -52,9 +52,19 @@ class UserResource extends Resource
                     ->maxLength(255),
 
                 Forms\Components\Select::make('role_id')
+                    ->label('Função')
                     ->relationship('role', 'name') // Relacionamento com o papel do usuário
                     ->required()
-                    ->reactive(),
+                    ->reactive()
+                    ->default(1)
+                    // só Administrador e Gerente Nacional podem alterar o papel
+                    ->disabled(fn (): bool => ! in_array(auth()->user()->role->name, ['Admin', 'Gerente Nacional'])
+                    )
+                    // opcional: tooltip explicando por que está bloqueado
+                    ->helperText(fn (): ?string => auth()->user()->role->name === 'Administrador' || auth()->user()->role->name === 'Gerente Nacional'
+                            ? null
+                            : 'Somente Administrador pode alterar este campo'
+                    ),
 
                 Forms\Components\Textarea::make('observacoes')
                     ->columnSpanFull(),
@@ -74,11 +84,22 @@ class UserResource extends Resource
                     ->searchable(),
 
                 Forms\Components\MultiSelect::make('gerentes')
-                    ->relationship('gerentes', 'name')
                     ->label('Gerente')
                     ->maxItems(1)
                     ->reactive()
                     ->visible(fn ($get) => in_array($get('role_id'), [1]))
+
+                    // só Administrador e Gerente Nacional podem alterar
+                    ->disabled(fn (): bool => ! in_array(auth()->user()->role->name, ['Admin', 'Gerente Nacional'])
+                    )
+                    ->helperText(fn (): ?string => auth()->user()->role->name === 'Administrador' || auth()->user()->role->name === 'Gerente Nacional'
+                            ? null
+                            : 'Somente Administrador pode alterar este campo'
+                    )
+
+                    // padrão: já seleciona o gerente comercial logado
+                    ->default(fn (): array => [auth()->id()])
+
                     ->relationship(
                         'gerentes',
                         'name',
@@ -164,15 +185,7 @@ class UserResource extends Resource
     public static function canCreate(): bool
     {
         return in_array(auth()->user()->role->name, [
-            'Administrador',
-            'Gerente Nacional',
-        ]);
-    }
-
-    public static function canEdit(Model $record): bool
-    {
-        return in_array(auth()->user()->role->name, [
-            'Administrador',
+            'Admin',
             'Gerente Nacional',
             'Gerente Comercial',
         ]);
@@ -181,7 +194,7 @@ class UserResource extends Resource
     public static function canDelete(Model $record): bool
     {
         return in_array(auth()->user()->role->name, [
-            'Administrador',
+            'Admin',
             'Gerente Nacional',
         ]);
     }
