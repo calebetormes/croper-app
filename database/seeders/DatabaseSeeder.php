@@ -16,6 +16,11 @@ class DatabaseSeeder extends Seeder
             RolesSeeder::class,
             AdminUserSeeder::class,
             UserFakeSeeder::class,
+            ProdutosClassesSeeder::class,
+            PrincipiosAtivosSeeder::class,
+            MarcasComerciaisSeeder::class,
+            UnidadesPesoSeeder::class,
+            FamiliasSeeder::class,
         ]);
     }
 }
