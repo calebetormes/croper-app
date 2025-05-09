@@ -20,12 +20,14 @@ Table users {
   observacoes text // Renomeado de userscol para observacoes por clareza
 }
 
-Table gerentes_vendedores {
-  gerente_id bigint [ref: > users.id]
-  Vendedor_id bigint [ref: > users.id]
-    indexes {
-    (gerente_id, Vendedor_id) [pk]
-  }
+Table gerentes  {
+  id bigint [pk, increment]
+  user_id [ref: > users.id, unique]
+}
+
+Table vendedores {
+  id bigint [pk, increment]
+  user_id [ref: > users.id, unique]
 }
 
 Table roles { 

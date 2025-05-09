@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;  // Adicionada a importação
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -42,15 +43,29 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
-    // Relacionamento: Um usuário (vendedor) pertence a qual Gerente
-    public function gerente(): BelongsTo
+    /**
+     * Um usuário (vendedor) pode ter vários gerentes (caso seja many-to-many)
+     */
+    public function gerentes(): BelongsToMany
     {
-        return $this->belongsTo(User::class, 'gerente_id');
+        return $this->belongsToMany(
+            User::class,               // Modelo relacionado
+            'gerentes_vendedores',     // Nome da pivot table
+            'vendedor_id',             // FK deste model na pivot
+            'gerente_id'               // FK do model relacionado na pivot
+        );
     }
 
-    // Relacionamento: Um usuário (gerente) pode ter vários vendedores
-    public function vendedores(): HasMany
+    /**
+     * Um usuário (gerente) pode ter vários vendedores
+     */
+    public function vendedores(): BelongsToMany
     {
-        return $this->hasMany(User::class, 'gerente_id');
+        return $this->belongsToMany(
+            User::class,
+            'gerentes_vendedores',
+            'gerente_id',              // FK deste model na pivot
+            'vendedor_id'              // FK do model relacionado na pivot
+        );
     }
 }

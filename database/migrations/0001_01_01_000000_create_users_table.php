@@ -40,6 +40,27 @@ return new class extends Migration
             $table->text('observacoes')->nullable();
         });
 
+        // tabela pivot Gerentes possuem vendedores
+        Schema::create('gerentes_vendedores', function (Blueprint $table) {
+            // Colunas de FK
+            $table->unsignedBigInteger('gerente_id');
+            $table->unsignedBigInteger('vendedor_id');
+
+            // Chave primária composta
+            $table->primary(['gerente_id', 'vendedor_id']);
+
+            // Foreign keys
+            $table->foreign('gerente_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
+
+            $table->foreign('vendedor_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
+        });
+
         // TABELAS TÉCNICAS
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
@@ -55,6 +76,7 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
     }
 
     /**
