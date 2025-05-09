@@ -10,6 +10,8 @@ use Filament\Resources\Resource;
 use Filament\Tables;             // lá no topo
 use Filament\Tables\Filters\SelectFilter;             // lá no topo
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class UserResource extends Resource
 {
@@ -134,5 +136,53 @@ class UserResource extends Resource
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * Filtra a query padrão do Resource.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        $user = auth()->user();
+        $role = $user->role->name;
+
+        if ($role === 'Gerente Comercial') {
+            // Só vê os vendedores subordinados
+            $query->whereHas('gerentes', fn (Builder $q) => $q->where('id', $user->id)
+            );
+        } elseif ($role === 'Vendedor') {
+            // Vendedor só vê o próprio cadastro
+            $query->where('id', $user->id);
+        }
+        // Admin e demais papéis continuam vendo tudo
+
+        return $query;
+    }
+
+    public static function canCreate(): bool
+    {
+        return in_array(auth()->user()->role->name, [
+            'Administrador',
+            'Gerente Nacional',
+        ]);
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return in_array(auth()->user()->role->name, [
+            'Administrador',
+            'Gerente Nacional',
+            'Gerente Comercial',
+        ]);
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return in_array(auth()->user()->role->name, [
+            'Administrador',
+            'Gerente Nacional',
+        ]);
     }
 }
