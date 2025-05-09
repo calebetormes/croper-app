@@ -11,6 +11,7 @@ use Filament\Tables;             // lá no topo
 use Filament\Tables\Filters\SelectFilter;             // lá no topo
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class UserResource extends Resource
 {
@@ -163,7 +164,24 @@ class UserResource extends Resource
     public static function canCreate(): bool
     {
         return in_array(auth()->user()->role->name, [
-            'Admin',
+            'Administrador',
+            'Gerente Nacional',
+        ]);
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return in_array(auth()->user()->role->name, [
+            'Administrador',
+            'Gerente Nacional',
+            'Gerente Comercial',
+        ]);
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return in_array(auth()->user()->role->name, [
+            'Administrador',
             'Gerente Nacional',
         ]);
     }
