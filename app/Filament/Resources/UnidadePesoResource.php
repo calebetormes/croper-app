@@ -14,7 +14,15 @@ class UnidadePesoResource extends Resource
 {
     protected static ?string $model = UnidadePeso::class;
 
-    protected static ?string $navigationGroup = 'Produto';
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Painel Administrativo';
+    }
+
+    public static function getNavigationCluster(): ?string
+    {
+        return 'PRODUTOS';
+    }
 
     protected static ?string $navigationIcon = 'heroicon-o-chevron-right';
 

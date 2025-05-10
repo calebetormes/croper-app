@@ -18,9 +18,18 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     // rótulo no menu lateral
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Painel Administrativo';
+    }
+
+    public static function getNavigationCluster(): ?string
+    {
+        return 'EQUIPE COMERCIAL';
+    }
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationLabel = 'Pessoal';
+    protected static ?string $navigationLabel = 'PESSOAL';
 
     // rótulo no título da página (Singular / Plural)
     protected static ?string $modelLabel = 'Pessoal';
