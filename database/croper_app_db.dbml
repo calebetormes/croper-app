@@ -109,6 +109,7 @@ Table pagamentos {
 Table culturas {
   id int [pk, increment] // Adicionado ID para padronizar FK
   nome varchar [unique]
+  descricao varchar
 }
 
 Table moedas {
@@ -117,10 +118,34 @@ Table moedas {
   sigla varchar
 }
 
+Table pracas_cotacoes {
+  id int [pk, increment]
+  cidade varchar
+  preco decimal(12,2)
+  vencimento date
+  preco_rs decimal(12,2)
+  preco_us decimal(12,2)
+  precos_congelados bool 
+  data_atualizacao_precos date
+  cultura_id int [ref:>culturas.id]
+}
+
+Table niveis_validacao{
+    id int [pk, increment]
+    nome varchar [unique] //Gerente Comercial,Gerente Nacional, Administrador
+    ordem_validacao int
+}
+
+Table status_negociacoes {
+    id int [pk, increment]
+    nome varchar [unique] //Rascunho, Em análise, Cancelado, Aprovado, Não Aprovado, Concluido
+    descricao text
+}
+
 Table negociacoes {
   id int [pk, increment]
   //
-  versao date
+  data_versao date
   data_negocio date
   moeda_id int [ref: > moedas.id] // Ajustado para usar ID
   //
@@ -131,7 +156,7 @@ Table negociacoes {
   cidade_cliente varchar
   //
   cultura_id int [ref: > culturas.id]
-  pracas_cotacoes int [ref: > pracas_cotacoes.id]
+  praca_cotacao_id int [ref: > pracas_cotacoes.id]
   pagamento_id int [ref: > pagamentos.id] // Renomeado de data_pgto_contrato
   data_entrega_graos date
   valor_total_com_bonus decimal(12,2) //FORMULA
@@ -144,61 +169,38 @@ Table negociacoes {
   valor_total_sem_bonus decimal(12,2) //FORMULA
 
   //VALIDAÇÔES
-  nivel_validacao_id int [ref: > nivel_validacao.id]
+  nivel_validacao_id int [ref: > niveis_validacao.id]
   status_validacao bool
   status_defensivos bool
   status_especialidades bool
-  status_negociacao_id int [ref: > status_negociacao.id]
+  status_negociacao_id int [ref: > status_negociacoes.id]
 
   //SNAP DE PREÇOS DAS PRAÇAS
-  preco_rs decimal(12,2) //snapshot calculado de pracas_cotacoes
-  preco_us decimal(12,2) //snapshot calculado de pracas_cotacoes
+  praca_preco_rs decimal(12,2) //snapshot calculado de pracas_cotacoes
+  praca_preco_us decimal(12,2) //snapshot calculado de pracas_cotacoes
   precos_congelados bool 
   data_atualizacao_precos date
   
   observacoes text // Renomeado 
 }
 
-Table niveis_validacao{
-    id int [pk, increment]
-    nome varchar //Gerente Comercial,Gerente Nacional, Administrador
-}
-
-Table status_negociacoes {
-    id int [pk, increment]
-    nome varchar //Rascunho, Em análise, Cancelado, Aprovado, Não Aprovado, Concluido
-    descricao text
-}
-
 Table negociacoes_produtos {
   negociacao_id int [ref: > negociacoes.id]
   produto_id int [ref: > produtos.id]
-  volume float // Alterado de varchar
+  volume decimal(12,2) // Alterado de varchar
   potencial_produto decimal(12,2) 
-  dose_hectare float
+  dose_hectare decimal(12,2)
 
   //campos snapshop para os preços
-  preco_real_rs decimal(12,2) 
-  preco_real_us decimal(12,2) 
-  preco_virtual_rs decimal(12,2) 
-  preco_virtual_us decimal(12,2) 
+  produto_preco_real_rs decimal(12,2) 
+  produto_preco_real_us decimal(12,2) 
+  produto_preco_virtual_rs decimal(12,2) 
+  produto_preco_virtual_us decimal(12,2) 
   precos_congelados bool
   data_atualizacao_precos date
   indexes {
     (negociacao_id, produto_id) [pk]
   }
-}
-
-Table pracas_cotacoes {
-  id int [pk, increment]
-  cidade varchar
-  preco decimal(12,2)
-  vencimento date
-  preco_rs decimal(12,2) //snapshot
-  preco_us decimal(12,2)//snapshot
-  precos_congelados bool 
-  data_atualizacao_precos date
-  cultura varchar
 }
 
 //--------------------------------------------------------------
@@ -255,4 +257,3 @@ Table migrations {
   migration varchar
   batch int
 }
-
