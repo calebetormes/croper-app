@@ -28,6 +28,17 @@ class StatusNegociacaoResource extends Resource
                     ->maxLength(255),
                 Forms\Components\Textarea::make('descricao')
                     ->columnSpanFull(),
+                    Forms\Components\ColorPicker::make('cor'),
+                Forms\Components\TextInput::make('ordem')
+                    ->required()
+                    ->numeric()
+                    ->default(0),
+                Forms\Components\TextInput::make('icone')
+                    ->maxLength(255),
+                Forms\Components\Toggle::make('finaliza_negociacao')
+                    ->required(),
+                Forms\Components\Toggle::make('ativo')
+                    ->required(),
             ]);
     }
 
@@ -37,6 +48,25 @@ class StatusNegociacaoResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nome')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('cor')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('ordem')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('icone')
+                    ->searchable(),
+                Tables\Columns\IconColumn::make('finaliza_negociacao')
+                    ->boolean(),
+                Tables\Columns\IconColumn::make('ativo')
+                    ->boolean(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
