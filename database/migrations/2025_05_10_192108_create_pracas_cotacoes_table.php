@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('pracas_cotacoes', function (Blueprint $table) {
             $table->id();
             $table->string('cidade');
-            $table->decimal('preco', 12, 2);
             $table->date('data_vencimento');
             $table->decimal('praca_cotacao_preco', 12, 2)->nullable();
             $table->unsignedBigInteger('cultura_id');

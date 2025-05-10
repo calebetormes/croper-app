@@ -13,7 +13,6 @@ class PracaCotacao extends Model
 
     protected $fillable = [
         'cidade',
-        'preco',
         'data_vencimento',
         'praca_cotacao_preco',
         'moeda_id',

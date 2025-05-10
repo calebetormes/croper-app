@@ -138,7 +138,6 @@ Table status_negociacoes {
 Table pracas_cotacoes {
   id int [pk, increment]
   cidade varchar
-  preco decimal(12,2)
   data_vencimento date
   praca_cotacao_preco decimal (12,2)
   moeda_id int [ref: > moedas.id]
