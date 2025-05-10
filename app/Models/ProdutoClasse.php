@@ -9,7 +9,10 @@ class ProdutoClasse extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $table = 'produtos_classes';
+
     protected $fillable = ['nome'];
 
     public function produtos()

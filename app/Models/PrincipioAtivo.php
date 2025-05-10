@@ -9,7 +9,10 @@ class PrincipioAtivo extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $table = 'principios_ativos';
+
     protected $fillable = ['nome'];
 
     public function produtos()

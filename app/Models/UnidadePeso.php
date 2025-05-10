@@ -9,7 +9,10 @@ class UnidadePeso extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $table = 'unidades_peso';
+
     protected $fillable = ['sigla', 'descricao'];
 
     public function produtos()

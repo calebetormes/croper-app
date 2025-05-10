@@ -9,6 +9,8 @@ class Familia extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = ['nome'];
 
     public function produtos()

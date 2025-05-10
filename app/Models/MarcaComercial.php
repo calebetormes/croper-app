@@ -9,7 +9,10 @@ class MarcaComercial extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $table = 'marcas_comerciais';
+
     protected $fillable = ['nome'];
 
     public function produtos()
