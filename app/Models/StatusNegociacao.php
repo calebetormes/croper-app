@@ -12,5 +12,10 @@ class StatusNegociacao extends Model
     protected $fillable = [
         'nome',
         'descricao',
+        'cor',
+        'ordem',
+        'icone',
+        'finaliza_negociacao',
+        'ativo',
     ];
 }

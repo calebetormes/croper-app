@@ -28,6 +28,8 @@ class DatabaseSeeder extends Seeder
         CulturaSeeder::class,
         MoedaSeeder::class,
         PagamentoSeeder::class,
+        //
+        PracaCotacaoSeeder::class,
         ]);
     }
 }

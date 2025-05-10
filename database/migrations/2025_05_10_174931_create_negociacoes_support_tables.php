@@ -39,6 +39,12 @@ return new class extends Migration
             $table->id();
             $table->string('nome')->unique(); // Ex: Rascunho, Em análise, etc.
             $table->text('descricao')->nullable();
+            $table->string('cor')->nullable(); // Ex: #4CAF50 ou bg-green-500
+            $table->integer('ordem')->default(0);
+            $table->string('icone')->nullable(); // Ex: check-circle
+            $table->boolean('finaliza_negociacao')->default(false);
+            $table->boolean('ativo')->default(true);
+            $table->timestamps();
         });
     }
 

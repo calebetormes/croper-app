@@ -21,7 +21,7 @@ Table users {
 
 Table gerentes_vendedores {
   gerente_id bigint [ref: > users.id]
-  Vendedor_id bigint [ref: > users.id]
+  vendedor_id bigint [ref: > users.id]
     indexes {
     (gerente_id, Vendedor_id) [pk]
   }
@@ -128,18 +128,21 @@ Table status_negociacoes {
     id int [pk, increment]
     nome varchar [unique] //Rascunho, Em análise, Cancelado, Aprovado, Não Aprovado, Concluido
     descricao text
+    cor varchar // Ex: "#4CAF50" ou "bg-green-500"
+    ordem int
+    icone varchar // Ex: "check-circle", "x-circle"
+    finaliza_negociacao boolean
+    ativo boolean
 }
 
 Table pracas_cotacoes {
   id int [pk, increment]
   cidade varchar
   preco decimal(12,2)
-  vencimento date
-  preco_rs decimal(12,2)
-  preco_us decimal(12,2)
-  precos_congelados bool 
-  data_atualizacao_precos date
-  cultura_id int [ref:>culturas.id]
+  data_vencimento date
+  praca_cotacao_preco decimal (12,2)
+  moeda_id int [ref: > moedas.id]
+  cultura_id int [ref: > culturas.id]
 }
 
 Table negociacoes {
@@ -176,10 +179,9 @@ Table negociacoes {
   status_negociacao_id int [ref: > status_negociacoes.id]
 
   //SNAP DE PREÇOS DAS PRAÇAS
-  praca_preco_rs decimal(12,2) //snapshot calculado de pracas_cotacoes
-  praca_preco_us decimal(12,2) //snapshot calculado de pracas_cotacoes
-  precos_congelados bool 
-  data_atualizacao_precos date
+  snap_praca_cotacao_preco decimal(12,2) //snapshot calculado de pracas_cotacoes
+  snap_praca_cotacao_preco_fixado bool 
+  data_atualizacao_snap_preco_praca_cotacao date
   
   observacoes text // Renomeado 
 }
@@ -192,12 +194,12 @@ Table negociacoes_produtos {
   dose_hectare decimal(12,2)
 
   //campos snapshop para os preços
-  produto_preco_real_rs decimal(12,2) 
-  produto_preco_real_us decimal(12,2) 
-  produto_preco_virtual_rs decimal(12,2) 
-  produto_preco_virtual_us decimal(12,2) 
-  precos_congelados bool
-  data_atualizacao_precos date
+  snap_produto_preco_real_rs decimal(12,2) 
+  snap_produto_preco_real_us decimal(12,2) 
+  snap_produto_preco_virtual_rs decimal(12,2) 
+  snap_produto_preco_virtual_us decimal(12,2) 
+  snap_precos_fixados bool
+  data_atualizacao_snap_precos_produtos date
   indexes {
     (negociacao_id, produto_id) [pk]
   }
