@@ -118,18 +118,6 @@ Table moedas {
   sigla varchar
 }
 
-Table pracas_cotacoes {
-  id int [pk, increment]
-  cidade varchar
-  preco decimal(12,2)
-  vencimento date
-  preco_rs decimal(12,2)
-  preco_us decimal(12,2)
-  precos_congelados bool 
-  data_atualizacao_precos date
-  cultura_id int [ref:>culturas.id]
-}
-
 Table niveis_validacao{
     id int [pk, increment]
     nome varchar [unique] //Gerente Comercial,Gerente Nacional, Administrador
@@ -140,6 +128,18 @@ Table status_negociacoes {
     id int [pk, increment]
     nome varchar [unique] //Rascunho, Em análise, Cancelado, Aprovado, Não Aprovado, Concluido
     descricao text
+}
+
+Table pracas_cotacoes {
+  id int [pk, increment]
+  cidade varchar
+  preco decimal(12,2)
+  vencimento date
+  preco_rs decimal(12,2)
+  preco_us decimal(12,2)
+  precos_congelados bool 
+  data_atualizacao_precos date
+  cultura_id int [ref:>culturas.id]
 }
 
 Table negociacoes {
