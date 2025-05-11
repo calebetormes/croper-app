@@ -161,9 +161,9 @@ Table negociacoes {
   praca_cotacao_id int [ref: > pracas_cotacoes.id]
   pagamento_id int [ref: > pagamentos.id] // Renomeado de data_pgto_contrato
   data_entrega_graos date
-  valor_total_com_bonus decimal(12,2) //FORMULA
   //
   area_hectares decimal(12,2)
+  valor_total_com_bonus decimal(12,2) //FORMULA
   investimento_sacas_hectare decimal(12,2) //FORMULA
   investimento_total_sacas decimal(12,2) //FORMULA
   preco_liquido_saca decimal(12,2)// FORMULA

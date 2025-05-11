@@ -9,10 +9,14 @@ use App\Models\Pagamento;
 use App\Models\PracaCotacao;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\Actions;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -122,8 +126,11 @@ class NegociacaoResource extends Resource
                             ->options(collect(config('cidades'))->mapWithKeys(fn ($cidade) => [$cidade => $cidade])->toArray())
                             ->required(),
 
-                        Forms\Components\TextInput::make('area_hectares')
-                            ->numeric(),
+                        TextInput::make('area_hectares')
+                            ->label('Área (ha)')
+                            ->numeric() // aceita apenas número válido
+                            ->placeholder('Ex: 12.5')
+                            ->required(),
                     ])
                     ->columns(2),
 
@@ -156,7 +163,15 @@ class NegociacaoResource extends Resource
                                     : null;
 
                                 $set('data_praca_vencimento', $data);
+                                $set('snap_praca_cotacao_preco', $cotacao?->praca_cotacao_preco);
                             }),
+
+                        TextInput::make('snap_praca_cotacao_preco')
+                            ->label('Preço da Praça')
+                            ->numeric()
+                            ->required()
+                            ->dehydrated()
+                            ->reactive(),
 
                         Placeholder::make('data_praca_vencimento')
                             ->label('Data da Cotação')
@@ -169,8 +184,33 @@ class NegociacaoResource extends Resource
                             })
                             ->reactive(),
 
+                        Hidden::make('snap_praca_cotacao_preco_fixado')
+                            ->default(true)
+                            ->dehydrated(), // garante que será salvo no banco
+
+                        Actions::make([
+                            Action::make('atualizar_preco_praca')
+                                ->label('Atualizar Preço da Praça')
+                                ->color('primary')
+                                ->icon('heroicon-o-arrow-path') // opcional, ícone de atualização
+                                ->visible(fn ($get) => $get('praca_cotacao_id')) // só exibe se tiver praça selecionada
+                                ->action(function ($get, $set) {
+                                    $cotacao = PracaCotacao::find($get('praca_cotacao_id'));
+                                    if ($cotacao) {
+                                        $set('snap_praca_cotacao_preco', $cotacao->praca_cotacao_preco);
+                                        $set('data_atualizacao_snap_preco_praca_cotacao', date('Y-m-d'));
+                                    }
+                                }),
+                        ]),
+
+                        DatePicker::make('data_atualizacao_snap_preco_praca_cotacao')
+                            ->label('Preço fixado no dia ')
+                            ->disabled()
+                            ->dehydrated()
+                            ->reactive(),
+
                     ])
-                    ->columns(3),
+                    ->columns(4),
                 // ----------------------------------------------------------------------------------------------------------------
                 Section::make('Pagamentos')
                     ->schema([
@@ -200,41 +240,56 @@ class NegociacaoResource extends Resource
                     ])
                     ->columns(2),
                 // ----------------------------------------------------------------------------------------------------------------
-
-                Section::make('Relacionamentos')
+                Section::make('Valores')
                     ->schema([
 
+                        // formula
                         Forms\Components\TextInput::make('valor_total_com_bonus')
                             ->required()
                             ->numeric(),
 
+                        // formula
                         Forms\Components\TextInput::make('investimento_sacas_hectare')
                             ->numeric(),
+
+                        // formula
                         Forms\Components\TextInput::make('investimento_total_sacas')
                             ->numeric(),
+
+                        // formula
                         Forms\Components\TextInput::make('preco_liquido_saca')
                             ->numeric(),
+
+                        // formula
                         Forms\Components\TextInput::make('bonus_cliente_pacote')
                             ->numeric(),
+
+                        // formula
                         Forms\Components\TextInput::make('valor_total_sem_bonus')
                             ->numeric(),
+
+                    ])
+                    ->columns(4),
+
+                Section::make('Validações')
+                    ->schema([
                         Forms\Components\TextInput::make('nivel_validacao_id')
                             ->required()
                             ->numeric(),
+
                         Forms\Components\Toggle::make('status_validacao')
                             ->required(),
+
                         Forms\Components\Toggle::make('status_defensivos')
                             ->required(),
+
                         Forms\Components\Toggle::make('status_especialidades')
                             ->required(),
+
                         Forms\Components\TextInput::make('status_negociacao_id')
                             ->required()
                             ->numeric(),
-                        Forms\Components\TextInput::make('snap_praca_cotacao_preco')
-                            ->numeric(),
-                        Forms\Components\Toggle::make('snap_praca_cotacao_preco_fixado')
-                            ->required(),
-                        Forms\Components\DatePicker::make('data_atualizacao_snap_preco_praca_cotacao'),
+
                         Forms\Components\Textarea::make('observacoes')
                             ->columnSpanFull(),
                     ])
