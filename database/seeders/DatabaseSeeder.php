@@ -15,22 +15,19 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolesSeeder::class,
             AdminUserSeeder::class,
-            //UserFakeSeeder::class,
+            UserFakeSeeder::class,
             ProdutosClassesSeeder::class,
             PrincipiosAtivosSeeder::class,
             MarcasComerciaisSeeder::class,
             UnidadesPesoSeeder::class,
             FamiliasSeeder::class,
-
-                    // Novos seeders adicionados
-        //NivelValidacaoSeeder::class,
-        StatusNegociacaoSeeder::class,
-        CulturaSeeder::class,
-        MoedaSeeder::class,
-        PagamentoSeeder::class,
-        //
-        PracaCotacaoSeeder::class,
-        $this->call(NegociacaoSeeder::class),
+            NivelValidacaoSeeder::class,
+            StatusNegociacaoSeeder::class,
+            CulturaSeeder::class,
+            MoedaSeeder::class,
+            PagamentoSeeder::class,
+            PracaCotacaoSeeder::class,
+            NegociacaoSeeder::class,
         ]);
     }
 }
