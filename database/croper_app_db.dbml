@@ -152,7 +152,7 @@ Table negociacoes {
   moeda_id int [ref: > moedas.id] // Ajustado para usar ID
   //
   gerente_id bigint [ref: > users.id] // Renomeado de GRV
-  representante_id bigint [ref: > users.id] // Renomeado de RTV
+  vendedor_id bigint [ref: > users.id] // Renomeado de RTV
   cliente varchar //Razão Social
   endereco_cliente varchar
   cidade_cliente varchar
@@ -183,6 +183,7 @@ Table negociacoes {
   data_atualizacao_snap_preco_praca_cotacao date
   
   observacoes text // Renomeado 
+  cotacao_moeda_usd_brl decimal (12,2)//para posterior pesquisa
 }
 
 Table negociacoes_produtos {

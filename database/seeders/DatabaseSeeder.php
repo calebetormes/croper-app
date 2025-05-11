@@ -23,13 +23,14 @@ class DatabaseSeeder extends Seeder
             FamiliasSeeder::class,
 
                     // Novos seeders adicionados
-        NivelValidacaoSeeder::class,
+        //NivelValidacaoSeeder::class,
         StatusNegociacaoSeeder::class,
         CulturaSeeder::class,
         MoedaSeeder::class,
         PagamentoSeeder::class,
         //
         PracaCotacaoSeeder::class,
+        $this->call(NegociacaoSeeder::class),
         ]);
     }
 }
