@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Moeda;
 
 class PracaCotacao extends Model
 {
@@ -22,5 +23,10 @@ class PracaCotacao extends Model
     public function cultura()
     {
         return $this->belongsTo(Cultura::class);
+    }
+
+    public function moeda()
+    {
+        return $this->belongsTo(Moeda::class);
     }
 }

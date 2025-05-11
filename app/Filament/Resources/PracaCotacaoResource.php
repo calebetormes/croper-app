@@ -12,9 +12,11 @@ use Filament\Forms\Components\TextInput\Mask;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\ToggleButtons;
+use Filament\Forms\Components\Select;
 use App\Models\Moeda;
 use App\Models\Cultura;
 
@@ -24,14 +26,21 @@ class PracaCotacaoResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+{
+    return parent::getEloquentQuery()->with(['moeda', 'cultura']);
+}
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('cidade')
-                    ->required()
-                    ->maxLength(255),
-
+                Select::make('cidade')
+                ->label('Cidade')
+                ->searchable()
+                ->options(collect(config('cidades'))->mapWithKeys(fn ($cidade) => [$cidade => $cidade])->toArray())
+                ->required(),
+                
                 Forms\Components\DatePicker::make('data_vencimento')
                     ->required(),
 
@@ -69,22 +78,25 @@ class PracaCotacaoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('cidade')
+                TextColumn::make('cidade')
+                    ->label('Cidade')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('preco')
-                    ->numeric()
+    
+                TextColumn::make('praca_cotacao_preco')
+                    ->label('Preço')
+                    ->formatStateUsing(function ($state, $record) {
+                        $sigla = $record->moeda->sigla ?? '';
+                        return $sigla . ' ' . number_format($state, 2, ',', '.');
+                    })
                     ->sortable(),
-                Tables\Columns\TextColumn::make('data_vencimento')
+    
+                TextColumn::make('data_vencimento')
+                    ->label('Data de Vencimento')
                     ->date()
                     ->sortable(),
-                    Tables\Columns\TextColumn::make('preco')
-                    ->money('BRL', locale: 'pt_BR')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('cultura_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('moeda_id')
-                    ->numeric()
+    
+                TextColumn::make('cultura.nome')
+                    ->label('Cultura')
                     ->sortable(),
             ])
             ->filters([
