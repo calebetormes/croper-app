@@ -12,4 +12,9 @@ class Cultura extends Model
         'nome',
         'descricao',
     ];
+
+    public function pracasCotacao()
+    {
+        return $this->hasMany(PracaCotacao::class);
+    }
 }

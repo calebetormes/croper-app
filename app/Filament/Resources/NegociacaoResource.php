@@ -3,9 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\NegociacaoResource\Pages;
+use App\Models\Cultura;
 use App\Models\Negociacao;
+use App\Models\Pagamento;
+use App\Models\PracaCotacao;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\ToggleButtons;
@@ -13,6 +18,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Carbon;
 
 class NegociacaoResource extends Resource
 {
@@ -24,6 +30,7 @@ class NegociacaoResource extends Resource
     {
         return $form
             ->schema([
+                // ----------------------------------------------------------------------------------------------------------------
                 Section::make('Informações Básicas')
                     ->schema([
                         Forms\Components\DatePicker::make('data_versao')
@@ -102,35 +109,105 @@ class NegociacaoResource extends Resource
                     ])
                     ->columns(4),
 
+                // ----------------------------------------------------------------------------------------------------------------
+                Section::make('Informações do Cliente')
+                    ->schema([
+                        Forms\Components\TextInput::make('endereco_cliente')
+                            ->label('Endereço')
+                            ->maxLength(255),
+
+                        Select::make('cidade_cliente')
+                            ->label('Município')
+                            ->searchable()
+                            ->options(collect(config('cidades'))->mapWithKeys(fn ($cidade) => [$cidade => $cidade])->toArray())
+                            ->required(),
+
+                        Forms\Components\TextInput::make('area_hectares')
+                            ->numeric(),
+                    ])
+                    ->columns(2),
+
+                // ----------------------------------------------------------------------------------------------------------------
+                Section::make('Cotações')
+                    ->schema([
+
+                        ToggleButtons::make('cultura_id')
+                            ->label('Cultura')
+                            ->options(Cultura::pluck('nome', 'id')->toArray())
+                            ->required()
+                            ->inline()
+                            ->reactive(),
+
+                        Select::make('praca_cotacao_id')
+                            ->label('Praça')
+                            ->reactive()
+                            ->options(fn ($get) => Cultura::find($get('cultura_id'))?->pracasCotacao
+                                ->whereNotNull('cidade')
+                                ->pluck('cidade', 'id')
+                                ->toArray() ?? []
+                            )
+                            ->disabled(fn ($get) => ! $get('cultura_id'))
+                            ->required()
+                            ->searchable()
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                $cotacao = PracaCotacao::find($state);
+                                $data = $cotacao?->data_vencimento
+                                    ? Carbon::parse($cotacao->data_vencimento)->format('d/m/Y')
+                                    : null;
+
+                                $set('data_praca_vencimento', $data);
+                            }),
+
+                        Placeholder::make('data_praca_vencimento')
+                            ->label('Data da Cotação')
+                            ->content(function ($get) {
+                                $cotacao = PracaCotacao::find($get('praca_cotacao_id'));
+
+                                return $cotacao?->data_vencimento
+                                    ? \Illuminate\Support\Carbon::parse($cotacao->data_vencimento)->format('d/m/Y')
+                                    : 'Nenhuma cotação selecionada';
+                            })
+                            ->reactive(),
+
+                    ])
+                    ->columns(3),
+                // ----------------------------------------------------------------------------------------------------------------
+                Section::make('Pagamentos')
+                    ->schema([
+                        Select::make('pagamento_id')
+                            ->label('Data de Pagamento')
+                            ->options(
+                                Pagamento::all()
+                                    ->pluck('data_pagamento', 'id')
+                                    ->mapWithKeys(fn ($value, $key) => [$key => \Carbon\Carbon::parse($value)->format('d/m/Y')])
+                                    ->toArray()
+                            )
+                            ->searchable()
+                            ->required()
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                $pagamento = Pagamento::find($state);
+                                $set('data_entrega_graos', $pagamento?->data_entrega);
+                            }),
+
+                        DatePicker::make('data_entrega_graos')
+                            ->label('Data de Entrega dos Grãos')
+                            ->required()
+                            ->reactive()
+                            ->disabled()
+                            ->dehydrated(false),
+
+                    ])
+                    ->columns(2),
+                // ----------------------------------------------------------------------------------------------------------------
+
                 Section::make('Relacionamentos')
                     ->schema([
-                        Forms\Components\TextInput::make('gerente_id')
-                            ->required()
-                            ->numeric(),
 
-                        Forms\Components\TextInput::make('cliente')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('endereco_cliente')
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('cidade_cliente')
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('cultura_id')
-                            ->required()
-                            ->numeric(),
-                        Forms\Components\TextInput::make('praca_cotacao_id')
-                            ->required()
-                            ->numeric(),
-                        Forms\Components\TextInput::make('pagamento_id')
-                            ->required()
-                            ->numeric(),
-                        Forms\Components\DatePicker::make('data_entrega_graos')
-                            ->required(),
                         Forms\Components\TextInput::make('valor_total_com_bonus')
                             ->required()
                             ->numeric(),
-                        Forms\Components\TextInput::make('area_hectares')
-                            ->numeric(),
+
                         Forms\Components\TextInput::make('investimento_sacas_hectare')
                             ->numeric(),
                         Forms\Components\TextInput::make('investimento_total_sacas')
