@@ -1,17 +1,18 @@
-<?php 
+<?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::create('negociacoes', function (Blueprint $table) {
             $table->id();
 
             // Datas principais
-            $table->date('data_versao');
+            $table->date('data_versao')->nullable();
             $table->date('data_negocio');
 
             // Moeda e pessoas
@@ -42,9 +43,9 @@ return new class extends Migration {
             // Validações
             $table->foreignId('nivel_validacao_id')->constrained('niveis_validacao');
             $table->boolean('status_validacao')->default(false);
-            $table->boolean('status_defensivos')->default(false);
-            $table->boolean('status_especialidades')->default(false);
-            $table->foreignId('status_negociacao_id')->constrained('status_negociacoes');
+            $table->unsignedBigInteger('status_defensivos')->default(false);
+            $table->unsignedBigInteger('status_especialidades')->default(false);
+            $table->foreignId('status_negociacao_id')->constrained('status_negociacoes')->nullable();
 
             // Snapshots de preço da praça
             $table->decimal('snap_praca_cotacao_preco', 12, 2)->nullable();

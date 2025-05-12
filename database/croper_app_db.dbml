@@ -173,8 +173,8 @@ Table negociacoes {
   //VALIDAÇÔES
   nivel_validacao_id int [ref: > niveis_validacao.id]
   status_validacao bool
-  status_defensivos bool
-  status_especialidades bool
+  status_defensivos int
+  status_especialidades int
   status_negociacao_id int [ref: > status_negociacoes.id]
 
   //SNAP DE PREÇOS DAS PRAÇAS

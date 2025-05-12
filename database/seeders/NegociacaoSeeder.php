@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Negociacao;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Seeder;
 
 class NegociacaoSeeder extends Seeder
 {
@@ -44,8 +43,8 @@ class NegociacaoSeeder extends Seeder
             // Validações
             'nivel_validacao_id' => 1,
             'status_validacao' => true,
-            'status_defensivos' => true,
-            'status_especialidades' => false,
+            'status_defensivos' => 5,
+            'status_especialidades' => 5,
             'status_negociacao_id' => 2,
 
             // Snapshot do preço da praça
@@ -54,7 +53,7 @@ class NegociacaoSeeder extends Seeder
             'data_atualizacao_snap_preco_praca_cotacao' => now(),
 
             // Observações
-            'observacoes' => 'Negociação de exemplo para testes iniciais.'
+            'observacoes' => 'Negociação de exemplo para testes iniciais.',
         ]);
     }
 }

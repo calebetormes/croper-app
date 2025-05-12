@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\StatusNegociacao;
+use Illuminate\Database\Seeder;
 
 class StatusNegociacaoSeeder extends Seeder
 {
@@ -50,8 +50,8 @@ class StatusNegociacaoSeeder extends Seeder
         ]);
 
         StatusNegociacao::create([
-            'nome' => 'Cancelado',
-            'descricao' => 'Negociação foi cancelada.',
+            'nome' => 'Pausada',
+            'descricao' => 'Negociação esta pausada pelo vendedor.',
             'cor' => '#EF4444', // vermelho
             'ordem' => 5,
             'icone' => 'ban',
@@ -60,10 +60,30 @@ class StatusNegociacaoSeeder extends Seeder
         ]);
 
         StatusNegociacao::create([
-            'nome' => 'Concluído',
-            'descricao' => 'Negociação foi concluída com sucesso.',
+            'nome' => 'Pagamento Recebido',
+            'descricao' => 'Foi confirmado o recebimento do pagamento com sucesso.',
             'cor' => '#8B5CF6', // roxo
             'ordem' => 6,
+            'icone' => 'check',
+            'finaliza_negociacao' => true,
+            'ativo' => true,
+        ]);
+
+        StatusNegociacao::create([
+            'nome' => 'Entrega de Grãos Realizada',
+            'descricao' => 'A entrega dos grãos foi concluída com sucesso.',
+            'cor' => '#8B5CF6', // roxo
+            'ordem' => 7,
+            'icone' => 'check',
+            'finaliza_negociacao' => true,
+            'ativo' => true,
+        ]);
+
+        StatusNegociacao::create([
+            'nome' => 'Concluído',
+            'descricao' => 'Todas as etapas da negociação foram concluída com sucesso.',
+            'cor' => '#8B5CF6', // roxo
+            'ordem' => 8,
             'icone' => 'check',
             'finaliza_negociacao' => true,
             'ativo' => true,

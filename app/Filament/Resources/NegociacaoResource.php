@@ -7,6 +7,7 @@ use App\Models\Cultura;
 use App\Models\Negociacao;
 use App\Models\Pagamento;
 use App\Models\PracaCotacao;
+use App\Models\StatusNegociacao;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\Actions;
@@ -19,6 +20,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -41,8 +43,8 @@ class NegociacaoResource extends Resource
                             ->Label('Data Versão')
                             ->default(now()) // Define a data atual
                             ->disabled()     // Impede edição
-                            ->required()
-                            ->hidden(),
+                            ->hidden()
+                            ->dehydrated(),
 
                         Forms\Components\DatePicker::make('data_negocio')
                             ->Label('Data da Negociação')
@@ -63,19 +65,16 @@ class NegociacaoResource extends Resource
                                 $role = $user?->role?->name;
 
                                 return match ($role) {
-                                    'Vendedor' => User::where('id', $user->id)
-                                        ->pluck('name', 'id'),
-
-                                    'Gerente Comercial' => $user->vendedores()
-                                        ->pluck('name', 'id'),
-
+                                    'Vendedor' => [$user->id => $user->name], // garante que aparece o nome
+                                    'Gerente Comercial' => $user->vendedores()->pluck('name', 'id'),
                                     default => \App\Models\User::pluck('name', 'id'),
                                 };
                             })
                             ->default(fn () => auth()->user()?->role?->name === 'Vendedor' ? auth()->id() : null)
                             ->disabled(fn () => auth()->user()?->role?->name === 'Vendedor')
                             ->searchable()
-                            ->required(),
+                            ->required()
+                            ->dehydrated(),
 
                         // REGRAS PARA SELEÇÃO DE GERENTE
                         Select::make('gerente_id')
@@ -108,7 +107,8 @@ class NegociacaoResource extends Resource
                                 };
                             })
                             ->searchable()
-                            ->required(),
+                            ->required()
+                            ->dehydrated(),
 
                     ])
                     ->columns(4),
@@ -116,6 +116,12 @@ class NegociacaoResource extends Resource
                 // ----------------------------------------------------------------------------------------------------------------
                 Section::make('Informações do Cliente')
                     ->schema([
+
+                        Forms\Components\TextInput::make('cliente')
+                            ->label('Razão Social')
+                            ->maxLength(255)
+                            ->required(),
+
                         Forms\Components\TextInput::make('endereco_cliente')
                             ->label('Endereço')
                             ->maxLength(255),
@@ -123,8 +129,7 @@ class NegociacaoResource extends Resource
                         Select::make('cidade_cliente')
                             ->label('Município')
                             ->searchable()
-                            ->options(collect(config('cidades'))->mapWithKeys(fn ($cidade) => [$cidade => $cidade])->toArray())
-                            ->required(),
+                            ->options(collect(config('cidades'))->mapWithKeys(fn ($cidade) => [$cidade => $cidade])->toArray()),
 
                         TextInput::make('area_hectares')
                             ->label('Área (ha)')
@@ -132,7 +137,7 @@ class NegociacaoResource extends Resource
                             ->placeholder('Ex: 12.5')
                             ->required(),
                     ])
-                    ->columns(2),
+                    ->columns(3),
 
                 // ----------------------------------------------------------------------------------------------------------------
                 Section::make('Cotações')
@@ -204,7 +209,7 @@ class NegociacaoResource extends Resource
                         ]),
 
                         DatePicker::make('data_atualizacao_snap_preco_praca_cotacao')
-                            ->label('Preço fixado no dia ')
+                            ->label('Preço fixado no dia')
                             ->disabled()
                             ->dehydrated()
                             ->reactive(),
@@ -235,7 +240,7 @@ class NegociacaoResource extends Resource
                             ->required()
                             ->reactive()
                             ->disabled()
-                            ->dehydrated(false),
+                            ->dehydrated(),
 
                     ])
                     ->columns(2),
@@ -271,29 +276,112 @@ class NegociacaoResource extends Resource
                     ])
                     ->columns(4),
 
-                Section::make('Validações')
+                Section::make('Status e Validações')
                     ->schema([
-                        Forms\Components\TextInput::make('nivel_validacao_id')
+                        Select::make('nivel_validacao_id')
+                            ->label('Que podera validar')
+                            ->options([
+                                1 => 'Vendedor',
+                                2 => 'Gerente Comercial',
+                                3 => 'Gerente Nacional',
+                                4 => 'Admin',
+                            ])
+                            ->default(4)
+                            ->searchable()
                             ->required()
-                            ->numeric(),
+                            ->disabled(fn (Get $get): bool =>
+                                // Vendedor nunca edita
+                                auth()->user()->role_id === 1
+                                // bloqueia quem for de nível inferior ao nível de validação
+                                || auth()->user()->role_id < $get('nivel_validacao_id')
+                                // Admin (4) bloqueia apenas quando nível for Gerente Nacional (3)
+                                || (auth()->user()->role_id === 4 && $get('nivel_validacao_id') === 3)
+                            )
+                            ->dehydrated(),
 
-                        Forms\Components\Toggle::make('status_validacao')
-                            ->required(),
+                        ToggleButtons::make('...')
+                            ->reactive()
+                            ->label('Status de Validação')
+                            ->options([
+                                0 => 'Aguardando',
+                                1 => 'Aprovado',
+                            ])
+                            ->colors([
+                                0 => 'warning',
+                                1 => 'success',
+                            ])
+                            ->default(0)
+                            ->inline()
+                            ->dehydrated()
+                            ->disabled(fn (Get $get): bool =>
+                                // Vendedor nunca edita
+                                auth()->user()->role_id === 1
+                                // bloqueia quem for de nível inferior ao nível de validação
+                                || auth()->user()->role_id < $get('nivel_validacao_id')
+                                // Admin (4) bloqueia apenas quando nível for Gerente Nacional (3)
+                                || (auth()->user()->role_id === 4 && $get('nivel_validacao_id') === 3)
+                            ),
 
-                        Forms\Components\Toggle::make('status_defensivos')
-                            ->required(),
+                        Placeholder::make('status_defensivos_label')
+                            ->label('Quantidade Minima de Defensivos')
+                            ->content(fn (Get $get) => $get('status_defensivos') == 1
+                                    ? 'Atingido'
+                                    : '⚠️ Adicione mais defensivos à sua negociação'
+                            )
+                            ->extraAttributes(fn (Get $get) => [
+                                'class' => 'inline-block px-3 py-1 rounded-full text-sm font-medium '.
+                                    ($get('status_defensivos') == 1
+                                        ? 'bg-green-100 text-green-800'
+                                        : 'bg-red-100 text-red-800'),
+                            ]),
 
-                        Forms\Components\Toggle::make('status_especialidades')
-                            ->required(),
+                        Placeholder::make('status_especialidades_label')
+                            ->label('Quantidade Minima de Especialidades')
+                            ->content(fn (Get $get) => $get('status_especialidades') > 3
+                                    ? '✅ Atingido'
+                                    : '⚠️ Adicione mais especialidades à sua negociação'
+                            )
+                            ->extraAttributes(fn (Get $get) => [
+                                'class' => $get('status_especialidades') > 3
+                                    ? 'text-green-500 font-semibold'
+                                    : 'text-yellow-400 font-semibold',
+                            ]),
+                    ])
+                    ->columns(4),
 
-                        Forms\Components\TextInput::make('status_negociacao_id')
+                Section::make('Status Geral')
+                    ->schema([
+
+                        ToggleButtons::make('status_negociacao_id')
+                            ->label('Status da Negociação')
+                            ->options(
+                                StatusNegociacao::where('ativo', true)
+                                    ->orderBy('ordem')
+                                    ->pluck('nome', 'id')
+                                    ->toArray()
+                            )
+                            ->colors([
+                                StatusNegociacao::where('nome', 'Em análise')->value('id') => 'warning',
+                                StatusNegociacao::where('nome', 'Aprovado')->value('id') => 'success',
+                                StatusNegociacao::where('nome', 'Não Aprovado')->value('id') => 'danger',
+                                StatusNegociacao::where('nome', 'Pausada')->value('id') => 'warning',
+                                StatusNegociacao::where('nome', 'Pagamento Recebido')->value('id') => 'success',
+                                StatusNegociacao::where('nome', 'Entrega de Grãos Realizada')->value('id') => 'success',
+                                StatusNegociacao::where('nome', 'Concluído')->value('id') => 'gray',
+                                // 'Rascunho' não incluso: ficará sem cor
+                            ])
+                            ->inline()
                             ->required()
-                            ->numeric(),
+                            ->default(StatusNegociacao::where('nome', 'Em análise')->value('id'))
+                            ->reactive()
+                            ->disabled(fn () => ! in_array(auth()->user()?->role_id, [3, 4]))
+                            ->dehydrated(),
 
                         Forms\Components\Textarea::make('observacoes')
                             ->columnSpanFull(),
-                    ])
-                    ->columns(2),
+
+                    ]),
+
             ]);
 
     }
@@ -302,14 +390,8 @@ class NegociacaoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('data_versao')
-                    ->date()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('data_negocio')
                     ->date()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('moeda_id')
-                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('gerente_id')
                     ->numeric()
@@ -319,71 +401,13 @@ class NegociacaoResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('cliente')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('endereco_cliente')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('cidade_cliente')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('cultura_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('praca_cotacao_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('pagamento_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('data_entrega_graos')
-                    ->date()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('valor_total_com_bonus')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('area_hectares')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('investimento_sacas_hectare')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('investimento_total_sacas')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('preco_liquido_saca')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('bonus_cliente_pacote')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('valor_total_sem_bonus')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('nivel_validacao_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\IconColumn::make('status_validacao')
-                    ->boolean(),
-                Tables\Columns\IconColumn::make('status_defensivos')
-                    ->boolean(),
-                Tables\Columns\IconColumn::make('status_especialidades')
-                    ->boolean(),
                 Tables\Columns\TextColumn::make('status_negociacao_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('snap_praca_cotacao_preco')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\IconColumn::make('snap_praca_cotacao_preco_fixado')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('data_atualizacao_snap_preco_praca_cotacao')
-                    ->date()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+
             ])
             ->filters([
                 //
@@ -412,5 +436,21 @@ class NegociacaoResource extends Resource
             'create' => Pages\CreateNegociacao::route('/create'),
             'edit' => Pages\EditNegociacao::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        $user = auth()->user();
+        $role = $user?->role?->name;
+
+        return match ($role) {
+            'Vendedor' => parent::getEloquentQuery()
+                ->where('vendedor_id', $user->id),
+
+            'Gerente Comercial' => parent::getEloquentQuery()
+                ->whereIn('vendedor_id', $user->vendedores()->pluck('id')),
+
+            default => parent::getEloquentQuery(), // Gerente Nacional e Admin veem tudo
+        };
     }
 }

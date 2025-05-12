@@ -2,15 +2,31 @@
 
 namespace Database\Seeders;
 
+use App\Models\NivelValidacao;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class NivelValidacaoSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('niveis_validacao')->insert(['nome' => 'Gerente Comercial', 'ordem_validacao' => '1']);
-        DB::table('niveis_validacao')->insert(['nome' => 'Gerente Nacional', 'ordem_validacao' => '2']);
-        DB::table('niveis_validacao')->insert(['nome' => 'Administrador', 'ordem_validacao' => '3']);
+        NivelValidacao::updateOrCreate(
+            ['id' => 1],
+            ['nome' => 'Vendedor', 'ordem_validacao' => 1]
+        );
+
+        NivelValidacao::updateOrCreate(
+            ['id' => 2],
+            ['nome' => 'Gerente Comercial', 'ordem_validacao' => 2]
+        );
+
+        NivelValidacao::updateOrCreate(
+            ['id' => 3],
+            ['nome' => 'Gerente Nacional', 'ordem_validacao' => 3]
+        );
+
+        NivelValidacao::updateOrCreate(
+            ['id' => 4],
+            ['nome' => 'Administrador', 'ordem_validacao' => 4]
+        );
     }
 }
