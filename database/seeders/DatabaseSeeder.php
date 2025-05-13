@@ -27,7 +27,10 @@ class DatabaseSeeder extends Seeder
             MoedaSeeder::class,
             PagamentoSeeder::class,
             PracaCotacaoSeeder::class,
+            ProdutosSeeder::class,
             NegociacaoSeeder::class,
+            NegociacoesProdutosSeeder::class,
+
         ]);
     }
 }

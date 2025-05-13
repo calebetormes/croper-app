@@ -187,6 +187,7 @@ Table negociacoes {
 }
 
 Table negociacoes_produtos {
+  id int [pk, increment]
   negociacao_id int [ref: > negociacoes.id]
   produto_id int [ref: > produtos.id]
   volume decimal(12,2) // Alterado de varchar
@@ -200,9 +201,6 @@ Table negociacoes_produtos {
   snap_produto_preco_virtual_us decimal(12,2) 
   snap_precos_fixados bool
   data_atualizacao_snap_precos_produtos date
-  indexes {
-    (negociacao_id, produto_id) [pk]
-  }
 }
 
 //--------------------------------------------------------------

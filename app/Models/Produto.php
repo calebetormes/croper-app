@@ -50,4 +50,30 @@ class Produto extends Model
     {
         return $this->belongsTo(Familia::class, 'familia_id');
     }
+
+    /**
+     * Rótulo composto para Filament e para exibição geral.
+     */
+    public function getNomeCompostoAttribute(): string
+    {
+        $parts = [];
+
+        if ($this->classe) {
+            $parts[] = $this->classe->nome;
+        }
+
+        if ($this->principioAtivo) {
+            $parts[] = $this->principioAtivo->nome;
+        }
+
+        if ($this->marcaComercial) {
+            $parts[] = $this->marcaComercial->nome;
+        }
+
+        // sempre existe no banco, mesmo que vazio
+        $parts[] = $this->apresentacao;
+
+        // junta com separador
+        return implode(' – ', $parts);
+    }
 }
