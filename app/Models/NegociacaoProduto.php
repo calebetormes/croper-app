@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class NegociacaoProduto extends Model
 {
+    // protected $guarded = [];
+
     protected $table = 'negociacoes_produtos';
 
     protected $primaryKey = 'id';
@@ -28,15 +30,7 @@ class NegociacaoProduto extends Model
     ];
 
     protected $casts = [
-        'snap_precos_fixados' => 'boolean',
-        'data_atualizacao_snap_precos_produtos' => 'date',
-        'volume' => 'decimal:2',
-        'potencial_produto' => 'decimal:2',
-        'dose_hectare' => 'decimal:2',
-        'snap_produto_preco_real_rs' => 'decimal:2',
-        'snap_produto_preco_real_us' => 'decimal:2',
-        'snap_produto_preco_virtual_rs' => 'decimal:2',
-        'snap_produto_preco_virtual_us' => 'decimal:2',
+        'data_atualizacao_snap_precos_produtos' => 'datetime',
     ];
 
     public function negociacao(): BelongsTo
@@ -44,8 +38,8 @@ class NegociacaoProduto extends Model
         return $this->belongsTo(Negociacao::class);
     }
 
-    public function produto(): BelongsTo
+    public function produto()
     {
-        return $this->belongsTo(Produto::class);
+        return $this->belongsTo(Produto::class, 'produto_id');
     }
 }
