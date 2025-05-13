@@ -7,11 +7,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class NegociacaoProduto extends Model
 {
-
     protected $table = 'negociacoes_produtos';
-    
+
     protected $primaryKey = 'id';
-    
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -40,12 +39,10 @@ class NegociacaoProduto extends Model
         'snap_produto_preco_virtual_us' => 'decimal:2',
     ];
 
-
     public function negociacao(): BelongsTo
     {
         return $this->belongsTo(Negociacao::class);
     }
-
 
     public function produto(): BelongsTo
     {
