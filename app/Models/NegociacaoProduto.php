@@ -2,18 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class NegociacaoProduto extends Model
 {
-    // protected $guarded = [];
+    use HasFactory;
 
     protected $table = 'negociacoes_produtos';
 
-    protected $primaryKey = 'id';
-
-    public $timestamps = false;
+    public $timestamps = false; // <-- Adicione essa linha aqui
 
     protected $fillable = [
         'negociacao_id',
@@ -30,7 +29,8 @@ class NegociacaoProduto extends Model
     ];
 
     protected $casts = [
-        'data_atualizacao_snap_precos_produtos' => 'datetime',
+        'snap_precos_fixados' => 'boolean',
+        'data_atualizacao_snap_precos_produtos' => 'date',
     ];
 
     public function negociacao(): BelongsTo
@@ -38,8 +38,8 @@ class NegociacaoProduto extends Model
         return $this->belongsTo(Negociacao::class);
     }
 
-    public function produto()
+    public function produto(): BelongsTo
     {
-        return $this->belongsTo(Produto::class, 'produto_id');
+        return $this->belongsTo(Produto::class);
     }
 }

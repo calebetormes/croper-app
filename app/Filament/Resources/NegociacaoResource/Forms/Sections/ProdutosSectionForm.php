@@ -4,42 +4,55 @@ namespace App\Filament\Resources\NegociacaoResource\Forms\Sections;
 
 use App\Models\Produto;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\MultiSelect;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 
 class ProdutosSectionForm
 {
     public static function make(): Section
     {
+
         return Section::make('Produtos')
             ->schema([
-                Repeater::make('negociacaoProdutos')
+
+                // 1) MultiSelect para adicionar/remover produtos
+                /*
+                MultiSelect::make('selected_products')
+                    ->label('Adicionar Produtos')
+                    ->options(fn () => Produto::all()->pluck('nome_composto', 'id')->toArray())
+                    ->reactive()
+                    ->afterStateUpdated(function (callable $set, $state) {
+                        // Monta a lista de itens com produto_id
+                        $items = collect($state)->map(fn ($id) => [
+                            'produto_id' => $id,
+                            'volume' => null,
+                            'potencial_produto' => null,
+                            'dose_hectare' => null,
+                            'snap_produto_preco_real_rs' => null,
+                            'snap_produto_preco_real_us' => null,
+                            'snap_produto_preco_virtual_rs' => null,
+                            'snap_produto_preco_virtual_us' => null,
+                            'snap_precos_fixados' => false,
+                            'data_atualizacao_snap_precos_produtos' => now()->toDateString(),
+                        ])->toArray();
+
+                        // Note o statePath aqui: snake_case
+                        $set('negociacao_produtos', $items);
+                    })
+                    ->columnSpan(2),
+                /*
+                Repeater::make('negociacao_produtos')
                     ->relationship('negociacaoProdutos')
-                    ->itemLabel(fn ($record): string => $record->produto?->nome_composto ?? 'Novo item')
-
-                    ->label('Produtos')
+                    ->statePath('negociacao_produtos')
                     ->schema([
-                        Select::make('produto_id')
-                            ->label('Produto')
-                            ->options(fn () => Produto::all()->pluck('nome_composto', 'id')->toArray())
-                            ->searchable()
-                            ->required()
-                            ->reactive()
-                            ->afterStateUpdated(function (int|string $state, Get $get, Set $set) {
-                                $produto = Produto::find($state);
-
-                                $set('snap_produto_preco_real_rs', $produto?->preco_real_rs);
-                                $set('snap_produto_preco_real_us', $produto?->preco_real_us);
-                                $set('snap_produto_preco_virtual_rs', $produto?->preco_virtual_rs);
-                                $set('snap_produto_preco_virtual_us', $produto?->preco_virtual_us);
-
-                                // $set('data_atualizacao_snap_precos_produtos', now());
-                            }),
+                        // *** Campo Hidden para garantir que produto_id venha no payload ***
+                        Hidden::make('produto_id')
+                            ->required(),
 
                         TextInput::make('volume')
                             ->label('Volume')
@@ -48,13 +61,11 @@ class ProdutosSectionForm
 
                         TextInput::make('potencial_produto')
                             ->label('Potencial')
-                            ->numeric()
-                            ->required(),
+                            ->numeric(),
 
                         TextInput::make('dose_hectare')
                             ->label('Dose (ha)')
-                            ->numeric()
-                            ->required(),
+                            ->numeric(),
 
                         TextInput::make('snap_produto_preco_real_rs')
                             ->label('Preço Real (R$)')
@@ -73,36 +84,107 @@ class ProdutosSectionForm
                             ->numeric(),
 
                         Toggle::make('snap_precos_fixados')
-                            ->label('Atualizar Preços')
-                            ->inline()
-                            ->reactive()
-                            ->afterStateUpdated(function (bool $state, Get $get, Set $set) {
-                                if (! $state) {
-                                    return;
-                                }
-
-                                // Pega o produto selecionado no mesmo repeater
-                                $produtoId = $get('produto_id');
-                                $produto = Produto::find($produtoId);
-
-                                if ($produto) {
-                                    $set('snap_produto_preco_real_rs', $produto->preco_real_rs);
-                                    $set('snap_produto_preco_real_us', $produto->preco_real_us);
-                                    $set('snap_produto_preco_virtual_rs', $produto->preco_virtual_rs);
-                                    $set('snap_produto_preco_virtual_us', $produto->preco_virtual_us);
-                                    $set('snap_produto_preco_virtual_us', $produto?->preco_virtual_us);
-                                    // $set('data_atualizacao_snap_precos_produtos', now()->toDateTimeString());
-                                }
-
-                                // “Reseta” o toggle pra deixar pronto pra próxima atualização
-                                $set('snap_precos_fixados', false);
-                            }),
+                            ->label('Preços fixados'),
 
                         DatePicker::make('data_atualizacao_snap_precos_produtos')
-                            ->label('Data de Fixação dos Preços'),
+                            ->label('Data de Atualização'),
                     ])
-                    ->columns(5)
-                    ->columnSpan('full'),
+                    ->columns(2),
+
+                // 2) Repeater para editar os detalhes de cada produto
+                /*
+                Repeater::make('negociacaoProdutos')
+                    ->relationship('negociacaoProdutos')
+                    ->statePath('negociacaoProdutos')
+                    ->schema([
+                        TextInput::make('produto_id')
+                            ->label('Produto ID')
+                            ->disabled(),
+                        TextInput::make('volume')
+                            ->label('Volume')
+                            ->numeric()
+                            ->required(),
+                        TextInput::make('potencial_produto')
+                            ->label('Potencial')
+                            ->numeric(),
+                        TextInput::make('dose_hectare')
+                            ->label('Dose (ha)')
+                            ->numeric(),
+                        TextInput::make('snap_produto_preco_real_rs')
+                            ->label('Preço Real (R$)')
+                            ->numeric(),
+                        TextInput::make('snap_produto_preco_real_us')
+                            ->label('Preço Real (US$)')
+                            ->numeric(),
+                        TextInput::make('snap_produto_preco_virtual_rs')
+                            ->label('Preço Virtual (R$)')
+                            ->numeric(),
+                        TextInput::make('snap_produto_preco_virtual_us')
+                            ->label('Preço Virtual (US$)')
+                            ->numeric(),
+                        Toggle::make('snap_precos_fixados')
+                            ->label('Preços fixados'),
+                        DatePicker::make('data_atualizacao_snap_precos_produtos')
+                            ->label('Data de Atualização'),
+                    ])
+                    ->columns(2),
+                Repeater::make('negociacao_produtos')
+                    ->relationship('negociacaoProdutos')
+                    ->statePath('negociacao_produtos')
+                    ->label('Produtos')
+                    ->schema([
+                        Select::make('produto_id')
+                            ->label('Produto')
+                            ->options(fn () => Produto::all()->pluck('nome_composto', 'id')->toArray())
+                            ->searchable()
+                            ->required(),
+
+                        TextInput::make('volume')
+                            ->label('Volume')
+                            ->numeric()
+                            ->required(),
+
+                        TextInput::make('potencial_produto')
+                            ->label('Potencial')
+                            ->numeric()
+                            ->required(),
+
+                        TextInput::make('dose_hectare')
+                            ->label('Dose (ha)')
+                            ->numeric()
+                            ->required(),
+
+                        TextInput::make('snap_produto_preco_real_rs')
+                            ->label('Preço Real (R$)')
+                            ->numeric()
+                            ->required(),
+
+                        TextInput::make('snap_produto_preco_real_us')
+                            ->label('Preço Real (US$)')
+                            ->numeric()
+                            ->required(),
+
+                        TextInput::make('snap_produto_preco_virtual_rs')
+                            ->label('Preço Virtual (R$)')
+                            ->numeric()
+                            ->required(),
+
+                        TextInput::make('snap_produto_preco_virtual_us')
+                            ->label('Preço Virtual (US$)')
+                            ->numeric()
+                            ->required(),
+
+                        Toggle::make('snap_precos_fixados')
+                            ->label('Preços fixados')
+                            ->default(false),
+
+                        DatePicker::make('data_atualizacao_snap_precos_produtos')
+                            ->label('Data de Atualização')
+                            ->required()
+                            ->default(now()),
+                    ])
+                    ->columns(4),
+                    */
             ]);
     }
 }

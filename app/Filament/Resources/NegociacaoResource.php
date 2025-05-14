@@ -11,6 +11,7 @@ use App\Filament\Resources\NegociacaoResource\Forms\Sections\StatusGeralSectionF
 use App\Filament\Resources\NegociacaoResource\Forms\Sections\StatusValidacoesSectionForm;
 use App\Filament\Resources\NegociacaoResource\Forms\Sections\ValoresSectionForm;
 use App\Filament\Resources\NegociacaoResource\Pages;
+use App\Filament\Resources\NegociacaoResource\RelationManagers\NegociacaoProdutosRelationManager;
 use App\Models\Negociacao;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -58,6 +59,7 @@ class NegociacaoResource extends Resource
     {
         return [
             // Se você tiver RelationManagers, inclua aqui
+            NegociacaoProdutosRelationManager::class,
         ];
     }
 

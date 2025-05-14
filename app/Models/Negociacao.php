@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany; // ← importe o HasMany correto
 
 // se ainda não estiver
@@ -112,21 +111,6 @@ class Negociacao extends Model
     public function statusNegociacao()
     {
         return $this->belongsTo(StatusNegociacao::class, 'status_negociacao_id');
-    }
-
-    /**
-     * Relacionamento muitos-para-muitos com Produto,
-     * usando a tabela pivô negociacoes_produtos.
-     */
-    public function produtos(): BelongsToMany
-    {
-        return $this
-            ->belongsToMany(
-                Produto::class,
-                'negociacoes_produtos',
-                'negociacao_id',
-                'produto_id'
-            );
     }
 
     /**
