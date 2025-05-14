@@ -19,18 +19,36 @@ use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Components\Select;
 use App\Models\Moeda;
 use App\Models\Cultura;
+use Filament\Navigation\NavigationItem;
 
 class PracaCotacaoResource extends Resource
 {
     protected static ?string $model = PracaCotacao::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationLabel = 'PRAÇAS/COTAÇÕES';
+    protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
 
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
 {
     return parent::getEloquentQuery()->with(['moeda', 'cultura']);
 }
 
+public static function getNavigationItems(): array
+{
+    return [
+        NavigationItem::make(static::getNavigationLabel())
+            ->url(static::getUrl())
+            ->icon(static::getNavigationIcon())
+            ->group(static::getNavigationGroup())
+            ->sort(static::getNavigationSort())
+            ->visible(fn () => in_array(auth()->user()?->role_id, [4, 5])),
+    ];
+}
+
+public static function canAccess(): bool
+{
+    return in_array(auth()->user()?->role_id, [4, 5]);
+}
     public static function form(Form $form): Form
     {
         return $form

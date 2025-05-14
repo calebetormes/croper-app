@@ -12,7 +12,7 @@ class GerenteVendedor extends Model
     use LogsActivity;
 
     // Nome da tabela no banco (não segue o padrão pluralizado do Laravel)
-    protected $table = 'gerente_vendedor';
+    protected $table = 'gerentes_vendedores';
 
     // A tabela não tem campos created_at e updated_at
     public $timestamps = false;

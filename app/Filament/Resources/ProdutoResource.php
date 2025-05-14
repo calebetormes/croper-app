@@ -11,28 +11,36 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Navigation\NavigationItem;
 
 class ProdutoResource extends Resource
 {
     protected static ?string $model = Produto::class;
 
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Painel Administrativo';
-    }
-
-    public static function getNavigationCluster(): ?string
-    {
-        return 'PRODUTOS';
-    }
-
-    protected static ?string $navigationGroup = 'Produto';
+    //protected static ?string $navigationGroup = 'Produto';
 
     protected static ?string $navigationIcon = 'heroicon-o-cube';
 
     protected static ?string $navigationLabel = 'PRODUTOS';
 
     protected static ?int $navigationSort = 1;
+
+    public static function getNavigationItems(): array
+    {
+        return [
+            NavigationItem::make(static::getNavigationLabel())
+                ->url(static::getUrl())
+                ->icon(static::getNavigationIcon())
+                ->group(static::getNavigationGroup())
+                ->sort(static::getNavigationSort())
+                ->visible(fn () => in_array(auth()->user()?->role_id, [4, 5])),
+        ];
+    }
+
+    public static function canAccess(): bool
+    {
+        return in_array(auth()->user()?->role_id, [4, 5]);
+    }
 
     public static function form(Form $form): Form
     {

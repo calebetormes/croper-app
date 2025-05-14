@@ -18,12 +18,31 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Navigation\NavigationItem;
 
 class NegociacaoResource extends Resource
 {
     protected static ?string $model = Negociacao::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
+    protected static ?string $navigationLabel = 'NEGOCIAÇÕES';
+
+    public static function getNavigationItems(): array
+    {
+        return [
+            NavigationItem::make(static::getNavigationLabel())
+                ->url(static::getUrl())
+                ->icon(static::getNavigationIcon())
+                ->group(static::getNavigationGroup())
+                ->sort(static::getNavigationSort())
+                ->visible(fn () => in_array(auth()->user()?->role_id, [1, 2, 3, 4, 5])),
+        ];
+    }
+
+    public static function canAccess(): bool
+    {
+        return in_array(auth()->user()?->role_id, [1, 2, 3, 4, 5]);
+    }
 
     public static function form(Form $form): Form
     {
@@ -83,4 +102,10 @@ class NegociacaoResource extends Resource
             default => parent::getEloquentQuery(),
         };
     }
+
+    public static function mutateFormDataBeforeCreate(array $data): array
+{
+    $data['status_negociacao_id'] ??= StatusNegociacao::where('nome', 'Em análise')->value('id');
+    return $data;
+}
 }

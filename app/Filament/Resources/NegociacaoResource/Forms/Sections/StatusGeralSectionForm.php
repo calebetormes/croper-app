@@ -25,6 +25,8 @@ class StatusGeralSectionForm
                         StatusNegociacao::where('nome', 'Entrega de Grãos Realizada')->value('id') => 'success',
                         StatusNegociacao::where('nome', 'Concluído')->value('id') => 'gray',])
                     ->inline()
+                    ->default(StatusNegociacao::where('nome', 'Em análise')->value('id')) // <- Default aplicado
+                    ->dehydrated(true) // <- Garante que será enviado mesmo se desabilitado
                     ->required()
                     ->default(StatusNegociacao::where('nome', 'Em análise')->value('id'))
                     ->reactive()

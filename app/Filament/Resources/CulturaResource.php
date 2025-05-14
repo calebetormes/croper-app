@@ -12,13 +12,34 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Navigation\NavigationItem;
 
 class CulturaResource extends Resource
 {
     protected static ?string $model = Cultura::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Configurações';
+    protected static ?string $navigationLabel = 'Culturas';
+    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
 
+    public static function getNavigationItems(): array
+    {
+        return [
+            NavigationItem::make(static::getNavigationLabel())
+                ->url(static::getUrl())
+                ->icon(static::getNavigationIcon())
+                ->group(static::getNavigationGroup())
+                ->sort(static::getNavigationSort())
+                ->visible(fn () => in_array(auth()->user()?->role_id, [4, 5])),
+        ];
+    }
+
+    public static function canAccess(): bool
+    {
+        return in_array(auth()->user()?->role_id, [4, 5]);
+    }
+
+    
     public static function form(Form $form): Form
     {
         return $form

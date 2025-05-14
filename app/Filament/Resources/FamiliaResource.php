@@ -9,26 +9,33 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Navigation\NavigationItem;
 
 class FamiliaResource extends Resource
 {
     protected static ?string $model = Familia::class;
 
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Painel Administrativo';
-    }
-
-    public static function getNavigationCluster(): ?string
-    {
-        return 'PRODUTOS';
-    }
-
-    protected static ?string $navigationIcon = 'heroicon-o-chevron-right';
-
-    protected static ?string $navigationLabel = 'Famílias';
-
+    protected static ?string $navigationGroup = 'Configurações';
+    protected static ?string $navigationLabel = 'Familias';
+    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
     protected static ?int $navigationSort = 6;
+
+    public static function getNavigationItems(): array
+    {
+        return [
+            NavigationItem::make(static::getNavigationLabel())
+                ->url(static::getUrl())
+                ->icon(static::getNavigationIcon())
+                ->group(static::getNavigationGroup())
+                ->sort(static::getNavigationSort())
+                ->visible(fn () => in_array(auth()->user()?->role_id, [4, 5])),
+        ];
+    }
+
+    public static function canAccess(): bool
+    {
+        return in_array(auth()->user()?->role_id, [4, 5]);
+    }
 
     public static function form(Form $form): Form
     {

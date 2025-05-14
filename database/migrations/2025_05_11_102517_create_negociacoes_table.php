@@ -45,7 +45,7 @@ return new class extends Migration
             $table->boolean('status_validacao')->default(false);
             $table->unsignedBigInteger('status_defensivos')->default(false);
             $table->unsignedBigInteger('status_especialidades')->default(false);
-            $table->foreignId('status_negociacao_id')->constrained('status_negociacoes')->nullable();
+            $table->foreignId('status_negociacao_id')->default(1)->constrained('status_negociacoes');
 
             // Snapshots de preço da praça
             $table->decimal('snap_praca_cotacao_preco', 12, 2)->nullable();

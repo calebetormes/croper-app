@@ -14,7 +14,7 @@ class AdminUserSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'admin@croper.com'],
             [
-                'name' => 'Administrador',
+                'name' => 'Admin',
                 'password' => Hash::make('croper'),
                 'role_id' => 4,
                 'observacoes' => 'Usuário Admin do sistema',
@@ -53,5 +53,16 @@ class AdminUserSeeder extends Seeder
                 'observacoes' => 'Usuário Vendedor do sistema',
             ]
         );
+
+                // Vendedor
+                User::firstOrCreate(
+                    ['email' => 'calebe@croper.com'],
+                    [
+                        'name' => 'Vendedor',
+                        'password' => Hash::make('croper'),
+                        'role_id' => 5,
+                        'observacoes' => 'Usuário Vendedor do sistema',
+                    ]
+                );
     }
 }
