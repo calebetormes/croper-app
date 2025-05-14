@@ -17,8 +17,8 @@ class NegociacaoProdutosRelationManager extends RelationManager
     {
         return $form->schema([
             Forms\Components\Select::make('produto_id')
-                ->label('Produto (ID)')
-                ->options(\App\Models\Produto::pluck('id', 'id'))
+                ->label('Produto')
+                ->options(\App\Models\Produto::all()->sortBy('nome')->pluck('nome_composto', 'id'))
                 ->searchable()
                 ->required(),
 
@@ -62,11 +62,8 @@ class NegociacaoProdutosRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('produto_id')
-                    ->label('Produto ID')
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('volume')
+                Tables\Columns\TextColumn::make('produto.nome_composto')
+                    ->label('Produto')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('potencial_produto')
@@ -75,17 +72,7 @@ class NegociacaoProdutosRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('dose_hectare')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('snap_produto_preco_real_rs')
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('snap_produto_preco_real_us')
-                    ->sortable(),
-
-                Tables\Columns\IconColumn::make('snap_precos_fixados')
-                    ->boolean(),
-
-                Tables\Columns\TextColumn::make('data_atualizacao_snap_precos_produtos')
-                    ->date('d/m/Y')
+                Tables\Columns\TextColumn::make('volume')
                     ->sortable(),
             ])
             ->headerActions([

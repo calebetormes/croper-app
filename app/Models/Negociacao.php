@@ -14,6 +14,10 @@ class Negociacao extends Model
 
     protected $table = 'negociacoes';
 
+    protected $casts = [
+        'negociacaoProdutos' => 'array',
+    ];
+
     /**
      * Campos que podem ser preenchidos em massa (mass assignment)
      * Organizados por blocos lógicos conforme a migration.

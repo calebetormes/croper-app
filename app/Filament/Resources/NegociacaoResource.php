@@ -35,7 +35,7 @@ class NegociacaoResource extends Resource
             ValoresSectionForm::make(),
             StatusValidacoesSectionForm::make(),
             StatusGeralSectionForm::make(),
-            ProdutosSectionForm::make(),
+            // ProdutosSectionForm::make(),
         ]);
     }
 
