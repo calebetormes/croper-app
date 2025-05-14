@@ -12,21 +12,14 @@ use Filament\Tables\Filters\SelectFilter;             // lá no topo
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Navigation\NavigationItem;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
     // rótulo no menu lateral
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Painel Administrativo';
-    }
 
-    public static function getNavigationCluster(): ?string
-    {
-        return 'EQUIPE COMERCIAL';
-    }
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $navigationLabel = 'PESSOAL';
@@ -35,6 +28,23 @@ class UserResource extends Resource
     protected static ?string $modelLabel = 'Pessoal';
 
     protected static ?string $pluralModelLabel = 'Pessoal';
+
+    public static function getNavigationItems(): array
+    {
+        return [
+            NavigationItem::make(static::getNavigationLabel())
+                ->url(static::getUrl())
+                ->icon(static::getNavigationIcon())
+                ->group(static::getNavigationGroup())
+                ->sort(static::getNavigationSort())
+                ->visible(fn () => in_array(auth()->user()?->role_id, [1, 2, 3, 4, 5])),
+        ];
+    }
+
+    public static function canAccess(): bool
+    {
+        return in_array(auth()->user()?->role_id, [1, 2, 3, 4, 5]);
+    }
 
     public static function form(Form $form): Form
     {
@@ -73,7 +83,8 @@ class UserResource extends Resource
                     ->helperText(fn (): ?string => auth()->user()->role->name === 'Administrador' || auth()->user()->role->name === 'Gerente Nacional'
                             ? null
                             : 'Somente Administrador pode alterar este campo'
-                    ),
+                    )
+                    ->dehydrated(),
 
                 Forms\Components\Textarea::make('observacoes')
                     ->columnSpanFull(),
@@ -92,20 +103,15 @@ class UserResource extends Resource
                     ->preload()
                     ->searchable(),
 
-                Forms\Components\MultiSelect::make('gerentes')
+                Forms\Components\Select::make('gerentes')
                     ->label('Gerente')
-                    ->maxItems(1)
+                    //->maxItems(1)
                     ->reactive()
                     ->visible(fn ($get) => in_array($get('role_id'), [1]))
 
                     // só Administrador e Gerente Nacional podem alterar
-                    ->disabled(fn (): bool => ! in_array(auth()->user()->role->name, ['Admin', 'Gerente Nacional'])
-                    )
-                    ->helperText(fn (): ?string => auth()->user()->role->name === 'Administrador' || auth()->user()->role->name === 'Gerente Nacional'
-                            ? null
-                            : 'Somente Administrador pode alterar este campo'
-                    )
-
+                    //->disabled(fn (): bool => ! in_array(auth()->user()->role->name, ['Admin', 'Gerente Nacional'])
+                    //)
                     // padrão: já seleciona o gerente comercial logado
                     ->default(fn (): array => [auth()->id()])
 
@@ -120,7 +126,8 @@ class UserResource extends Resource
                             ]))
                     )
                     ->preload()
-                    ->searchable(),
+                    ->searchable()
+                    ->dehydrated(),
             ]);
     }
 
