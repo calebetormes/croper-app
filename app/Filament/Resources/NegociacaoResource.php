@@ -13,18 +13,22 @@ use App\Filament\Resources\NegociacaoResource\Forms\Sections\ValoresSectionForm;
 use App\Filament\Resources\NegociacaoResource\Pages;
 use App\Filament\Resources\NegociacaoResource\RelationManagers\NegociacaoProdutosRelationManager;
 use App\Models\Negociacao;
+use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Navigation\NavigationItem;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Navigation\NavigationItem;
+use Illuminate\Database\Eloquent\Builder; // já deve existir
 
 class NegociacaoResource extends Resource
 {
     protected static ?string $model = Negociacao::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
+
     protected static ?string $navigationLabel = 'NEGOCIAÇÕES';
 
     public static function getNavigationItems(): array
@@ -69,7 +73,42 @@ class NegociacaoResource extends Resource
                 Tables\Columns\TextColumn::make('cultura.nome')->label('Cultura')->sortable(),
                 Tables\Columns\TextColumn::make('status_negociacao.nome')->label('Status')->sortable(),
             ])
-            ->filters([])
+            ->filters([
+                // filtro de intervalo de datas
+                Filter::make('data_negocio')
+                    ->label('Data')
+                    ->form([
+                        Forms\Components\DatePicker::make('from')->label('De'),
+                        Forms\Components\DatePicker::make('until')->label('Até'),
+                    ])
+                    ->query(fn ($query, array $data) => $query
+                        ->when($data['from'], fn ($q) => $q->whereDate('data_negocio', '>=', $data['from']))
+                        ->when($data['until'], fn ($q) => $q->whereDate('data_negocio', '<=', $data['until']))
+                    ),
+
+                // filtro por gerente
+                SelectFilter::make('gerente_id')
+                    ->multiple()
+                    ->label('Gerente')
+                    ->relationship('gerente', 'name')
+                    // ->preload()
+                    ->searchable(),
+
+                // filtro por vendedor
+                SelectFilter::make('vendedor_id')
+                    ->multiple()
+                    ->label('Vendedor')
+                    ->relationship('vendedor', 'name')
+                    ->searchable(),
+
+                // filtro por status
+                SelectFilter::make('status_negociacao_id')
+                    ->label('Status')
+                    ->relationship('statusNegociacao', 'nome')
+                    ->searchable()
+                    ->multiple()
+                    ->preload(),
+            ])
             ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([Tables\Actions\DeleteBulkAction::make()]);
     }
@@ -104,8 +143,9 @@ class NegociacaoResource extends Resource
     }
 
     public static function mutateFormDataBeforeCreate(array $data): array
-{
-    $data['status_negociacao_id'] ??= StatusNegociacao::where('nome', 'Em análise')->value('id');
-    return $data;
-}
+    {
+        $data['status_negociacao_id'] ??= StatusNegociacao::where('nome', 'Em análise')->value('id');
+
+        return $data;
+    }
 }

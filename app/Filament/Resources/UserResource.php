@@ -6,9 +6,9 @@ use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Navigation\NavigationItem;
+use Filament\Navigation\NavigationItem;             // lá no topo
 use Filament\Resources\Resource;             // lá no topo
-use Filament\Tables;             // lá no topo
+use Filament\Tables;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
