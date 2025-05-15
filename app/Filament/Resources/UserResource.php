@@ -6,13 +6,13 @@ use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use Filament\Navigation\NavigationItem;
+use Filament\Resources\Resource;             // lá no topo
 use Filament\Tables;             // lá no topo
-use Filament\Tables\Filters\SelectFilter;             // lá no topo
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Filament\Navigation\NavigationItem;
 
 class UserResource extends Resource
 {
@@ -101,17 +101,23 @@ class UserResource extends Resource
                             ->whereHas('role', fn ($q) => $q->where('name', 'Vendedor'))
                     )
                     ->preload()
-                    ->searchable(),
+                    ->searchable()
+                    ->dehydrated(),
 
-                Forms\Components\Select::make('gerentes')
+                Forms\Components\MultiSelect::make('gerentes')
                     ->label('Gerente')
-                    //->maxItems(1)
+                    ->maxItems(1)
                     ->reactive()
                     ->visible(fn ($get) => in_array($get('role_id'), [1]))
 
                     // só Administrador e Gerente Nacional podem alterar
-                    //->disabled(fn (): bool => ! in_array(auth()->user()->role->name, ['Admin', 'Gerente Nacional'])
-                    //)
+                    ->disabled(fn (): bool => ! in_array(auth()->user()->role->name, ['Admin', 'Gerente Nacional'])
+                    )
+                    ->helperText(fn (): ?string => auth()->user()->role->name === 'Administrador' || auth()->user()->role->name === 'Gerente Nacional'
+                            ? null
+                            : 'Somente Administrador pode alterar este campo'
+                    )
+
                     // padrão: já seleciona o gerente comercial logado
                     ->default(fn (): array => [auth()->id()])
 
@@ -203,7 +209,7 @@ class UserResource extends Resource
         return in_array(auth()->user()->role->name, [
             'Admin',
             'Gerente Nacional',
-            'Gerente Comercial',
+            'dev-admin',
         ]);
     }
 
