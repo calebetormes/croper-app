@@ -7,9 +7,9 @@ use App\Models\Cultura;
 use App\Models\Moeda;
 use App\Models\PracaCotacao;
 use Carbon\Carbon;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
+use Filament\Resources\Pages\ListRecords;
 use League\Csv\Reader;
 
 class ListPracaCotacaos extends ListRecords
@@ -33,9 +33,9 @@ class ListPracaCotacaos extends ListRecords
                 ])
                 ->action(function (array $data) {
                     $relativePath = $data['arquivo']; // ex: csv/arquivo.csv
-                    $path = storage_path('app/public/' . $relativePath); // caminho real
+                    $path = storage_path('app/public/'.$relativePath); // caminho real
 
-                    if (!file_exists($path)) {
+                    if (! file_exists($path)) {
                         throw new \Exception("Arquivo CSV não encontrado: $path");
                     }
 
@@ -44,19 +44,19 @@ class ListPracaCotacaos extends ListRecords
                     $csv->setHeaderOffset(0);
 
                     foreach ($csv->getRecords() as $row) {
-                        $cidade       = trim($row['PRAÇA'] ?? '');
-                        $precoTxt     = trim($row['PREÇO'] ?? '');
-                        $vencimento   = trim($row['VENCIMENTO'] ?? '');
-                        $moedaNome    = trim($row['MOEDA'] ?? '');
-                        $culturaNome  = trim($row['CULTURA'] ?? '');
+                        $cidade = trim($row['PRAÇA'] ?? '');
+                        $precoTxt = trim($row['PREÇO'] ?? '');
+                        $vencimento = trim($row['VENCIMENTO'] ?? '');
+                        $moedaNome = trim($row['MOEDA'] ?? '');
+                        $culturaNome = trim($row['CULTURA'] ?? '');
 
                         if (! $cidade || ! $precoTxt || ! $vencimento || ! $moedaNome || ! $culturaNome) {
                             continue;
                         }
 
                         $moeda = Moeda::where('nome', $moedaNome)
-                                      ->orWhere('sigla', $moedaNome)
-                                      ->first();
+                            ->orWhere('sigla', $moedaNome)
+                            ->first();
 
                         $cultura = Cultura::where('nome', $culturaNome)->first();
 
@@ -74,11 +74,11 @@ class ListPracaCotacaos extends ListRecords
                         }
 
                         PracaCotacao::create([
-                            'cidade'                => $cidade,
-                            'data_vencimento'       => $dataVenc,
-                            'praca_cotacao_preco'   => floatval($valor),
-                            'moeda_id'              => $moeda->id,
-                            'cultura_id'            => $cultura->id,
+                            'cidade' => $cidade,
+                            'data_vencimento' => $dataVenc,
+                            'praca_cotacao_preco' => floatval($valor),
+                            'moeda_id' => $moeda->id,
+                            'cultura_id' => $cultura->id,
                         ]);
                     }
                 })

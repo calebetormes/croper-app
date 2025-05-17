@@ -58,6 +58,15 @@ class AdminPanelProvider extends PanelProvider
 
             ->plugin(
                 ThemesPlugin::make()
-            );
+            )
+
+                        // seta o logo principal (URL ou asset)
+            ->brandLogo(asset('images/logo.svg'))                                // :contentReference[oaicite:0]{index=0}
+            // seta um logo alternativo para o dark mode (opcional)
+            ->darkModeBrandLogo(asset('images/logo-dark.svg'))                   // :contentReference[oaicite:1]{index=1}
+            // ajusta a altura do logo, se necessário (ex.: '2rem', '3rem', etc.)
+            ->brandLogoHeight('2rem')                                            // :contentReference[oaicite:2]{index=2}
+            // seta o favicon (URL ou asset)
+            ->favicon(asset('images/favicon.ico'));                               // :contentReference[oaicite:3]{index=3}
     }
 }
