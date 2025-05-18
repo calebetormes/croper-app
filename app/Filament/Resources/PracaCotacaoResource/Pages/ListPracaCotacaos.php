@@ -11,6 +11,7 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Resources\Pages\ListRecords;
 use League\Csv\Reader;
+use Filament\Actions;
 
 class ListPracaCotacaos extends ListRecords
 {
@@ -83,6 +84,10 @@ class ListPracaCotacaos extends ListRecords
                     }
                 })
                 ->successNotificationTitle('Importação concluída com sucesso!'),
+
+            Actions\CreateAction::make()
+                ->label('Adicionar Nova Praça de Cotação')
+                ->url(fn () => PracaCotacaoResource::getUrl('create')),
         ];
     }
 }

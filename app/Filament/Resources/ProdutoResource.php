@@ -12,6 +12,16 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Navigation\NavigationItem;
+use App\Filament\Resources\ProdutoResource\Pages\ProdutoImport;
+use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Actions\CreateAction;        // <— aqui
+use Filament\Tables\Actions\Action;
+
+
+
+
+use Maatwebsite\Excel\Facades\Excel;
+use Filament\Notifications\Notification;
 
 class ProdutoResource extends Resource
 {
@@ -121,6 +131,33 @@ class ProdutoResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+        ->headerActions([
+            CreateAction::make(),
+            Action::make('importarCSV')
+                ->label('Importar CSV')
+                ->icon('heroicon-o-cube')
+                ->form([
+                    FileUpload::make('csv_file')
+                        ->label('Arquivo CSV')
+                        ->acceptedFileTypes(['text/csv', '.csv'])
+                        ->disk('local') // armazena em storage/app
+                        ->required(),
+                ])
+                ->action(function (array $data): void {
+                    // monta o caminho completo do CSV no disco local
+                    $relativePath = $data['csv_file'];
+                    $fullPath = storage_path('app/' . $relativePath);
+
+                    // importa em massa
+                    Excel::import(new ProdutoImport(), $fullPath);
+
+                    Notification::make()
+                        ->success()
+                        ->title('Importação concluída!')
+                        ->body('Todos os produtos foram importados com sucesso.')
+                        ->send();
+                }),
+        ])
             ->columns([
                 TextColumn::make('classe.nome')
                     ->label('Classe')
