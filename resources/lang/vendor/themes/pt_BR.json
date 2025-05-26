@@ -1,0 +1,13 @@
+{
+    "themes::themes.themes": "Alterar Tema",
+    "themes::themes.custom": "Personalizada",
+    "themes::themes.select": "Selecionar Tema",
+    "themes::themes.select_interface": "Selecionar Interface",
+    "themes::themes.light": "Modo Claro",
+    "themes::themes.dark": "Modo Escuro",
+    "themes::themes.no_light_mode": "Modo Claro",
+    "themes::themes.primary_color": "Cor Principal",
+    "themes::themes.select_base_color": "Selecionar",
+    "themes::themes.primary_color_set": "Cor Personalizada",
+    "themes::themes.appearance": "Configurações do Tema"
+}

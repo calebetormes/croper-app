@@ -76,7 +76,8 @@ class NegociacaoProdutosRelationManager extends RelationManager
                     ->sortable(),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->label('Adicionar Produtos a Negociação'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

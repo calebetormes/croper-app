@@ -58,9 +58,13 @@ class AdminPanelProvider extends PanelProvider
 
             ->plugin(
                 ThemesPlugin::make()
+                    ->canViewThemesPage(
+                        fn(): bool => auth()->check()
+                        && auth()->user()?->role?->name === 'Admin'
+                    )
             )
 
-                        // seta o logo principal (URL ou asset)
+            // seta o logo principal (URL ou asset)
             ->brandLogo(asset('images/logo.svg'))                                // :contentReference[oaicite:0]{index=0}
             // seta um logo alternativo para o dark mode (opcional)
             ->darkModeBrandLogo(asset('images/logo-dark.svg'))                   // :contentReference[oaicite:1]{index=1}

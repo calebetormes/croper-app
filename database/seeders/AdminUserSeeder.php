@@ -14,7 +14,7 @@ class AdminUserSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'admin@croper.com'],
             [
-                'name' => 'Admin',
+                'name' => 'User Admin',
                 'password' => Hash::make('croper'),
                 'role_id' => 4,
                 'observacoes' => 'Usuário Admin do sistema',
@@ -25,7 +25,7 @@ class AdminUserSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'nacional@croper.com'],
             [
-                'name' => 'Gerente Nacional',
+                'name' => 'User Gerente Nacional',
                 'password' => Hash::make('croper'),
                 'role_id' => 3,
                 'observacoes' => 'Usuário Gerente Nacional do sistema',
@@ -36,7 +36,7 @@ class AdminUserSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'comercial@croper.com'],
             [
-                'name' => 'Gerente Comercial',
+                'name' => 'User Gerente Comercial',
                 'password' => Hash::make('croper'),
                 'role_id' => 2,
                 'observacoes' => 'Usuário Gerente Comercial do sistema',
@@ -47,22 +47,22 @@ class AdminUserSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'vendedor@croper.com'],
             [
-                'name' => 'Vendedor',
+                'name' => 'User Vendedor',
                 'password' => Hash::make('croper'),
                 'role_id' => 1,
                 'observacoes' => 'Usuário Vendedor do sistema',
             ]
         );
 
-                // Vendedor
-                User::firstOrCreate(
-                    ['email' => 'calebe@croper.com'],
-                    [
-                        'name' => 'Vendedor',
-                        'password' => Hash::make('croper'),
-                        'role_id' => 5,
-                        'observacoes' => 'Usuário Vendedor do sistema',
-                    ]
-                );
+        // Vendedor
+        User::firstOrCreate(
+            ['email' => 'dev@croper.com'],
+            [
+                'name' => 'Dev Admin',
+                'password' => Hash::make('croper'),
+                'role_id' => 5,
+                'observacoes' => 'Usuário desenvolvedor do sistema',
+            ]
+        );
     }
 }
