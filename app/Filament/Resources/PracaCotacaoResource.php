@@ -29,36 +29,36 @@ class PracaCotacaoResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
 
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
-{
-    return parent::getEloquentQuery()->with(['moeda', 'cultura']);
-}
+    {
+        return parent::getEloquentQuery()->with(['moeda', 'cultura']);
+    }
 
-public static function getNavigationItems(): array
-{
-    return [
-        NavigationItem::make(static::getNavigationLabel())
-            ->url(static::getUrl())
-            ->icon(static::getNavigationIcon())
-            ->group(static::getNavigationGroup())
-            ->sort(static::getNavigationSort())
-            ->visible(fn () => in_array(auth()->user()?->role_id, [4, 5])),
-    ];
-}
+    public static function getNavigationItems(): array
+    {
+        return [
+            NavigationItem::make(static::getNavigationLabel())
+                ->url(static::getUrl())
+                ->icon(static::getNavigationIcon())
+                ->group(static::getNavigationGroup())
+                ->sort(static::getNavigationSort())
+                ->visible(fn() => in_array(auth()->user()?->role_id, [4, 5])),
+        ];
+    }
 
-public static function canAccess(): bool
-{
-    return in_array(auth()->user()?->role_id, [4, 5]);
-}
+    public static function canAccess(): bool
+    {
+        return in_array(auth()->user()?->role_id, [4, 5]);
+    }
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Select::make('cidade')
-                ->label('Cidade')
-                ->searchable()
-                ->options(collect(config('cidades'))->mapWithKeys(fn ($cidade) => [$cidade => $cidade])->toArray())
-                ->required(),
-                
+                    ->label('Cidade')
+                    ->searchable()
+                    ->options(collect(config('cidades'))->mapWithKeys(fn($cidade) => [$cidade => $cidade])->toArray())
+                    ->required(),
+
                 Forms\Components\DatePicker::make('data_vencimento')
                     ->required(),
 
@@ -72,20 +72,19 @@ public static function canAccess(): bool
                         $moeda = Moeda::find($moedaId);
                         return $moeda?->sigla ?? '';
                     })
-                    ->inputMode('decimal'),    // teclado numérico
-                     
+                    ->inputMode('decimal'),
+
                 ToggleButtons::make('cultura_id')
                     ->label('Cultura')
-                    ->options([
-                        1 => 'SOJA',
-                        2 => 'MILHO',
-                    ])
+                    ->options(
+                        options: fn() => Cultura::pluck('nome', 'id')->toArray()
+                    )
                     ->inline()
                     ->required(),
 
                 ToggleButtons::make('moeda_id')
                     ->label('Moeda')
-                    ->options(fn () => \App\Models\Moeda::all()->pluck('nome', 'id')->toArray())
+                    ->options(fn() => \App\Models\Moeda::all()->pluck('nome', 'id')->toArray())
                     ->inline()
                     ->reactive()
                     ->required()
@@ -99,7 +98,7 @@ public static function canAccess(): bool
                 TextColumn::make('cidade')
                     ->label('Cidade')
                     ->searchable(),
-    
+
                 TextColumn::make('praca_cotacao_preco')
                     ->label('Preço')
                     ->formatStateUsing(function ($state, $record) {
@@ -107,12 +106,12 @@ public static function canAccess(): bool
                         return $sigla . ' ' . number_format($state, 2, ',', '.');
                     })
                     ->sortable(),
-    
+
                 TextColumn::make('data_vencimento')
                     ->label('Data de Vencimento')
                     ->date()
                     ->sortable(),
-    
+
                 TextColumn::make('cultura.nome')
                     ->label('Cultura')
                     ->sortable(),

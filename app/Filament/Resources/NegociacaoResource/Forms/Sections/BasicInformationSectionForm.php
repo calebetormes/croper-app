@@ -30,17 +30,17 @@ class BasicInformationSectionForm
                     ->options(Moeda::pluck('sigla', 'id')->toArray())
                     ->required()
                     ->inline(),
-                    
-                    Select::make('vendedor_id')
+
+                Select::make('vendedor_id')
                     ->label('RTV')
                     ->options(function () {
                         $user = auth()->user();
                         $role = optional($user->role)->name;
-                
+
                         if ($role === 'Vendedor') {
                             return [$user->id => $user->name];
                         }
-                
+
                         if ($role === 'Gerente Comercial') {
                             return \App\Models\GerenteVendedor::where('gerente_id', $user->id)
                                 ->with('vendedor')
@@ -48,45 +48,45 @@ class BasicInformationSectionForm
                                 ->pluck('vendedor.name', 'vendedor.id')
                                 ->toArray();
                         }
-                
+
                         return \App\Models\User::pluck('name', 'id')->toArray();
                     })
                     ->default(function () {
                         $user = auth()->user();
                         return optional($user->role)->name === 'Vendedor' ? $user->id : null;
                     })
-                    ->disabled(fn () => optional(auth()->user()->role)->name === 'Vendedor')
+                    ->disabled(fn() => optional(auth()->user()->role)->name === 'Vendedor')
                     ->searchable()
                     ->required()
                     ->dehydrated(),
 
-                    Select::make('gerente_id')
-                    ->label('Gerente')
+                Select::make('gerente_id')
+                    ->label('GRV')
                     ->options(function () {
                         $user = auth()->user();
-                
+
                         if ($user?->role?->name === 'Vendedor') {
                             // Busca o gerente vinculado a este vendedor
                             $gerente = \App\Models\GerenteVendedor::where('vendedor_id', $user->id)
                                 ->with('gerente')
                                 ->first()?->gerente;
-                
+
                             return $gerente ? [$gerente->id => $gerente->name] : [];
                         }
-                
+
                         // Caso contrário, lista todos os gerentes
                         return User::whereRelation('role', 'name', 'Gerente Comercial')->pluck('name', 'id')->toArray();
                     })
                     ->default(function () {
                         $user = auth()->user();
-                
+
                         if ($user?->role?->name === 'Vendedor') {
                             return \App\Models\GerenteVendedor::where('vendedor_id', $user->id)->value('gerente_id');
                         }
-                
+
                         return null;
                     })
-                    ->disabled(fn () => auth()->user()?->role?->name === 'Vendedor')
+                    ->disabled(fn() => auth()->user()?->role?->name === 'Vendedor')
                     ->searchable()
                     ->required()
                     ->dehydrated(),
