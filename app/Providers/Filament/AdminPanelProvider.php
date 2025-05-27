@@ -30,9 +30,11 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->profile()
+
             ->colors([
                 'primary' => Color::Amber,
             ])
+
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
@@ -40,6 +42,7 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
             ])
+
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -52,6 +55,7 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
                 SetTheme::class,
             ])
+
             ->authMiddleware([
                 Authenticate::class,
             ])
@@ -64,13 +68,9 @@ class AdminPanelProvider extends PanelProvider
                     )
             )
 
-            // seta o logo principal (URL ou asset)
-            ->brandLogo(asset('images/logo.svg'))                                // :contentReference[oaicite:0]{index=0}
-            // seta um logo alternativo para o dark mode (opcional)
-            ->darkModeBrandLogo(asset('images/logo-dark.svg'))                   // :contentReference[oaicite:1]{index=1}
-            // ajusta a altura do logo, se necessário (ex.: '2rem', '3rem', etc.)
-            ->brandLogoHeight('2rem')                                            // :contentReference[oaicite:2]{index=2}
-            // seta o favicon (URL ou asset)
-            ->favicon(asset('images/favicon.ico'));                               // :contentReference[oaicite:3]{index=3}
+            ->brandLogo(asset('images/logo.svg'))
+            ->darkModeBrandLogo(asset('images/logo-dark.svg'))
+            ->brandLogoHeight('2rem')
+            ->favicon(asset('images/favicon.ico'));
     }
 }
