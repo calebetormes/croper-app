@@ -25,6 +25,7 @@ class Produto extends Model
         'preco_virtual_us',
         'custo_rs',
         'custo_us',
+        'fator_multiplicador',
     ];
 
     public function classe()

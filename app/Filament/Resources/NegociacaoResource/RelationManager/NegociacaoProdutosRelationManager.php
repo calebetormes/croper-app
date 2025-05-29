@@ -6,6 +6,8 @@ use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Forms\Get;
+use App\Models\Produto;
 
 class NegociacaoProdutosRelationManager extends RelationManager
 {
@@ -15,16 +17,46 @@ class NegociacaoProdutosRelationManager extends RelationManager
 
     public function form(Forms\Form $form): Forms\Form
     {
+
+        $opt = Produto::all()
+            ->mapWithKeys(fn($p) => [$p->id => $p->nome_composto])
+            ->toArray();
+
         return $form->schema([
+
             Forms\Components\Select::make('produto_id')
                 ->label('Produto')
-                ->options(\App\Models\Produto::all()->sortBy('nome')->pluck('nome_composto', 'id'))
+                ->options($opt)
                 ->searchable()
-                ->required(),
+                ->required()
+                ->reactive(),
 
             Forms\Components\TextInput::make('volume')
+                ->label('Volume')
                 ->numeric()
-                ->required(),
+                ->required()
+                ->step(
+                    fn(Get $get) =>
+                    optional(Produto::find($get('produto_id')))
+                        ->fator_multiplicador
+                    ?? 1
+                )
+                ->rules(fn(Get $get) => [
+                    'required',
+                    'numeric',
+                    'multiple_of:' .
+                    (optional(Produto::find($get('produto_id')))
+                        ->fator_multiplicador
+                        ?? 1),
+                ])
+                ->helperText(
+                    fn(Get $get) =>
+                    'Somente múltiplos de ' .
+                    (optional(Produto::find($get('produto_id')))
+                        ->fator_multiplicador
+                        ?? 1)
+                ),
+
 
             Forms\Components\TextInput::make('snap_produto_preco_real_rs')
                 ->numeric()

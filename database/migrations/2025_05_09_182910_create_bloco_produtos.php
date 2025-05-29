@@ -56,6 +56,7 @@ return new class extends Migration {
             $table->decimal('preco_virtual_us', 12, 2);
             $table->decimal('custo_rs', 12, 2);
             $table->decimal('custo_us', 12, 2);
+            $table->decimal('fator_multiplicador', 12, 2)->nullable(); // peso do produto em kg
 
             // chaves estrangeiras
             $table->foreign('classe_id')

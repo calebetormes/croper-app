@@ -120,6 +120,12 @@ class ProdutoResource extends Resource
                     ->label('Custo (U$)')
                     ->numeric()
                     ->required(),
+
+                TextInput::make('fator_multiplicador')
+                    ->label('Fator Multiplicador')
+                    ->numeric()
+                    ->default(1)
+                    ->required(),
             ]);
     }
 

@@ -68,6 +68,7 @@ Table produtos {
   preco_virtual_us decimal(12,2)
   custo_rs decimal(12,2)
   custo_us decimal(12,2)
+  fator_multiplicador decimal(12,2) // Fator de multiplicação para o volume 
 }
 
 Table produtos_classes {
