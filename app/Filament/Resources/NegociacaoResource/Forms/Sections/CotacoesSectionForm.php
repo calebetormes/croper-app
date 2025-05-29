@@ -30,13 +30,13 @@ class CotacoesSectionForm
                 Select::make('praca_cotacao_id')
                     ->label('Praça')
                     ->reactive()
-                    ->options(fn ($get) => Cultura::find($get('cultura_id'))?->pracasCotacao->whereNotNull('cidade')->pluck('cidade', 'id')->toArray() ?? [])
-                    ->disabled(fn ($get) => ! $get('cultura_id'))
+                    ->options(fn($get) => Cultura::find($get('cultura_id'))?->pracasCotacao->whereNotNull('cidade')->pluck('cidade', 'id')->toArray() ?? [])
+                    ->disabled(fn($get) => !$get('cultura_id'))
                     ->required()
                     ->searchable()
                     ->afterStateUpdated(function ($state, $set) {
                         $cotacao = PracaCotacao::find($state);
-                        $data   = $cotacao && $cotacao->data_vencimento
+                        $data = $cotacao && $cotacao->data_vencimento
                             ? Carbon::parse($cotacao->data_vencimento)->format('d/m/Y')
                             : null;
                         $set('data_praca_vencimento', $data);
@@ -50,7 +50,8 @@ class CotacoesSectionForm
                     ->reactive(),
                 Placeholder::make('data_praca_vencimento')
                     ->label('Data da Cotação')
-                    ->content(fn ($get) => $get('praca_cotacao_id')
+                    ->content(
+                        fn($get) => $get('praca_cotacao_id')
                         ? Carbon::parse(PracaCotacao::find($get('praca_cotacao_id'))->data_vencimento)->format('d/m/Y')
                         : 'Nenhuma cotação selecionada'
                     )
@@ -61,7 +62,7 @@ class CotacoesSectionForm
                         ->label('Atualizar Preço da Praça')
                         ->color('primary')
                         ->icon('heroicon-o-arrow-path')
-                        ->visible(fn ($get) => $get('praca_cotacao_id'))
+                        ->visible(fn($get) => $get('praca_cotacao_id'))
                         ->action(function ($get, $set) {
                             $cotacao = PracaCotacao::find($get('praca_cotacao_id'));
                             $set('snap_praca_cotacao_preco', $cotacao?->praca_cotacao_preco);
@@ -70,6 +71,7 @@ class CotacoesSectionForm
                 ]),
                 DatePicker::make('data_atualizacao_snap_preco_praca_cotacao')
                     ->label('Preço fixado no dia')
+                    ->default(fn() => Carbon::now()->format('Y-m-d'))
                     ->disabled()
                     ->dehydrated()
                     ->reactive(),

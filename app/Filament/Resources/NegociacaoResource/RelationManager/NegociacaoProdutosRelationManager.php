@@ -26,14 +26,6 @@ class NegociacaoProdutosRelationManager extends RelationManager
                 ->numeric()
                 ->required(),
 
-            Forms\Components\TextInput::make('potencial_produto')
-                ->numeric()
-                ->required(),
-
-            Forms\Components\TextInput::make('dose_hectare')
-                ->numeric()
-                ->required(),
-
             Forms\Components\TextInput::make('snap_produto_preco_real_rs')
                 ->numeric()
                 ->required(),
@@ -64,12 +56,6 @@ class NegociacaoProdutosRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('produto.nome_composto')
                     ->label('Produto')
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('potencial_produto')
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('dose_hectare')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('volume')

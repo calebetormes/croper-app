@@ -19,7 +19,7 @@ class NegociacoesProdutosSeeder extends Seeder
         $negociacaoId = DB::table('negociacoes')->value('id');
         $produtoId = DB::table('produtos')->value('id');
 
-        if (! $negociacaoId || ! $produtoId) {
+        if (!$negociacaoId || !$produtoId) {
             $this->command->info('Tabela negociacoes ou produtos está vazia. Seeder ignorado.');
 
             return;
@@ -29,8 +29,6 @@ class NegociacoesProdutosSeeder extends Seeder
             'negociacao_id' => $negociacaoId,
             'produto_id' => $produtoId,
             'volume' => 100.00,
-            'potencial_produto' => 250.00,
-            'dose_hectare' => 1.75,
             'snap_produto_preco_real_rs' => 500.00,
             'snap_produto_preco_real_us' => 100.00,
             'snap_produto_preco_virtual_rs' => 450.00,

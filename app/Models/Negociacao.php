@@ -4,9 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany; // ← importe o HasMany correto
-
-// se ainda não estiver
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Negociacao extends Model
 {
@@ -18,11 +16,19 @@ class Negociacao extends Model
         'negociacaoProdutos' => 'array',
     ];
 
-    /**
-     * Campos que podem ser preenchidos em massa (mass assignment)
-     * Organizados por blocos lógicos conforme a migration.
-     */
+
+    protected static function booted()
+    {
+        static::created(function (Negociacao $negociacao) {
+            $negociacao->updateQuietly([
+                'pedido_id' => str_pad($negociacao->id, 6, '0', STR_PAD_LEFT), // ← padding para 6 dígitos
+            ]);
+        });
+    }
+
     protected $fillable = [
+
+        'pedido_id',
 
         // Datas principais
         'data_versao',
@@ -65,61 +71,54 @@ class Negociacao extends Model
         'snap_praca_cotacao_preco_fixado',
         'data_atualizacao_snap_preco_praca_cotacao',
 
+
         // Observações
         'observacoes',
     ];
 
-    // Relação com a moeda utilizada na negociação
+
     public function moeda()
     {
         return $this->belongsTo(Moeda::class);
     }
 
-    // Relação com o gerente da negociação
+
     public function gerente()
     {
         return $this->belongsTo(User::class, 'gerente_id');
     }
 
-    // Relação com o vendedor responsável
     public function vendedor()
     {
         return $this->belongsTo(User::class, 'vendedor_id');
     }
 
-    // Relação com a cultura agrícola da negociação
+
     public function cultura()
     {
         return $this->belongsTo(Cultura::class);
     }
 
-    // Relação com a praça de cotação associada
     public function pracaCotacao()
     {
         return $this->belongsTo(PracaCotacao::class, 'praca_cotacao_id');
     }
 
-    // Relação com a condição de pagamento
     public function pagamento()
     {
         return $this->belongsTo(Pagamento::class);
     }
 
-    // Relação com o nível de validação do processo
     public function nivelValidacao()
     {
         return $this->belongsTo(NivelValidacao::class, 'nivel_validacao_id');
     }
 
-    // Relação com o status atual da negociação
     public function statusNegociacao()
     {
         return $this->belongsTo(StatusNegociacao::class, 'status_negociacao_id');
     }
 
-    /**
-     * Relação com o pivot NegociacaoProduto
-     */
     public function negociacaoProdutos(): HasMany
     {
         return $this->hasMany(NegociacaoProduto::class, 'negociacao_id');

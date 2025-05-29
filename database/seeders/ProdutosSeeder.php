@@ -28,6 +28,7 @@ class ProdutosSeeder extends Seeder
                 'preco_virtual_rs' => 90.00,
                 'preco_virtual_us' => 18.00,
                 'custo_rs' => 80.00,
+                'custo_us' => 16.00,
             ],
             [
                 'classe_id' => 1,
@@ -42,6 +43,7 @@ class ProdutosSeeder extends Seeder
                 'preco_virtual_rs' => 110.00,
                 'preco_virtual_us' => 22.00,
                 'custo_rs' => 96.00,
+                'custo_us' => 16.00,
             ],
             [
                 'classe_id' => 2,
@@ -56,6 +58,7 @@ class ProdutosSeeder extends Seeder
                 'preco_virtual_rs' => 72.00,
                 'preco_virtual_us' => 14.40,
                 'custo_rs' => 64.00,
+                'custo_us' => 16.00,
             ],
             [
                 'classe_id' => 2,
@@ -70,6 +73,7 @@ class ProdutosSeeder extends Seeder
                 'preco_virtual_rs' => 54.00,
                 'preco_virtual_us' => 10.80,
                 'custo_rs' => 48.00,
+                'custo_us' => 16.00,
             ],
             [
                 'classe_id' => 3,
@@ -84,6 +88,7 @@ class ProdutosSeeder extends Seeder
                 'preco_virtual_rs' => 180.00,
                 'preco_virtual_us' => 36.00,
                 'custo_rs' => 160.00,
+                'custo_us' => 16.00,
             ],
             [
                 'classe_id' => 1,
@@ -98,6 +103,7 @@ class ProdutosSeeder extends Seeder
                 'preco_virtual_rs' => 45.00,
                 'preco_virtual_us' => 9.00,
                 'custo_rs' => 40.00,
+                'custo_us' => 16.00,
             ],
             [
                 'classe_id' => 3,
@@ -112,6 +118,7 @@ class ProdutosSeeder extends Seeder
                 'preco_virtual_rs' => 270.00,
                 'preco_virtual_us' => 54.00,
                 'custo_rs' => 240.00,
+                'custo_us' => 16.00,
             ],
             [
                 'classe_id' => 2,
@@ -126,6 +133,7 @@ class ProdutosSeeder extends Seeder
                 'preco_virtual_rs' => 81.00,
                 'preco_virtual_us' => 16.20,
                 'custo_rs' => 72.00,
+                'custo_us' => 16.00,
             ],
             [
                 'classe_id' => 3,
@@ -140,6 +148,7 @@ class ProdutosSeeder extends Seeder
                 'preco_virtual_rs' => 225.00,
                 'preco_virtual_us' => 45.00,
                 'custo_rs' => 200.00,
+                'custo_us' => 16.00,
             ],
             [
                 'classe_id' => 1,
@@ -154,6 +163,7 @@ class ProdutosSeeder extends Seeder
                 'preco_virtual_rs' => 63.00,
                 'preco_virtual_us' => 12.60,
                 'custo_rs' => 56.00,
+                'custo_us' => 16.00,
             ],
         ];
 

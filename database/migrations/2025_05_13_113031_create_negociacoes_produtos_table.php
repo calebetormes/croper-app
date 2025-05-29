@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -18,8 +17,6 @@ return new class extends Migration
             $table->unsignedBigInteger('negociacao_id');
             $table->unsignedInteger('produto_id');
             $table->decimal('volume', 12, 2);
-            $table->decimal('potencial_produto', 12, 2);
-            $table->decimal('dose_hectare', 12, 2);
 
             // Campos snapshot para os preços
             $table->decimal('snap_produto_preco_real_rs', 12, 2);

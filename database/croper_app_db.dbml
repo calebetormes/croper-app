@@ -67,6 +67,7 @@ Table produtos {
   preco_real_us decimal(12,2)
   preco_virtual_us decimal(12,2)
   custo_rs decimal(12,2)
+  custo_us decimal(12,2)
 }
 
 Table produtos_classes {
@@ -146,6 +147,7 @@ Table pracas_cotacoes {
 
 Table negociacoes {
   id int [pk, increment]
+  pedido_id int [unique]
   //
   data_versao date
   data_negocio date
@@ -191,8 +193,6 @@ Table negociacoes_produtos {
   negociacao_id int [ref: > negociacoes.id]
   produto_id int [ref: > produtos.id]
   volume decimal(12,2) // Alterado de varchar
-  potencial_produto decimal(12,2) 
-  dose_hectare decimal(12,2)
 
   //campos snapshop para os preços
   snap_produto_preco_real_rs decimal(12,2) 

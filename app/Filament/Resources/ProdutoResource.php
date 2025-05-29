@@ -115,6 +115,11 @@ class ProdutoResource extends Resource
                     ->label('Custo (R$)')
                     ->numeric()
                     ->required(),
+
+                TextInput::make('custo_us')
+                    ->label('Custo (U$)')
+                    ->numeric()
+                    ->required(),
             ]);
     }
 

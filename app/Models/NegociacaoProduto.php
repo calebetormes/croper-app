@@ -18,8 +18,6 @@ class NegociacaoProduto extends Model
         'negociacao_id',
         'produto_id',
         'volume',
-        'potencial_produto',
-        'dose_hectare',
         'snap_produto_preco_real_rs',
         'snap_produto_preco_real_us',
         'snap_produto_preco_virtual_rs',

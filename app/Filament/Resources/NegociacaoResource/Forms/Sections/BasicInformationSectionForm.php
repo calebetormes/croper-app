@@ -6,6 +6,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use App\Models\Moeda;
 use App\Models\User;
 
@@ -15,6 +16,11 @@ class BasicInformationSectionForm
     {
         return Section::make('Informações Básicas')
             ->schema([
+
+                TextInput::make('pedido_id')
+                    ->label('Pedido ID')
+                    ->disabled()
+                    ->hiddenOn('create'),
                 DatePicker::make('data_versao')
                     ->label('Data Versão')
                     ->default(now())
@@ -91,6 +97,6 @@ class BasicInformationSectionForm
                     ->required()
                     ->dehydrated(),
             ])
-            ->columns(4);
+            ->columns(3);
     }
 }
