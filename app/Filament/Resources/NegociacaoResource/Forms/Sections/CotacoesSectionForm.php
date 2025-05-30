@@ -71,10 +71,17 @@ class CotacoesSectionForm
                 ]),
                 DatePicker::make('data_atualizacao_snap_preco_praca_cotacao')
                     ->label('Preço fixado no dia')
-                    ->default(fn() => Carbon::now()->format('Y-m-d'))
+                    ->default(fn() => now()->toDateString())
                     ->disabled()
                     ->dehydrated()
-                    ->reactive(),
+                    ->reactive()
+                    ->afterOrEqual(
+                        now()->subDays(3)->toDateString()
+                    )
+                    ->validationMessages([
+                        'after_or_equal' => 'Já se passaram {$days} dias desde a última atualização de preços da praça. clique em atualizar preço da praça?',
+                    ])
+                    ->validationAttribute('Preço fixado no dia')
             ])
             ->columns(4);
     }
