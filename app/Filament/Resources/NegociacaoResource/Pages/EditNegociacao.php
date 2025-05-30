@@ -22,6 +22,7 @@ class EditNegociacao extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
     protected function getSaveFormAction(): Action
     {
         $action = Action::make('save')
@@ -49,4 +50,5 @@ class EditNegociacao extends EditRecord
 
         return $action;
     }
+
 }
