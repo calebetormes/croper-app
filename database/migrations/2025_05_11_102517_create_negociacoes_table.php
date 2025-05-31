@@ -48,6 +48,7 @@ return new class extends Migration {
             $table->foreignId('status_negociacao_id')->default(1)->constrained('status_negociacoes');
 
             // Snapshots de preço da praça
+            $table->decimal('snap_praca_cotacao_fator_valorizacao', 12, 2)->nullable();
             $table->decimal('snap_praca_cotacao_preco', 12, 2)->nullable();
             $table->boolean('snap_praca_cotacao_preco_fixado')->default(false);
             $table->date('data_atualizacao_snap_preco_praca_cotacao')->nullable();

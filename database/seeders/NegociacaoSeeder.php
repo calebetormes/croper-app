@@ -49,6 +49,7 @@ class NegociacaoSeeder extends Seeder
 
             // Snapshot do preço da praça
             'snap_praca_cotacao_preco' => 118.50,
+            'snap_praca_cotacao_fator_valorizacao' => 0.5,
             'snap_praca_cotacao_preco_fixado' => true,
             'data_atualizacao_snap_preco_praca_cotacao' => now(),
 

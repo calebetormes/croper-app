@@ -68,6 +68,7 @@ class Negociacao extends Model
 
         // Snapshots de preço da praça
         'snap_praca_cotacao_preco',
+        'snap_praca_cotacao_fato_valorizacao',
         'snap_praca_cotacao_preco_fixado',
         'data_atualizacao_snap_preco_praca_cotacao',
 

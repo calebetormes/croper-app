@@ -17,6 +17,7 @@ class PracaCotacao extends Model
         'praca_cotacao_preco',
         'moeda_id',
         'cultura_id',
+        'fator_valorizacao'
     ];
 
     public function cultura()

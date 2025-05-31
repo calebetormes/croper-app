@@ -71,7 +71,7 @@ class NegociacaoResource extends Resource
                     ->sortable()
                     ->label('Data negócio')
                     ->date('d/m/Y'),
-
+                Tables\Columns\TextColumn::make('pedido_id')->label('ID do Pedido')->sortable(),
                 Tables\Columns\TextColumn::make('gerente.name')->label('GRV')->sortable(),
                 Tables\Columns\TextColumn::make('vendedor.name')->label('RTV')->sortable(),
                 Tables\Columns\TextColumn::make('cliente')->searchable(),

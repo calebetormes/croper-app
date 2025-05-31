@@ -20,16 +20,16 @@ class PracaCotacaoSeeder extends Seeder
         }
 
         $cotacoes = [
-            ['cidade' => 'SELECIONE A PRAÇA DESEJADA',     'valor' => 0.00],
-            ['cidade' => 'AGUA BOA-MT',                    'valor' => 101.54],
-            ['cidade' => 'RONDONOPOLIS-MT',                'valor' => 106.38],
-            ['cidade' => 'CAMPO NOVO PARECIS-MT',          'valor' => 99.61],
-            ['cidade' => 'SORRISO-MT',                     'valor' => 98.64],
-            ['cidade' => 'JUARA-MT',                       'valor' => 97.42],
-            ['cidade' => 'BRASNORTE-MT',                   'valor' => 97.52],
-            ['cidade' => 'SINOP-MT',                       'valor' => 97.62],
-            ['cidade' => 'QUERENCIA-MT',                   'valor' => 97.84],
-            ['cidade' => 'PRIMAVERA DO LESTE-MT',          'valor' => 103.67],
+            ['cidade' => 'SELECIONE A PRAÇA DESEJADA', 'valor' => 0.00],
+            ['cidade' => 'AGUA BOA-MT', 'valor' => 101.54],
+            ['cidade' => 'RONDONOPOLIS-MT', 'valor' => 106.38],
+            ['cidade' => 'CAMPO NOVO PARECIS-MT', 'valor' => 99.61],
+            ['cidade' => 'SORRISO-MT', 'valor' => 98.64],
+            ['cidade' => 'JUARA-MT', 'valor' => 97.42],
+            ['cidade' => 'BRASNORTE-MT', 'valor' => 97.52],
+            ['cidade' => 'SINOP-MT', 'valor' => 97.62],
+            ['cidade' => 'QUERENCIA-MT', 'valor' => 97.84],
+            ['cidade' => 'PRIMAVERA DO LESTE-MT', 'valor' => 103.67],
         ];
 
         foreach ($cotacoes as $cotacao) {

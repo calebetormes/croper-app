@@ -144,6 +144,7 @@ Table pracas_cotacoes {
   praca_cotacao_preco decimal (12,2)
   moeda_id int [ref: > moedas.id]
   cultura_id int [ref: > culturas.id]
+  fator_valorizacao decimal (12,2)
 }
 
 Table negociacoes {
@@ -181,6 +182,7 @@ Table negociacoes {
   status_negociacao_id int [ref: > status_negociacoes.id]
 
   //SNAP DE PREÇOS DAS PRAÇAS
+  snap_praca_cotacao_fator_valorizacao decimal(12,2)
   snap_praca_cotacao_preco decimal(12,2) //snapshot calculado de pracas_cotacoes
   snap_praca_cotacao_preco_fixado bool 
   data_atualizacao_snap_preco_praca_cotacao date

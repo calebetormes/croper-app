@@ -27,6 +27,7 @@ class CotacoesSectionForm
                     ->required()
                     ->inline()
                     ->reactive(),
+
                 Select::make('praca_cotacao_id')
                     ->label('Praça')
                     ->reactive()
@@ -41,13 +42,23 @@ class CotacoesSectionForm
                             : null;
                         $set('data_praca_vencimento', $data);
                         $set('snap_praca_cotacao_preco', $cotacao?->praca_cotacao_preco);
+                        $set('snap_praca_cotacao_fator_valorizacao', $cotacao?->snap_praca_cotacao_fator_valorizacao);
                     }),
+
                 TextInput::make('snap_praca_cotacao_preco')
                     ->label('Preço da Praça')
                     ->numeric()
                     ->required()
                     ->dehydrated()
                     ->reactive(),
+
+                TextInput::make('snap_praca_cotacao_fator_valorizacao')
+                    ->label('Fator de Valorização')
+                    ->numeric()
+                    ->required()
+                    ->dehydrated()
+                    ->reactive(),
+
                 Placeholder::make('data_praca_vencimento')
                     ->label('Data da Cotação')
                     ->content(
@@ -56,7 +67,9 @@ class CotacoesSectionForm
                         : 'Nenhuma cotação selecionada'
                     )
                     ->reactive(),
+
                 Hidden::make('snap_praca_cotacao_preco_fixado')->default(true)->dehydrated(),
+
                 Actions::make([
                     Action::make('atualizar_preco_praca')
                         ->label('Atualizar Preço da Praça')
@@ -69,6 +82,7 @@ class CotacoesSectionForm
                             $set('data_atualizacao_snap_preco_praca_cotacao', date('Y-m-d'));
                         }),
                 ]),
+
                 DatePicker::make('data_atualizacao_snap_preco_praca_cotacao')
                     ->label('Preço fixado no dia')
                     ->default(fn() => now()->toDateString())
