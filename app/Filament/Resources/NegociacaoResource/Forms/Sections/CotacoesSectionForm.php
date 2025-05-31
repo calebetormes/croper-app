@@ -42,7 +42,7 @@ class CotacoesSectionForm
                             : null;
                         $set('data_praca_vencimento', $data);
                         $set('snap_praca_cotacao_preco', $cotacao?->praca_cotacao_preco);
-                        $set('snap_praca_cotacao_fator_valorizacao', $cotacao?->snap_praca_cotacao_fator_valorizacao);
+                        $set('snap_praca_cotacao_fator_valorizacao', $cotacao?->fator_valorizacao);
                     }),
 
                 TextInput::make('snap_praca_cotacao_preco')
@@ -79,6 +79,7 @@ class CotacoesSectionForm
                         ->action(function ($get, $set) {
                             $cotacao = PracaCotacao::find($get('praca_cotacao_id'));
                             $set('snap_praca_cotacao_preco', $cotacao?->praca_cotacao_preco);
+                            $set('snap_praca_cotacao_fator_valorizacao', $cotacao?->fator_valorizacao);
                             $set('data_atualizacao_snap_preco_praca_cotacao', date('Y-m-d'));
                         }),
                 ]),

@@ -18,12 +18,13 @@ class NegociacaoProduto extends Model
         'negociacao_id',
         'produto_id',
         'volume',
-        'snap_produto_preco_real_rs',
-        'snap_produto_preco_real_us',
-        'snap_produto_preco_virtual_rs',
-        'snap_produto_preco_virtual_us',
+        'snap_produto_preco_rs',
+        'snap_produto_preco_us',
         'snap_precos_fixados',
         'data_atualizacao_snap_precos_produtos',
+        'negociacao_produto_fator_valorizacao',
+        'negociacao_produto_preco_virtual_rs',
+        'negociacao_produto_preco_virtual_us',
     ];
 
     protected $casts = [

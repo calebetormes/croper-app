@@ -30,7 +30,7 @@ class NegociacaoProdutoResource extends Resource
                 ->icon(static::getNavigationIcon())
                 ->group(static::getNavigationGroup())
                 ->sort(static::getNavigationSort())
-                ->visible(fn () => in_array(auth()->user()?->role_id, [5])),
+                ->visible(fn() => in_array(auth()->user()?->role_id, [5])),
         ];
     }
 
@@ -46,36 +46,56 @@ class NegociacaoProdutoResource extends Resource
                 Forms\Components\Select::make('negociacao_id')
                     ->relationship('negociacao', 'id')
                     ->required(),
+
                 Forms\Components\TextInput::make('produto_id')
                     ->required()
                     ->numeric(),
+
                 Forms\Components\TextInput::make('volume')
                     ->required()
                     ->numeric(),
+
                 Forms\Components\TextInput::make('potencial_produto')
                     ->required()
                     ->numeric(),
+
                 Forms\Components\TextInput::make('dose_hectare')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('snap_produto_preco_real_rs')
+
+                //SNAPS
+                Forms\Components\TextInput::make('snap_produto_preco_rs')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('snap_produto_preco_real_us')
+
+                Forms\Components\TextInput::make('snap_produto_preco_us')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('snap_produto_preco_virtual_rs')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('snap_produto_preco_virtual_us')
-                    ->required()
-                    ->numeric(),
+
                 Forms\Components\Toggle::make('snap_precos_fixados')
                     ->required(),
+
                 Forms\Components\DatePicker::make('data_atualizacao_snap_precos_produtos')
                     ->required(),
+
+                //FORMULAS
+                Forms\Components\TextInput::make('negociacao_produto_fator_valorizacao')
+                    ->required()
+                    ->numeric(),
+
+                Forms\Components\TextInput::make('negociacao_produto_preco_virtual_rs')
+                    ->required()
+                    ->numeric(),
+
+                Forms\Components\TextInput::make('negociacao_produto_preco_virtual_us')
+                    ->required()
+                    ->numeric(),
+
+
             ]);
     }
+
+
 
     public static function table(Table $table): Table
     {

@@ -62,10 +62,10 @@ Table produtos {
   familia_id int [ref: > familias.id]
   apresentacao varchar
   dose_sugerida_hectare varchar
-  preco_real_rs decimal(12,2)
-  preco_virtual_rs decimal(12,2)
-  preco_real_us decimal(12,2)
-  preco_virtual_us decimal(12,2)
+  preco_rs decimal(12,2)
+  preco_us decimal(12,2)
+  //preco_virtual_rs decimal(12,2)
+  //preco_virtual_us decimal(12,2)
   custo_rs decimal(12,2)
   custo_us decimal(12,2)
   fator_multiplicador decimal(12,2) // Fator de multiplicação para o volume 
@@ -198,12 +198,15 @@ Table negociacoes_produtos {
   volume decimal(12,2) // Alterado de varchar
 
   //campos snapshop para os preços
-  snap_produto_preco_real_rs decimal(12,2) 
-  snap_produto_preco_real_us decimal(12,2) 
-  snap_produto_preco_virtual_rs decimal(12,2) 
-  snap_produto_preco_virtual_us decimal(12,2) 
+  snap_produto_preco_rs decimal(12,2) 
+  snap_produto_preco_us decimal(12,2) 
   snap_precos_fixados bool
   data_atualizacao_snap_precos_produtos date
+
+  negociacao_produto_fator_valorizacao
+  negociacao_produto_preco_virtual_rs decimal(12,2) //RENOMEADO nao é mais snap, devido ao fator de valorizaçao em cotações
+  negociacao_produto_preco_virtual_us decimal(12,2) //RENOMEADO nao é mais snap, devido ao fator de valorizaçao em cotações
+
 }
 
 //--------------------------------------------------------------

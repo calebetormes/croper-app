@@ -91,25 +91,16 @@ class ProdutoResource extends Resource
                     ->required()
                     ->maxLength(255),
 
-                TextInput::make('preco_real_rs')
-                    ->label('Preço Real (R$)')
+                TextInput::make('preco_rs')
+                    ->label('Preço (R$)')
                     ->numeric()
                     ->required(),
 
-                TextInput::make('preco_virtual_rs')
-                    ->label('Preço Virtual (R$)')
+                TextInput::make('preco_us')
+                    ->label('Preço (US$)')
                     ->numeric()
                     ->required(),
 
-                TextInput::make('preco_real_us')
-                    ->label('Preço Real (US$)')
-                    ->numeric()
-                    ->required(),
-
-                TextInput::make('preco_virtual_us')
-                    ->label('Preço Virtual (US$)')
-                    ->numeric()
-                    ->required(),
 
                 TextInput::make('custo_rs')
                     ->label('Custo (R$)')

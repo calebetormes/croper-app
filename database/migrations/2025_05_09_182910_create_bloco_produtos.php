@@ -50,10 +50,8 @@ return new class extends Migration {
             $table->string('apresentacao');
             $table->string('dose_sugerida_hectare');
 
-            $table->decimal('preco_real_rs', 12, 2);
-            $table->decimal('preco_virtual_rs', 12, 2);
-            $table->decimal('preco_real_us', 12, 2);
-            $table->decimal('preco_virtual_us', 12, 2);
+            $table->decimal('preco_rs', 12, 2);
+            $table->decimal('preco_us', 12, 2);
             $table->decimal('custo_rs', 12, 2);
             $table->decimal('custo_us', 12, 2);
             $table->decimal('fator_multiplicador', 12, 2)->nullable(); // peso do produto em kg
