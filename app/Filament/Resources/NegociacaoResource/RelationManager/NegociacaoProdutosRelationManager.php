@@ -48,6 +48,22 @@ class NegociacaoProdutosRelationManager extends RelationManager
                     // 1.4) Data de atualização dos preços (formato YYYY-MM-DD para DatePicker)
                     $set('data_atualizacao_snap_precos_produtos', now()->toDateString());
 
+                    // ───────────────────────────────────────────────────
+                    // 1.4) Agora calcula os preços virtuais usando o estado “snap” * o estado do “fator”
+                    //      Observe que usamos o valor que está em $get('snap_produto_preco_rs') e 
+                    //      $get('negociacao_produto_fator_valorizacao'), pois estes campos existem em 
+                    //      NegociacaoProduto e já estão no form state.
+                    $set(
+                        'negociacao_produto_preco_virtual_rs',
+                        ($get('snap_produto_preco_rs') ?? 0)
+                        * ($get('negociacao_produto_fator_valorizacao') ?? 0)
+                    );
+                    $set(
+                        'negociacao_produto_preco_virtual_us',
+                        ($get('snap_produto_preco_us') ?? 0)
+                        * ($get('negociacao_produto_fator_valorizacao') ?? 0)
+                    );
+
                 }),
 
             Forms\Components\TextInput::make('volume')
@@ -97,18 +113,33 @@ class NegociacaoProdutosRelationManager extends RelationManager
                 ->required(),
 
 
-            // ────────────────────────────────────────────────────────────────
-            // 7) Fator de Valorização – será preenchido quando o produto for selecionado
-            // ────────────────────────────────────────────────────────────────
-            Forms\Components\TextInput::make('snap_praca_cotacao_fator_valorizacao')
+            Forms\Components\TextInput::make('negociacao_produto_fator_valorizacao')
                 ->label('Fator de Valorização')
+                ->default(fn() => $this->ownerRecord->snap_praca_cotacao_fator_valorizacao)
                 ->numeric()
                 ->required()
                 ->dehydrated()
-                ->reactive(),
+                ->reactive()
 
-            Forms\Components\TextInput::make('negociacao_produto_preco_virtual_rs')->numeric()->required(),
-            Forms\Components\TextInput::make('negociacao_produto_preco_virtual_us')->numeric()->required(),
+                //Calcula os preços virtuais quando o fator de valorização é atualizado
+                ->afterStateUpdated(function (Get $get, Set $set) {
+                    if ($get('produto_id')) {
+                        $fator = $get('negociacao_produto_fator_valorizacao') ?? 0;
+                        $precoRs = $get('snap_produto_preco_rs') ?? 0;
+                        $precoUs = $get('snap_produto_preco_us') ?? 0;
+
+                        $set('negociacao_produto_preco_virtual_rs', $precoRs * $fator);
+                        $set('negociacao_produto_preco_virtual_us', $precoUs * $fator);
+                    }
+                }),
+
+            Forms\Components\TextInput::make('negociacao_produto_preco_virtual_rs')
+                ->numeric()
+                ->required(),
+
+            Forms\Components\TextInput::make('negociacao_produto_preco_virtual_us')
+                ->numeric()
+                ->required(),
         ]);
     }
 
