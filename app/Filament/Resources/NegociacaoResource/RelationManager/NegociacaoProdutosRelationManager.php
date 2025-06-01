@@ -9,7 +9,8 @@ use Filament\Tables\Table;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use App\Models\Produto;
-use App\Models\PracaCotacao;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TextInput\Mask;
 
 
 class NegociacaoProdutosRelationManager extends RelationManager
@@ -135,6 +136,14 @@ class NegociacaoProdutosRelationManager extends RelationManager
 
             Forms\Components\TextInput::make('negociacao_produto_preco_virtual_rs')
                 ->numeric()
+                ->mask(
+                    fn(Mask $mask) => $mask
+                        ->money(
+                            decimalPlaces: 2,
+                            thousandsSeparator: '.', // separador de milhares (opcional)
+                            decimalSeparator: ',',   // vírgula para decimal
+                        )
+                )
                 ->required(),
 
             Forms\Components\TextInput::make('negociacao_produto_preco_virtual_us')
