@@ -31,7 +31,6 @@ class NegociacoesProdutosSeeder extends Seeder
             'volume' => 100.00,
             'snap_produto_preco_rs' => 500.00,
             'snap_produto_preco_us' => 100.00,
-            'snap_precos_fixados' => true,
             'data_atualizacao_snap_precos_produtos' => now()->toDateString(),
 
             'negociacao_produto_fator_valorizacao' => 1.2,

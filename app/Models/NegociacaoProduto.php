@@ -20,7 +20,6 @@ class NegociacaoProduto extends Model
         'volume',
         'snap_produto_preco_rs',
         'snap_produto_preco_us',
-        'snap_precos_fixados',
         'data_atualizacao_snap_precos_produtos',
         'negociacao_produto_fator_valorizacao',
         'negociacao_produto_preco_virtual_rs',

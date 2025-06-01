@@ -72,9 +72,6 @@ class NegociacaoProdutoResource extends Resource
                     ->required()
                     ->numeric(),
 
-                Forms\Components\Toggle::make('snap_precos_fixados')
-                    ->required(),
-
                 Forms\Components\DatePicker::make('data_atualizacao_snap_precos_produtos')
                     ->required(),
 

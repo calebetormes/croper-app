@@ -10,7 +10,11 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use App\Models\Produto;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\TextInput\Mask;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Actions;
+
+
 
 
 class NegociacaoProdutosRelationManager extends RelationManager
@@ -43,9 +47,6 @@ class NegociacaoProdutosRelationManager extends RelationManager
                     $set('snap_produto_preco_rs', $produto?->preco_rs);
                     $set('snap_produto_preco_us', $produto?->preco_us);
 
-                    // 1.3) Marca o toggle “snap_precos_fixados”
-                    $set('snap_precos_fixados', true);
-
                     // 1.4) Data de atualização dos preços (formato YYYY-MM-DD para DatePicker)
                     $set('data_atualizacao_snap_precos_produtos', now()->toDateString());
 
@@ -67,7 +68,7 @@ class NegociacaoProdutosRelationManager extends RelationManager
 
                 }),
 
-            Forms\Components\TextInput::make('volume')
+            TextInput::make('volume')
                 ->label('Volume')
                 ->numeric()
                 ->required()
@@ -94,27 +95,71 @@ class NegociacaoProdutosRelationManager extends RelationManager
                 ),
 
 
-            Forms\Components\TextInput::make('snap_produto_preco_rs')
-                ->label('Preço (R$) do Produto na Negociação')
+            TextInput::make('snap_produto_preco_rs')
+                ->label('Preço do Produto na Negociação (R$)')
                 ->numeric()
-                ->required(),
+                ->prefix('R$')
+                ->required()
+                ->reactive()
+                ->afterStateUpdated(function (Get $get, Set $set) {
+                    if ($get('produto_id')) {
+                        $fator = $get('negociacao_produto_fator_valorizacao') ?? 0;
+                        $precoRs = $get('snap_produto_preco_rs') ?? 0;
+                        $set('negociacao_produto_preco_virtual_rs', $precoRs * $fator);
+                    }
+                }),
 
-            Forms\Components\TextInput::make('snap_produto_preco_us')
-                ->label('Preço (US$) do Produto na Negociação')
+            TextInput::make('snap_produto_preco_us')
+                ->label('Preço do Produto na Negociação (US$) ')
                 ->numeric()
-                ->required(),
+                ->prefix('US$')
+                ->required()
+                ->reactive()
+                ->afterStateUpdated(function (Get $get, Set $set) {
+                    if ($get('produto_id')) {
+                        $fator = $get('negociacao_produto_fator_valorizacao') ?? 0;
+                        $precoUs = $get('snap_produto_preco_us') ?? 0;
+                        $set('negociacao_produto_preco_virtual_us', $precoUs * $fator);
+                    }
+                }),
 
-            // 5) TOGGLE “Preços Fixados” (marcado via afterStateUpdated)
-            Forms\Components\Toggle::make('snap_precos_fixados')
-                ->label('Preços Fixados')
-                ->required(),
+            Actions::make([
+                Action::make('resetar_precos_fixados')
+                    ->label('Atualizar Preços do Produto')
+                    ->color('primary')
+                    ->action(function (Get $get, Set $set) {
+                        $produto = Produto::find($get('produto_id'));
 
-            Forms\Components\DatePicker::make('data_atualizacao_snap_precos_produtos')
+                        // 1) Preenche os campos de preço com os valores atuais do Produto
+                        $set('snap_produto_preco_rs', $produto?->preco_rs);
+                        $set('snap_produto_preco_us', $produto?->preco_us);
+
+                        // 2) Atualiza a data de fixação de preços
+                        $set('data_atualizacao_snap_precos_produtos', now()->toDateString());
+
+                        // 3) Calcula os preços virtuais (snap * fator)
+                        $set(
+                            'negociacao_produto_preco_virtual_rs',
+                            ($get('snap_produto_preco_rs') ?? 0)
+                            * ($get('negociacao_produto_fator_valorizacao') ?? 0)
+                        );
+                        $set(
+                            'negociacao_produto_preco_virtual_us',
+                            ($get('snap_produto_preco_us') ?? 0)
+                            * ($get('negociacao_produto_fator_valorizacao') ?? 0)
+                        );
+                    }),
+            ]),
+
+
+            DatePicker::make('data_atualizacao_snap_precos_produtos')
                 ->label('Data de Atualização dos Preços')
-                ->required(),
+                ->required()
+                ->disabled()
+                ->dehydrated(),
 
 
-            Forms\Components\TextInput::make('negociacao_produto_fator_valorizacao')
+            TextInput::make('negociacao_produto_fator_valorizacao')
                 ->label('Fator de Valorização')
                 ->default(fn() => $this->ownerRecord->snap_praca_cotacao_fator_valorizacao)
                 ->numeric()
@@ -134,19 +179,17 @@ class NegociacaoProdutosRelationManager extends RelationManager
                     }
                 }),
 
-            Forms\Components\TextInput::make('negociacao_produto_preco_virtual_rs')
+
+            TextInput::make('negociacao_produto_preco_virtual_rs')
+                ->label('Preço Virtual (R$)')
+                ->prefix('R$')
                 ->numeric()
-                ->mask(
-                    fn(Mask $mask) => $mask
-                        ->money(
-                            decimalPlaces: 2,
-                            thousandsSeparator: '.', // separador de milhares (opcional)
-                            decimalSeparator: ',',   // vírgula para decimal
-                        )
-                )
                 ->required(),
 
-            Forms\Components\TextInput::make('negociacao_produto_preco_virtual_us')
+
+            TextInput::make('negociacao_produto_preco_virtual_us')
+                ->label('Preço Virtual (US$)')
+                ->prefix('US$')
                 ->numeric()
                 ->required(),
         ]);

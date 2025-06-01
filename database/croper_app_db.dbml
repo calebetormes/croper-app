@@ -200,7 +200,6 @@ Table negociacoes_produtos {
   //campos snapshop para os preços
   snap_produto_preco_rs decimal(12,2) 
   snap_produto_preco_us decimal(12,2) 
-  snap_precos_fixados bool
   data_atualizacao_snap_precos_produtos date
 
   negociacao_produto_fator_valorizacao

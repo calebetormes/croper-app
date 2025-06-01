@@ -21,7 +21,6 @@ return new class extends Migration {
             // Campos snapshot para os preços
             $table->decimal('snap_produto_preco_rs', 12, 2);
             $table->decimal('snap_produto_preco_us', 12, 2);
-            $table->boolean('snap_precos_fixados');
             $table->date('data_atualizacao_snap_precos_produtos');
 
             // formulas
