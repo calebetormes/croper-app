@@ -3,15 +3,12 @@
 namespace App\Filament\Resources\PracaCotacaoResource\Pages;
 
 use App\Filament\Resources\PracaCotacaoResource;
-use App\Models\Cultura;
-use App\Models\Moeda;
+use App\Filament\Resources\PracaCotacaoResource\Pages\ImportPracaCotacao;
 use App\Models\PracaCotacao;
-use Carbon\Carbon;
 use Filament\Actions\Action;
+use Filament\Actions;
 use Filament\Forms\Components\FileUpload;
 use Filament\Resources\Pages\ListRecords;
-use League\Csv\Reader;
-use Filament\Actions;
 
 class ListPracaCotacaos extends ListRecords
 {
@@ -27,67 +24,27 @@ class ListPracaCotacaos extends ListRecords
                     FileUpload::make('arquivo')
                         ->label('Arquivo CSV')
                         ->acceptedFileTypes(['text/csv'])
-                        ->disk('public')              // ✅ usa disco public
-                        ->directory('csv')            // ✅ salva em storage/app/public/csv
+                        ->disk('public')      // usa disco public
+                        ->directory('csv')    // salva em storage/app/public/csv
                         ->preserveFilenames()
                         ->required(),
                 ])
                 ->action(function (array $data) {
-                    $relativePath = $data['arquivo']; // ex: csv/arquivo.csv
-                    $path = storage_path('app/public/'.$relativePath); // caminho real
-
-                    if (! file_exists($path)) {
-                        throw new \Exception("Arquivo CSV não encontrado: $path");
-                    }
-
-                    $csv = Reader::createFromPath($path, 'r');
-                    $csv->setDelimiter(';');
-                    $csv->setHeaderOffset(0);
-
-                    foreach ($csv->getRecords() as $row) {
-                        $cidade = trim($row['PRAÇA'] ?? '');
-                        $precoTxt = trim($row['PREÇO'] ?? '');
-                        $vencimento = trim($row['VENCIMENTO'] ?? '');
-                        $moedaNome = trim($row['MOEDA'] ?? '');
-                        $culturaNome = trim($row['CULTURA'] ?? '');
-
-                        if (! $cidade || ! $precoTxt || ! $vencimento || ! $moedaNome || ! $culturaNome) {
-                            continue;
-                        }
-
-                        $moeda = Moeda::where('nome', $moedaNome)
-                            ->orWhere('sigla', $moedaNome)
-                            ->first();
-
-                        $cultura = Cultura::where('nome', $culturaNome)->first();
-
-                        if (! $moeda || ! $cultura) {
-                            continue;
-                        }
-
-                        $valor = preg_replace('/[^0-9,]/', '', $precoTxt);
-                        $valor = str_replace(',', '.', $valor);
-
-                        try {
-                            $dataVenc = Carbon::createFromFormat('d/m/Y', $vencimento)->format('Y-m-d');
-                        } catch (\Exception $e) {
-                            continue;
-                        }
-
-                        PracaCotacao::create([
-                            'cidade' => $cidade,
-                            'data_vencimento' => $dataVenc,
-                            'praca_cotacao_preco' => floatval($valor),
-                            'moeda_id' => $moeda->id,
-                            'cultura_id' => $cultura->id,
-                        ]);
-                    }
+                    ImportPracaCotacao::import($data['arquivo']);
                 })
                 ->successNotificationTitle('Importação concluída com sucesso!'),
 
+            Action::make('exportarCsv')    // ← nova action
+                ->label('Exportar CSV')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->action(function () {
+                    return ExportPracaCotacao::export();
+                })
+                ->color('primary'),
+
             Actions\CreateAction::make()
                 ->label('Adicionar Nova Praça de Cotação')
-                ->url(fn () => PracaCotacaoResource::getUrl('create')),
+                ->url(fn() => PracaCotacaoResource::getUrl('create')),
         ];
     }
 }

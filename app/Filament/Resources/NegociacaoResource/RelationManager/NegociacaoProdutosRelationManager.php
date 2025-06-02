@@ -38,7 +38,7 @@ class NegociacaoProdutosRelationManager extends RelationManager
                 ->searchable()
                 ->required()
                 ->reactive()
-                ->afterStateUpdated(function (Get $get, Set $set) {
+                ->afterStateUpdated(function ($get, $set) {
 
                     // 1.1) Busca dados do produto selecionado
                     $produto = Produto::find($get('produto_id'));
@@ -101,7 +101,7 @@ class NegociacaoProdutosRelationManager extends RelationManager
                 ->prefix('R$')
                 ->required()
                 ->reactive()
-                ->afterStateUpdated(function (Get $get, Set $set) {
+                ->afterStateUpdated(function ($get, $set) {
                     if ($get('produto_id')) {
                         $fator = $get('negociacao_produto_fator_valorizacao') ?? 0;
                         $precoRs = $get('snap_produto_preco_rs') ?? 0;
@@ -115,7 +115,7 @@ class NegociacaoProdutosRelationManager extends RelationManager
                 ->prefix('US$')
                 ->required()
                 ->reactive()
-                ->afterStateUpdated(function (Get $get, Set $set) {
+                ->afterStateUpdated(function ($get, $set) {
                     if ($get('produto_id')) {
                         $fator = $get('negociacao_produto_fator_valorizacao') ?? 0;
                         $precoUs = $get('snap_produto_preco_us') ?? 0;
@@ -127,7 +127,7 @@ class NegociacaoProdutosRelationManager extends RelationManager
                 Action::make('resetar_precos_fixados')
                     ->label('Atualizar Preços do Produto')
                     ->color('primary')
-                    ->action(function (Get $get, Set $set) {
+                    ->action(function ($get, $set) {
                         $produto = Produto::find($get('produto_id'));
 
                         // 1) Preenche os campos de preço com os valores atuais do Produto
@@ -168,7 +168,7 @@ class NegociacaoProdutosRelationManager extends RelationManager
                 ->reactive()
 
                 //Calcula os preços virtuais quando o fator de valorização é atualizado
-                ->afterStateUpdated(function (Get $get, Set $set) {
+                ->afterStateUpdated(function ($get, $set) {
                     if ($get('produto_id')) {
                         $fator = $get('negociacao_produto_fator_valorizacao') ?? 0;
                         $precoRs = $get('snap_produto_preco_rs') ?? 0;
