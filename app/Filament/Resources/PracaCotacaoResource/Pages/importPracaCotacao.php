@@ -30,7 +30,13 @@ class ImportPracaCotacao
             $culturaNome = trim($row['CULTURA'] ?? '');
             $fatorTxt = trim($row['FATOR_VALORIZACAO'] ?? '');
 
-            if (!$cidade || !$precoTxt || !$vencimento || !$moedaNome || !$culturaNome || !$fatorTxt) {
+            if (
+                $cidade === '' ||
+                $precoTxt === '' ||
+                $vencimento === '' || $moedaNome === '' ||
+                $culturaNome === '' ||
+                $fatorTxt === ''
+            ) {
                 continue;
             }
 

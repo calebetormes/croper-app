@@ -35,6 +35,7 @@ class PracaCotacaoSeeder extends Seeder
         foreach ($cotacoes as $cotacao) {
             PracaCotacao::create([
                 'cidade' => $cotacao['cidade'],
+                'data_inclusao' => '2025-05-28',
                 'data_vencimento' => '2025-05-30',
                 'praca_cotacao_preco' => $cotacao['valor'],
                 'moeda_id' => $moeda->id,

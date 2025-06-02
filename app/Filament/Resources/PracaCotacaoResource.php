@@ -9,6 +9,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TextInput\Mask;
+use Filament\Forms\Components\DatePicker;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -20,6 +21,8 @@ use Filament\Forms\Components\Select;
 use App\Models\Moeda;
 use App\Models\Cultura;
 use Filament\Navigation\NavigationItem;
+use Filament\Forms\Get;
+use Illuminate\Validation\Rule;
 
 class PracaCotacaoResource extends Resource
 {
@@ -49,6 +52,7 @@ class PracaCotacaoResource extends Resource
     {
         return in_array(auth()->user()?->role_id, [4, 5]);
     }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -59,7 +63,13 @@ class PracaCotacaoResource extends Resource
                     ->options(collect(config('cidades'))->mapWithKeys(fn($cidade) => [$cidade => $cidade])->toArray())
                     ->required(),
 
-                Forms\Components\DatePicker::make('data_vencimento')
+                DatePicker::make('data_inclusao')
+                    ->required()
+                    ->default(now())
+                    ->disabled()
+                    ->dehydrated(true),
+
+                DatePicker::make('data_vencimento')
                     ->required(),
 
                 TextInput::make('praca_cotacao_preco')
@@ -100,6 +110,7 @@ class PracaCotacaoResource extends Resource
                     ->inline()
                     ->reactive()
                     ->required()
+
             ]);
     }
 
@@ -109,7 +120,8 @@ class PracaCotacaoResource extends Resource
             ->columns([
                 TextColumn::make('cidade')
                     ->label('Cidade')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('praca_cotacao_preco')
                     ->label('Preço')
@@ -117,6 +129,11 @@ class PracaCotacaoResource extends Resource
                         $sigla = $record->moeda->sigla ?? '';
                         return $sigla . ' ' . number_format($state, 2, ',', '.');
                     })
+                    ->sortable(),
+
+                TextColumn::make('data_inclusao')
+                    ->label('Data de Inclusao')
+                    ->date()
                     ->sortable(),
 
                 TextColumn::make('data_vencimento')
@@ -156,4 +173,6 @@ class PracaCotacaoResource extends Resource
             'edit' => Pages\EditPracaCotacao::route('/{record}/edit'),
         ];
     }
+
+
 }

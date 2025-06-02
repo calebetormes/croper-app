@@ -13,13 +13,21 @@ return new class extends Migration {
         Schema::create('pracas_cotacoes', function (Blueprint $table) {
             $table->id();
             $table->string('cidade');
+            $table->date('data_inclusao');
             $table->date('data_vencimento');
             $table->decimal('praca_cotacao_preco', 12, 2)->nullable();
             $table->decimal('fator_valorizacao', 12, 2)->nullable();
             $table->unsignedBigInteger('cultura_id');
             $table->unsignedBigInteger('moeda_id');
             $table->foreign('cultura_id')->references('id')->on('culturas')->onDelete('cascade');
-            $table->foreign('moeda_id')->references('id')->on('culturas')->onDelete('cascade');
+            $table->foreign('moeda_id')->references('id')->on('moedas')->onDelete('cascade');
+
+            // índice único composto: cidade + data_vencimento + moeda_id + cultura_id
+            $table->unique(
+                ['cidade', 'data_vencimento', 'moeda_id', 'cultura_id'],
+                'pracas_cotacoes_unico'
+            );
+
             $table->timestamps();
         });
     }

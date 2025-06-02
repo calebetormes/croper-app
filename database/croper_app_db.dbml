@@ -140,6 +140,7 @@ Table status_negociacoes {
 Table pracas_cotacoes {
   id int [pk, increment]
   cidade varchar
+  data_inclusao date
   data_vencimento date
   praca_cotacao_preco decimal (12,2)
   moeda_id int [ref: > moedas.id]
@@ -202,7 +203,7 @@ Table negociacoes_produtos {
   snap_produto_preco_us decimal(12,2) 
   data_atualizacao_snap_precos_produtos date
 
-  negociacao_produto_fator_valorizacao
+  negociacao_produto_fator_valorizacao decimal(12,2)
   negociacao_produto_preco_virtual_rs decimal(12,2) //RENOMEADO nao é mais snap, devido ao fator de valorizaçao em cotações
   negociacao_produto_preco_virtual_us decimal(12,2) //RENOMEADO nao é mais snap, devido ao fator de valorizaçao em cotações
 
