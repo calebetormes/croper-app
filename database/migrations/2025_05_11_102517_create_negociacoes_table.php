@@ -32,7 +32,13 @@ return new class extends Migration {
             $table->date('data_entrega_graos');
 
             // Valores financeiros
-            $table->decimal('valor_total_com_bonus', 12, 2);
+            $table->decimal('valor_total_com_bonus_rs', 12, 2)->nullable();
+            $table->decimal('valor_total_sem_bonus_rs', 12, 2)->nullable();
+            $table->decimal('valor_total_com_bonus_us', 12, 2)->nullable();
+            $table->decimal('valor_total_sem_bonus_us', 12, 2)->nullable();
+            $table->decimal('valor_total_com_bonus_sacas', 12, 2)->nullable();
+            $table->decimal('valor_total_sem_bonus_sacas', 12, 2)->nullable();
+            $table->decimal('peso_total_kg', 12, 2)->nullable();
             $table->decimal('area_hectares', 12, 2)->nullable();
             $table->decimal('investimento_sacas_hectare', 12, 2)->nullable();
             $table->decimal('investimento_total_sacas', 12, 2)->nullable();

@@ -22,14 +22,15 @@ use Filament\Tables;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder; // já deve existir
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class NegociacaoResource extends Resource
 {
     protected static ?string $model = Negociacao::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
-
     protected static ?string $navigationLabel = 'NEGOCIAÇÕES';
 
     public static function getNavigationItems(): array
@@ -59,7 +60,7 @@ class NegociacaoResource extends Resource
             ValoresSectionForm::make(),
             StatusValidacoesSectionForm::make(),
             StatusGeralSectionForm::make(),
-            // ProdutosSectionForm::make(),
+            // ProdutosSectionForm::make(), // caso use
         ]);
     }
 
@@ -79,7 +80,6 @@ class NegociacaoResource extends Resource
                 Tables\Columns\TextColumn::make('status_negociacao.nome')->label('Status')->sortable(),
             ])
             ->filters([
-                // filtro de intervalo de datas
                 Filter::make('data_negocio')
                     ->label('Data')
                     ->form([
@@ -92,22 +92,18 @@ class NegociacaoResource extends Resource
                             ->when($data['until'], fn($q) => $q->whereDate('data_negocio', '<=', $data['until']))
                     ),
 
-                // filtro por gerente
                 SelectFilter::make('gerente_id')
                     ->multiple()
                     ->label('Gerente')
                     ->relationship('gerente', 'name')
-                    // ->preload()
                     ->searchable(),
 
-                // filtro por vendedor
                 SelectFilter::make('vendedor_id')
                     ->multiple()
                     ->label('Vendedor')
                     ->relationship('vendedor', 'name')
                     ->searchable(),
 
-                // filtro por status
                 SelectFilter::make('status_negociacao_id')
                     ->label('Status')
                     ->relationship('statusNegociacao', 'nome')
@@ -115,12 +111,10 @@ class NegociacaoResource extends Resource
                     ->multiple()
                     ->preload(),
             ])
-
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->iconButton(),
             ])
-
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
                     ->iconButton(),
@@ -130,7 +124,6 @@ class NegociacaoResource extends Resource
     public static function getRelations(): array
     {
         return [
-                // Se você tiver RelationManagers, inclua aqui
             NegociacaoProdutosRelationManager::class,
         ];
     }
@@ -158,7 +151,28 @@ class NegociacaoResource extends Resource
 
     public static function mutateFormDataBeforeCreate(array $data): array
     {
+        // continua setando o status “Em análise” normalmente
         $data['status_negociacao_id'] ??= StatusNegociacao::where('nome', 'Em análise')->value('id');
+        return $data;
+    }
+
+    /**
+     * 1) Este hook é executado ANTES do Livewire “encher” o formulário (tanto no Create quanto no Edit).
+     * 2) Se já existir data_atualizacao_snap_preco_praca_cotacao > 3 dias atrás, então zera o campo praca_cotacao_id.
+     */
+    protected static function mutateFormDataBeforeFill(array $data): array
+    {
+
+        dd('FOI AQUI');
+        if (!empty($data['data_atualizacao_snap_preco_praca_cotacao'])) {
+            $selectedDate = Carbon::parse($data['data_atualizacao_snap_preco_praca_cotacao']);
+            $limite = Carbon::now()->subDays(3)->startOfDay();
+
+            if ($selectedDate->lt($limite)) {
+                // Se a data for mais antiga que (hoje - 3 dias), zera a praça antes de renderizar o form
+                $data['praca_cotacao_id'] = null;
+            }
+        }
 
         return $data;
     }

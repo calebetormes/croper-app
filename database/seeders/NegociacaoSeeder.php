@@ -32,7 +32,13 @@ class NegociacaoSeeder extends Seeder
             'data_entrega_graos' => now()->addMonths(3),
 
             // Valores financeiros (simulando fórmulas)
-            'valor_total_com_bonus' => 250000.00,
+            'valor_total_com_bonus_rs' => 0.00,
+            'valor_total_sem_bonus_rs' => 0.00,
+            'valor_total_com_bonus_us' => 0.00,
+            'valor_total_sem_bonus_us' => 0.00,
+            'valor_total_com_bonus_sacas' => 0.00,
+            'valor_total_sem_bonus_sacas' => 0.00,
+            'peso_total_kg' => 100000.00, // 100 toneladas
             'area_hectares' => 100.00,
             'investimento_sacas_hectare' => 5.50, // valor fictício
             'investimento_total_sacas' => 550.00, // 100 * 5.5

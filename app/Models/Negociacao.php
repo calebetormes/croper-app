@@ -13,7 +13,7 @@ class Negociacao extends Model
     protected $table = 'negociacoes';
 
     protected $casts = [
-        'negociacaoProdutos' => 'array',
+        //'negociacaoProdutos' => 'array',
     ];
 
 

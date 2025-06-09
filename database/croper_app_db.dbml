@@ -168,12 +168,18 @@ Table negociacoes {
   data_entrega_graos date
   //
   area_hectares decimal(12,2)
-  valor_total_com_bonus decimal(12,2) //FORMULA
+  valor_total_com_bonus_rs decimal(12,2) //FORMULA
+  valor_total_sem_bonus_rs decimal(12,2) //FORMULA
+  valor_total_com_bonus_us decimal(12,2) //FORMULA
+  valor_total_sem_bonus_us decimal(12,2) //FORMULA
+  valor_total_com_bonus_sacas decimal(12,2) //FORMULA
+  valor_total_sem_bonus_sacas decimal(12,2) //FORMULA
+  peso_total_kg decimal(12,2) //FORMULA
   investimento_sacas_hectare decimal(12,2) //FORMULA
   investimento_total_sacas decimal(12,2) //FORMULA
   preco_liquido_saca decimal(12,2)// FORMULA
   bonus_cliente_pacote decimal(12,2) //FORMULA
-  valor_total_sem_bonus decimal(12,2) //FORMULA
+  
 
   //VALIDAÇÔES
   nivel_validacao_id int [ref: > niveis_validacao.id]

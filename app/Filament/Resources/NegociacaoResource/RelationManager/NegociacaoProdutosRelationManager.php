@@ -13,6 +13,13 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Actions;
+use Filament\Tables\Actions\CreateAction;
+use Livewire\Component;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Columns\TextColumn;
 
 
 
@@ -50,21 +57,18 @@ class NegociacaoProdutosRelationManager extends RelationManager
                     // 1.4) Data de atualização dos preços (formato YYYY-MM-DD para DatePicker)
                     $set('data_atualizacao_snap_precos_produtos', now()->toDateString());
 
-                    // ───────────────────────────────────────────────────
-                    // 1.4) Agora calcula os preços virtuais usando o estado “snap” * o estado do “fator”
-                    //      Observe que usamos o valor que está em $get('snap_produto_preco_rs') e 
-                    //      $get('negociacao_produto_fator_valorizacao'), pois estes campos existem em 
-                    //      NegociacaoProduto e já estão no form state.
-                    $set(
-                        'negociacao_produto_preco_virtual_rs',
-                        ($get('snap_produto_preco_rs') ?? 0)
-                        * ($get('negociacao_produto_fator_valorizacao') ?? 0)
-                    );
-                    $set(
-                        'negociacao_produto_preco_virtual_us',
-                        ($get('snap_produto_preco_us') ?? 0)
-                        * ($get('negociacao_produto_fator_valorizacao') ?? 0)
-                    );
+                    // 1.5) Extrai valores em variáveis intermediárias
+                    $snapRs = $get('snap_produto_preco_rs') ?? 0;
+                    $snapUs = $get('snap_produto_preco_us') ?? 0;
+                    $fator = $get('negociacao_produto_fator_valorizacao') ?? 0;
+
+                    // 1.6) Calcula preços virtuais
+                    $virtualRs = $snapRs + ($snapRs * $fator);                              // mantém fórmula original
+                    $virtualUs = $snapUs + ($snapUs * $fator);                  // nova fórmula: snap + (snap * fator)
+        
+                    // 1.7) Seta no estado
+                    $set('negociacao_produto_preco_virtual_rs', $virtualRs);
+                    $set('negociacao_produto_preco_virtual_us', $virtualUs);
 
                 }),
 
@@ -105,7 +109,7 @@ class NegociacaoProdutosRelationManager extends RelationManager
                     if ($get('produto_id')) {
                         $fator = $get('negociacao_produto_fator_valorizacao') ?? 0;
                         $precoRs = $get('snap_produto_preco_rs') ?? 0;
-                        $set('negociacao_produto_preco_virtual_rs', $precoRs * $fator);
+                        $set('negociacao_produto_preco_virtual_rs', $precoRs + $precoRs * $fator);
                     }
                 }),
 
@@ -115,13 +119,15 @@ class NegociacaoProdutosRelationManager extends RelationManager
                 ->prefix('US$')
                 ->required()
                 ->reactive()
+
                 ->afterStateUpdated(function ($get, $set) {
                     if ($get('produto_id')) {
                         $fator = $get('negociacao_produto_fator_valorizacao') ?? 0;
                         $precoUs = $get('snap_produto_preco_us') ?? 0;
-                        $set('negociacao_produto_preco_virtual_us', $precoUs * $fator);
+                        $set('negociacao_produto_preco_virtual_us', $precoUs + $precoUs * $fator);
                     }
                 }),
+
 
             Actions::make([
                 Action::make('resetar_precos_fixados')
@@ -174,8 +180,8 @@ class NegociacaoProdutosRelationManager extends RelationManager
                         $precoRs = $get('snap_produto_preco_rs') ?? 0;
                         $precoUs = $get('snap_produto_preco_us') ?? 0;
 
-                        $set('negociacao_produto_preco_virtual_rs', $precoRs * $fator);
-                        $set('negociacao_produto_preco_virtual_us', $precoUs * $fator);
+                        $set('negociacao_produto_preco_virtual_rs', $precoRs + $precoRs * $fator);
+                        $set('negociacao_produto_preco_virtual_us', $precoUs + $precoUs * $fator);
                     }
                 }),
 
@@ -199,25 +205,37 @@ class NegociacaoProdutosRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('produto.nome_composto')
+                TextColumn::make('produto.nome_composto')
                     ->label('Produto')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('volume')
+                TextColumn::make('volume')
+                    ->sortable(),
+
+                TextColumn::make('snap_produto_preco_rs')
                     ->sortable(),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
-                    ->label('Adicionar Produtos a Negociação'),
+                CreateAction::make()
+                    ->label('Adicionar Produtos a Negociação')
+                    ->after(fn(Component $livewire) => $livewire->dispatch('negociacaoProdutoUpdated')),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make()
+                    ->after(fn(Component $livewire) => $livewire->dispatch('negociacaoProdutoUpdated')),
+
+                DeleteAction::make()
+                    ->after(fn(Component $livewire) => $livewire->dispatch('negociacaoProdutoUpdated')),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
+                        ->after(fn(Component $livewire) => $livewire->dispatch('negociacaoProdutoUpdated')),
                 ]),
+            ])
+            ->emptyStateActions([
+                CreateAction::make()
+                    ->after(fn(Component $livewire) => $livewire->dispatch('negociacaoProdutoUpdated')),
             ]);
     }
 }
