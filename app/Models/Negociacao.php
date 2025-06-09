@@ -51,13 +51,18 @@ class Negociacao extends Model
         'data_entrega_graos',
 
         // Valores financeiros
-        'valor_total_com_bonus',
+        'valor_total_com_bonus_rs',
+        'valor_total_com_bonus_us',
+        'valor_total_sem_bonus_rs',
+        'valor_total_sem_bonus_us',
+        'valor_total_com_bonus_sacas',
+        'valor_total_sem_bonus_sacas',
+        'peso_total_kg',
         'area_hectares',
         'investimento_sacas_hectare',
         'investimento_total_sacas',
         'preco_liquido_saca',
         'bonus_cliente_pacote',
-        'valor_total_sem_bonus',
 
         // Validações
         'nivel_validacao_id',

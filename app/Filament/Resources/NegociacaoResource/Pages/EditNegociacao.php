@@ -29,35 +29,34 @@ class EditNegociacao extends EditRecord
         ]);
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        // busca sempre pela relação real, ignorando casts indesejados
+        $produtos = $this->record->negociacaoProdutos()->get();
+
+        return array_merge($data, [
+            'valor_total_sem_bonus_rs' => $produtos->sum(fn($item) => $item->snap_produto_preco_rs * $item->volume),
+            'valor_total_sem_bonus_us' => $produtos->sum(fn($item) => $item->snap_produto_preco_us * $item->volume),
+            'valor_total_com_bonus_rs' => $produtos->sum(fn($item) => $item->negociacao_produto_preco_virtual_rs * $item->volume),
+            'valor_total_com_bonus_us' => $produtos->sum(fn($item) => $item->negociacao_produto_preco_virtual_us * $item->volume),
+        ]);
+    }
+
     #[On('negociacaoProdutoUpdated')]
     public function refreshValores(): void
     {
-        // 1) Recarrega somente o relacionamento/moeda
-        $this->record->load('moeda');
-
-        $isUsd = optional($this->record->moeda)->sigla === 'US$';
-
-        // 2) Busca via relação (ignorando possível cast)
         $produtos = $this->record->negociacaoProdutos()->get();
 
-        $totalSem = $produtos->sum(fn($item) => (
-            $isUsd
-            ? $item->snap_produto_preco_us
-            : $item->snap_produto_preco_rs
-        ) * $item->volume);
+        $novosTotais = [
+            'valor_total_sem_bonus_rs' => $produtos->sum(fn($item) => $item->snap_produto_preco_rs * $item->volume),
+            'valor_total_sem_bonus_us' => $produtos->sum(fn($item) => $item->snap_produto_preco_us * $item->volume),
+            'valor_total_com_bonus_rs' => $produtos->sum(fn($item) => $item->negociacao_produto_preco_virtual_rs * $item->volume),
+            'valor_total_com_bonus_us' => $produtos->sum(fn($item) => $item->negociacao_produto_preco_virtual_us * $item->volume),
+        ];
 
-        $totalCom = $produtos->sum(fn($item) => (
-            $isUsd
-            ? $item->negociacao_produto_preco_virtual_us
-            : $item->negociacao_produto_preco_virtual_rs
-        ) * $item->volume);
-
-        // 3) Merge do state existente + updates
+        // preserva todo o state atual e sobrescreve só os 4 campos
         $state = $this->form->getState();
-        $newState = array_merge($state, [
-            'valor_total_sem_bonus' => $totalSem,
-            'valor_total_com_bonus' => $totalCom,
-        ]);
+        $newState = array_merge($state, $novosTotais);
 
         $this->form->fill($newState);
     }

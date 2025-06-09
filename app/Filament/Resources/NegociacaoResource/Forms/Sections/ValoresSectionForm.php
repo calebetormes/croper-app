@@ -12,24 +12,47 @@ class ValoresSectionForm
     {
         return Section::make('Valores')
             ->schema([
-                TextInput::make('valor_total_com_bonus')
-                    ->label('Valor Total com Bônus')
+                TextInput::make('valor_total_com_bonus_rs')
+                    ->label('Valor Total com Bônus R$')
                     ->reactive()             // ⬅️ adiciona reatividade
                     ->disabled()
                     ->numeric()
                     ->default(0)
-                    ->prefix(fn($get) => optional(Moeda::find($get('moeda_id')))->sigla)
+                    ->prefix('R$')
                     ->dehydrated(),
 
-                TextInput::make('valor_total_sem_bonus')
-                    ->label('Valor Total sem Bônus')
+                TextInput::make('valor_total_com_bonus_us')
+                    ->label('Valor Total com Bônus U$')
                     ->reactive()             // ⬅️ adiciona reatividade
                     ->disabled()
                     ->numeric()
                     ->default(0)
-                    ->prefix(fn($get) => optional(Moeda::find($get('moeda_id')))->sigla)
+                    ->prefix('US$')
                     ->dehydrated(),
 
+
+
+                TextInput::make('valor_total_sem_bonus_rs')
+                    ->label('Valor Total sem Bônus R$')
+                    ->reactive()             // ⬅️ adiciona reatividade
+                    ->disabled()
+                    ->numeric()
+                    ->default(0)
+                    ->prefix('R$')
+                    ->dehydrated(),
+
+                TextInput::make('valor_total_sem_bonus_us')
+                    ->label('Valor Total sem Bônus U$')
+                    ->reactive()             // ⬅️ adiciona reatividade
+                    ->disabled()
+                    ->numeric()
+                    ->default(0)
+                    ->prefix('US$')
+                    ->dehydrated(),
+
+                TextInput::make('valor_total_com_bonus_sacas')->numeric(),
+                TextInput::make('valor_total_sem_bonus_sacas')->numeric(),
+                TextInput::make('peso_total_kg')->numeric(),
                 TextInput::make('investimento_sacas_hectare')->numeric(),
                 TextInput::make('investimento_total_sacas')->numeric(),
                 TextInput::make('preco_liquido_saca')->numeric(),
