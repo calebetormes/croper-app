@@ -12,22 +12,37 @@ class Negociacao extends Model
 
     protected $table = 'negociacoes';
 
+    // Casts para datas, booleanos e valores decimais
     protected $casts = [
-        //'negociacaoProdutos' => 'array',
+        'data_versao' => 'date',
+        'data_negocio' => 'date',
+        'data_atualizacao_snap_preco_praca_cotacao' => 'date',
+        'status_validacao' => 'boolean',
+        'valor_total_pedido_rs' => 'decimal:2',
+        'valor_total_pedido_us' => 'decimal:2',
+        'valor_total_pedido_rs_valorizado' => 'decimal:2',
+        'valor_total_pedido_us_valorizado' => 'decimal:2',
+        'area_hectares' => 'decimal:2',
+        'investimento_total_sacas' => 'decimal:2',
+        'investimento_sacas_hectare' => 'decimal:2',
+        'indice_valorizacao_saca' => 'decimal:2',
+        'preco_liquido_saca' => 'decimal:2',
+        'preco_liquido_saca_valorizado' => 'decimal:2',
+        'bonus_cliente_pacote' => 'decimal:2',
+        'peso_total_kg' => 'decimal:2',
+        'cotacao_moeda_usd_brl' => 'decimal:2',
     ];
-
 
     protected static function booted()
     {
         static::created(function (Negociacao $negociacao) {
             $negociacao->updateQuietly([
-                'pedido_id' => str_pad($negociacao->id, 6, '0', STR_PAD_LEFT), // ← padding para 6 dígitos
+                'pedido_id' => str_pad($negociacao->id, 6, '0', STR_PAD_LEFT),
             ]);
         });
     }
 
     protected $fillable = [
-
         'pedido_id',
 
         // Datas principais
@@ -44,50 +59,46 @@ class Negociacao extends Model
         'endereco_cliente',
         'cidade_cliente',
 
-        // Cultura e praça
+        // Cultura, praça e pagamento
         'cultura_id',
         'praca_cotacao_id',
         'pagamento_id',
-        'data_entrega_graos',
+
+        // Snapshots de preço da praça
+        'snap_praca_cotacao_preco',
+        'data_atualizacao_snap_preco_praca_cotacao',
 
         // Valores financeiros
-        'valor_total_com_bonus_rs',
-        'valor_total_com_bonus_us',
-        'valor_total_sem_bonus_rs',
-        'valor_total_sem_bonus_us',
-        'valor_total_com_bonus_sacas',
-        'valor_total_sem_bonus_sacas',
-        'peso_total_kg',
         'area_hectares',
-        'investimento_sacas_hectare',
+        'valor_total_pedido_rs',
+        'valor_total_pedido_us',
+        'valor_total_pedido_rs_valorizado',
+        'valor_total_pedido_us_valorizado',
         'investimento_total_sacas',
+        'investimento_sacas_hectare',
+        'indice_valorizacao_saca',
         'preco_liquido_saca',
+        'preco_liquido_saca_valorizado',
         'bonus_cliente_pacote',
+        'peso_total_kg',
 
-        // Validações
+        // Validações e status
         'nivel_validacao_id',
         'status_validacao',
         'status_defensivos',
         'status_especialidades',
         'status_negociacao_id',
 
-        // Snapshots de preço da praça
-        'snap_praca_cotacao_preco',
-        'snap_praca_cotacao_fator_valorizacao',
-        'snap_praca_cotacao_preco_fixado',
-        'data_atualizacao_snap_preco_praca_cotacao',
-
-
-        // Observações
+        // Observações e câmbio
         'observacoes',
+        'cotacao_moeda_usd_brl',
     ];
 
-
+    // Relações
     public function moeda()
     {
         return $this->belongsTo(Moeda::class);
     }
-
 
     public function gerente()
     {
@@ -98,7 +109,6 @@ class Negociacao extends Model
     {
         return $this->belongsTo(User::class, 'vendedor_id');
     }
-
 
     public function cultura()
     {

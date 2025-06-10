@@ -2,15 +2,17 @@
 
 namespace Database\Seeders;
 
-use App\Models\Negociacao;
 use Illuminate\Database\Seeder;
+use App\Models\Negociacao;
 
 class NegociacaoSeeder extends Seeder
 {
     public function run(): void
     {
-        // Exemplo de inserção com valores fictícios
         Negociacao::create([
+            // Identificador do pedido (6 caracteres)
+            'pedido_id' => 'PED001',
+
             // Datas
             'data_versao' => now()->subDays(3),
             'data_negocio' => now(),
@@ -25,26 +27,28 @@ class NegociacaoSeeder extends Seeder
             'endereco_cliente' => 'Rodovia BR-101, KM 25',
             'cidade_cliente' => 'Lucas do Rio Verde',
 
-            // Cultura e praça
+            // Cultura, praça de cotação e forma de pagamento
             'cultura_id' => 1, // Ex: Soja
             'praca_cotacao_id' => 1,
             'pagamento_id' => 1,
-            'data_entrega_graos' => now()->addMonths(3),
 
-            // Valores financeiros (simulando fórmulas)
-            'valor_total_com_bonus_rs' => 0.00,
-            'valor_total_sem_bonus_rs' => 0.00,
-            'valor_total_com_bonus_us' => 0.00,
-            'valor_total_sem_bonus_us' => 0.00,
-            'valor_total_com_bonus_sacas' => 0.00,
-            'valor_total_sem_bonus_sacas' => 0.00,
-            'peso_total_kg' => 100000.00, // 100 toneladas
+            // Snapshot do preço da praça
+            'snap_praca_cotacao_preco' => 118.50,
+            'data_atualizacao_snap_preco_praca_cotacao' => now(),
+
+            // Valores financeiros
             'area_hectares' => 100.00,
-            'investimento_sacas_hectare' => 5.50, // valor fictício
-            'investimento_total_sacas' => 550.00, // 100 * 5.5
+            'valor_total_pedido_rs' => 235000.00,
+            'valor_total_pedido_us' => 47000.00,
+            'valor_total_pedido_rs_valorizado' => 240000.00,
+            'valor_total_pedido_us_valorizado' => 48000.00,
+            'investimento_total_sacas' => 550.00,
+            'investimento_sacas_hectare' => 5.50,
+            'indice_valorizacao_saca' => 0.50,
             'preco_liquido_saca' => 120.75,
+            'preco_liquido_saca_valorizado' => 122.00,
             'bonus_cliente_pacote' => 15000.00,
-            'valor_total_sem_bonus' => 235000.00,
+            'peso_total_kg' => 100000.00,
 
             // Validações
             'nivel_validacao_id' => 1,
@@ -53,14 +57,9 @@ class NegociacaoSeeder extends Seeder
             'status_especialidades' => 5,
             'status_negociacao_id' => 2,
 
-            // Snapshot do preço da praça
-            'snap_praca_cotacao_preco' => 118.50,
-            'snap_praca_cotacao_fator_valorizacao' => 0.5,
-            'snap_praca_cotacao_preco_fixado' => true,
-            'data_atualizacao_snap_preco_praca_cotacao' => now(),
-
-            // Observações
+            // Outros
             'observacoes' => 'Negociação de exemplo para testes iniciais.',
+            'cotacao_moeda_usd_brl' => 5.00,
         ]);
     }
 }
