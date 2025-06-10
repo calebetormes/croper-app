@@ -128,6 +128,45 @@ class NegociacaoProdutosRelationManager extends RelationManager
                     }
                 }),
 
+            TextInput::make('negociacao_produto_preco_virtual_rs')
+                ->label('Preço Virtual (R$)')
+                ->prefix('R$')
+                ->numeric()
+                ->required(),
+
+
+            TextInput::make('negociacao_produto_preco_virtual_us')
+                ->label('Preço Virtual (US$)')
+                ->prefix('US$')
+                ->numeric()
+                ->required(),
+
+            DatePicker::make('data_atualizacao_snap_precos_produtos')
+                ->label('Data de Atualização dos Preços')
+                ->required()
+                ->disabled()
+                ->dehydrated(),
+
+
+            TextInput::make('negociacao_produto_fator_valorizacao')
+                ->label('Fator de Valorização')
+                ->default(fn() => $this->ownerRecord->snap_praca_cotacao_fator_valorizacao)
+                ->numeric()
+                ->required()
+                ->dehydrated()
+                ->reactive()
+
+                //Calcula os preços virtuais quando o fator de valorização é atualizado
+                ->afterStateUpdated(function ($get, $set) {
+                    if ($get('produto_id')) {
+                        $fator = $get('negociacao_produto_fator_valorizacao') ?? 0;
+                        $precoRs = $get('snap_produto_preco_rs') ?? 0;
+                        $precoUs = $get('snap_produto_preco_us') ?? 0;
+
+                        $set('negociacao_produto_preco_virtual_rs', $precoRs + $precoRs * $fator);
+                        $set('negociacao_produto_preco_virtual_us', $precoUs + $precoUs * $fator);
+                    }
+                }),
 
             Actions::make([
                 Action::make('resetar_precos_fixados')
@@ -157,47 +196,6 @@ class NegociacaoProdutosRelationManager extends RelationManager
                     }),
             ]),
 
-
-            DatePicker::make('data_atualizacao_snap_precos_produtos')
-                ->label('Data de Atualização dos Preços')
-                ->required()
-                ->disabled()
-                ->dehydrated(),
-
-
-            TextInput::make('negociacao_produto_fator_valorizacao')
-                ->label('Fator de Valorização')
-                ->default(fn() => $this->ownerRecord->snap_praca_cotacao_fator_valorizacao)
-                ->numeric()
-                ->required()
-                ->dehydrated()
-                ->reactive()
-
-                //Calcula os preços virtuais quando o fator de valorização é atualizado
-                ->afterStateUpdated(function ($get, $set) {
-                    if ($get('produto_id')) {
-                        $fator = $get('negociacao_produto_fator_valorizacao') ?? 0;
-                        $precoRs = $get('snap_produto_preco_rs') ?? 0;
-                        $precoUs = $get('snap_produto_preco_us') ?? 0;
-
-                        $set('negociacao_produto_preco_virtual_rs', $precoRs + $precoRs * $fator);
-                        $set('negociacao_produto_preco_virtual_us', $precoUs + $precoUs * $fator);
-                    }
-                }),
-
-
-            TextInput::make('negociacao_produto_preco_virtual_rs')
-                ->label('Preço Virtual (R$)')
-                ->prefix('R$')
-                ->numeric()
-                ->required(),
-
-
-            TextInput::make('negociacao_produto_preco_virtual_us')
-                ->label('Preço Virtual (US$)')
-                ->prefix('US$')
-                ->numeric()
-                ->required(),
         ]);
     }
 
@@ -218,24 +216,24 @@ class NegociacaoProdutosRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->label('Adicionar Produtos a Negociação')
-                    ->after(fn(Component $livewire) => $livewire->dispatch('negociacaoProdutoUpdated')),
+                    ->after(fn($livewire) => $livewire->dispatch('negociacaoProdutoUpdated')),
             ])
             ->actions([
                 EditAction::make()
-                    ->after(fn(Component $livewire) => $livewire->dispatch('negociacaoProdutoUpdated')),
+                    ->after(fn($livewire) => $livewire->dispatch('negociacaoProdutoUpdated')),
 
                 DeleteAction::make()
-                    ->after(fn(Component $livewire) => $livewire->dispatch('negociacaoProdutoUpdated')),
+                    ->after(fn($livewire) => $livewire->dispatch('negociacaoProdutoUpdated')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->after(fn(Component $livewire) => $livewire->dispatch('negociacaoProdutoUpdated')),
+                        ->after(fn($livewire) => $livewire->dispatch('negociacaoProdutoUpdated')),
                 ]),
             ])
             ->emptyStateActions([
                 CreateAction::make()
-                    ->after(fn(Component $livewire) => $livewire->dispatch('negociacaoProdutoUpdated')),
+                    ->after(fn($livewire) => $livewire->dispatch('negociacaoProdutoUpdated')),
             ]);
     }
 }

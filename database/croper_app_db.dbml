@@ -148,6 +148,8 @@ Table pracas_cotacoes {
   fator_valorizacao decimal (12,2)
 }
 
+//ALTERADO 
+//lembrar de REMOVER FATOR DE VALORização no section pracas_cotacoes
 Table negociacoes {
   id int [pk, increment]
   pedido_id int [unique]
@@ -165,22 +167,38 @@ Table negociacoes {
   cultura_id int [ref: > culturas.id]
   praca_cotacao_id int [ref: > pracas_cotacoes.id]
   pagamento_id int [ref: > pagamentos.id] // Renomeado de data_pgto_contrato
-  data_entrega_graos date
-  //
-  area_hectares decimal(12,2)
-  valor_total_com_bonus_rs decimal(12,2) //FORMULA
-  valor_total_sem_bonus_rs decimal(12,2) //FORMULA
-  valor_total_com_bonus_us decimal(12,2) //FORMULA
-  valor_total_sem_bonus_us decimal(12,2) //FORMULA
-  valor_total_com_bonus_sacas decimal(12,2) //FORMULA
-  valor_total_sem_bonus_sacas decimal(12,2) //FORMULA
-  peso_total_kg decimal(12,2) //FORMULA
-  investimento_sacas_hectare decimal(12,2) //FORMULA
-  investimento_total_sacas decimal(12,2) //FORMULA
-  preco_liquido_saca decimal(12,2)// FORMULA
-  bonus_cliente_pacote decimal(12,2) //FORMULA
+  dat
+   
+  //SNAP DE PREÇOS DAS PRAÇAS
+  snap_praca_cotacao_preco decimal(12,2) //snapshot calculado de pracas_cotacoes
+  snap_praca_cotacao_preco_fixado bool 
+  data_atualizacao_snap_preco_praca_cotacao date
+
+  //VALORES
+  area_hectares decimal(12,2) //manual
+  valor_total_pedido_rs decimal(12,2) //SOMA DOS snap_produto_preco_rs * VOLUME 
+  valor_total_pedido_us decimal(12,2) //SOMA DOS snap_produto_preco_us * VOLUME
+  valor_total_pedido_rs_valorizado decimal(12,2) //SOMA DOS (preco_produto_valorizado_rs * VOLUME) 
+  valor_total_pedido_us_valorizado decimal(12,2) //SOMA DOS (preco_produto_valorizado_rs * VOLUME)
+  
+  
+  
+  //Deve ser feito uma verificação para ver se o pedido é em RS ou US
+  //se for em RS, sera valor_total_pedido_rs dividido pelo preco_rs do produto
+  //se for em US, sera valor_total_pedido_us dividido pelo preco_us do produto
+  investimento_total_sacas decimal(12,2) //quantidade de investimento em sacas de 60 Kg será a seguinte conta: VALOR TOTAL DO PEDIDO / PREÇO DA SACA 60 KG
+  
+  investimento_sacas_hectare decimal(12,2) // investimento_total_sacas / area_hectares
   
 
+  //valorização da saca
+  indice_valorizacao_saca decimal(12,2) // media dos fatores de valorização dos produtos
+  preco_liquido_saca decimal(12,2) //recebe da praca_cotacao_preco
+  preco_liquido_saca_valorizado decimal(12,2) //snap_preco_liquido_saca * indice_valorizacao_saca
+
+  bonus_cliente_pacote decimal(12,2) //
+  peso_total_kg decimal(12,2) 
+  
   //VALIDAÇÔES
   nivel_validacao_id int [ref: > niveis_validacao.id]
   status_validacao bool
@@ -188,30 +206,34 @@ Table negociacoes {
   status_especialidades int
   status_negociacao_id int [ref: > status_negociacoes.id]
 
-  //SNAP DE PREÇOS DAS PRAÇAS
-  snap_praca_cotacao_fator_valorizacao decimal(12,2)
-  snap_praca_cotacao_preco decimal(12,2) //snapshot calculado de pracas_cotacoes
-  snap_praca_cotacao_preco_fixado bool 
-  data_atualizacao_snap_preco_praca_cotacao date
   
   observacoes text // Renomeado 
   cotacao_moeda_usd_brl decimal (12,2)//para posterior pesquisa
+
 }
 
-Table negociacoes_produtos {
+
+//--------------------------------------------------------------
+// ALTERADA
+//--------------------------------------------------------------
+Table negociacoes_produtos { 
   id int [pk, increment]
   negociacao_id int [ref: > negociacoes.id]
   produto_id int [ref: > produtos.id]
   volume decimal(12,2) // Alterado de varchar
+  indice_valorizacao decimal(12,2) // Fator de valorização do produto na negociação
 
-  //campos snapshop para os preços
+  //campos snapshop para os preços recebidos do produto editaveis manualmente
   snap_produto_preco_rs decimal(12,2) 
   snap_produto_preco_us decimal(12,2) 
+  snap_custo_rs decimal(12,2) //AAAAA
+  snap_custo_us decimal(12,2) //AAAAA
+  //
+  preco_produto_valorizado_rs decimal(12,2) // snap_produto_preco_rs * indice_valorização 
+  preco_produto_valorizado_us decimal(12,2) // snap_produto_preco_us * indice_valorização
+  
   data_atualizacao_snap_precos_produtos date
-
   negociacao_produto_fator_valorizacao decimal(12,2)
-  negociacao_produto_preco_virtual_rs decimal(12,2) //RENOMEADO nao é mais snap, devido ao fator de valorizaçao em cotações
-  negociacao_produto_preco_virtual_us decimal(12,2) //RENOMEADO nao é mais snap, devido ao fator de valorizaçao em cotações
 
 }
 

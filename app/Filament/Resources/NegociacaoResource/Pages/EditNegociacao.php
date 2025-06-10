@@ -2,63 +2,87 @@
 
 namespace App\Filament\Resources\NegociacaoResource\Pages;
 
+use App\Models\Moeda;
 use App\Filament\Resources\NegociacaoResource;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Actions;
 use Livewire\Attributes\On;
-
-
+use Filament\Actions\DeleteAction;
 
 class EditNegociacao extends EditRecord
 {
     protected static string $resource = NegociacaoResource::class;
 
-    // cabeçalho: botão de excluir
+    // Cabeçalho
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 
-    // 1) Registra o listener
-    protected function getListeners(): array
-    {
-        return array_merge(parent::getListeners(), [
-            'negociacaoProdutoUpdated' => 'refreshValores',
-        ]);
-    }
-
+    // Popula os totais INICIAIS sem apagar nada
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        // busca sempre pela relação real, ignorando casts indesejados
         $produtos = $this->record->negociacaoProdutos()->get();
 
         return array_merge($data, [
-            'valor_total_sem_bonus_rs' => $produtos->sum(fn($item) => $item->snap_produto_preco_rs * $item->volume),
-            'valor_total_sem_bonus_us' => $produtos->sum(fn($item) => $item->snap_produto_preco_us * $item->volume),
-            'valor_total_com_bonus_rs' => $produtos->sum(fn($item) => $item->negociacao_produto_preco_virtual_rs * $item->volume),
-            'valor_total_com_bonus_us' => $produtos->sum(fn($item) => $item->negociacao_produto_preco_virtual_us * $item->volume),
+            'valor_total_sem_bonus_rs' => $produtos->sum('total_sem_bonus_rs'),
+            'valor_total_sem_bonus_us' => $produtos->sum('total_sem_bonus_us'),
+            'valor_total_com_bonus_rs' => $produtos->sum('total_com_bonus_rs'),
+            'valor_total_com_bonus_us' => $produtos->sum('total_com_bonus_us'),
+            'investimento_total_sacas' => $this->calculateInvestimento($data),
         ]);
     }
 
+    // Recalcula **só** quando o RelationManager emitir o evento
     #[On('negociacaoProdutoUpdated')]
     public function refreshValores(): void
     {
+        $state = $this->form->getState();
         $produtos = $this->record->negociacaoProdutos()->get();
 
-        $novosTotais = [
-            'valor_total_sem_bonus_rs' => $produtos->sum(fn($item) => $item->snap_produto_preco_rs * $item->volume),
-            'valor_total_sem_bonus_us' => $produtos->sum(fn($item) => $item->snap_produto_preco_us * $item->volume),
-            'valor_total_com_bonus_rs' => $produtos->sum(fn($item) => $item->negociacao_produto_preco_virtual_rs * $item->volume),
-            'valor_total_com_bonus_us' => $produtos->sum(fn($item) => $item->negociacao_produto_preco_virtual_us * $item->volume),
+        $updates = [
+            'valor_total_sem_bonus_rs' => $produtos->sum('total_sem_bonus_rs'),
+            'valor_total_sem_bonus_us' => $produtos->sum('total_sem_bonus_us'),
+            'valor_total_com_bonus_rs' => $produtos->sum('total_com_bonus_rs'),
+            'valor_total_com_bonus_us' => $produtos->sum('total_com_bonus_us'),
+            'investimento_total_sacas' => $this->calculateInvestimento($state),
         ];
 
-        // preserva todo o state atual e sobrescreve só os 4 campos
-        $state = $this->form->getState();
-        $newState = array_merge($state, $novosTotais);
-
-        $this->form->fill($newState);
+        // Merge preserve os outros campos
+        $this->form->fill(array_merge($state, $updates));
     }
 
+    // Extrai a lógica de investimento para facilitar reuse
+    protected function calculateInvestimento(array $state): float
+    {
+        $sigla = optional(Moeda::find($state['moeda_id'] ?? null))->sigla;
+        $total = $sigla === 'US$'
+            ? ($state['valor_total_sem_bonus_us'] ?? 0)
+            : ($state['valor_total_sem_bonus_rs'] ?? 0);
+        $preco = $state['preco_liquido_saca'] ?: 1;
+
+        return $total / $preco;
+    }
+
+    public function updatedSnapPracaCotacaoPreco($value): void
+    {
+        // 1) garantir que o preco_liquido_saca esteja sincronizado
+        $state = $this->form->getState();
+        $state['preco_liquido_saca'] = $value;
+
+        // 2) recalcula o investimento
+        $state['investimento_total_sacas'] = $this->calculateInvestimento($state);
+
+        // 3) preenche de volta no form sem apagar nada
+        $this->form->fill($state);
+    }
+
+    // Sempre que o preço mudar, atualiza só o investimento
+    public function updatedPrecoLiquidoSaca($value): void
+    {
+        $state = $this->form->getState();
+        $state['investimento_total_sacas'] = $this->calculateInvestimento($state);
+        $this->form->fill($state);
+    }
 }

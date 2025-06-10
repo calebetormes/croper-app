@@ -55,8 +55,8 @@ class NegociacaoResource extends Resource
         return $form->schema([
             BasicInformationSectionForm::make(),
             ClientInformationSectionForm::make(),
-            CotacoesSectionForm::make(),
             PagamentosSectionForm::make(),
+            CotacoesSectionForm::make(),
             ValoresSectionForm::make(),
             StatusValidacoesSectionForm::make(),
             StatusGeralSectionForm::make(),

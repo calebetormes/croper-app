@@ -103,6 +103,7 @@ class CotacoesSectionForm
                     ->searchable()
                     ->afterStateUpdated(function ($state, $set) {
                         $cotacao = PracaCotacao::find($state);
+                        $preco = $cotacao?->praca_cotacao_preco;
                         $data = $cotacao && $cotacao->data_vencimento
                             ? Carbon::parse($cotacao->data_vencimento)->format('d/m/Y')
                             : null;
@@ -110,6 +111,7 @@ class CotacoesSectionForm
                         $set('snap_praca_cotacao_preco', $cotacao?->praca_cotacao_preco);
                         $set('snap_praca_cotacao_fator_valorizacao', $cotacao?->fator_valorizacao);
                         $set('data_atualizacao_snap_preco_praca_cotacao', date('Y-m-d'));
+                        $set('preco_liquido_saca', $preco);
                     }),
 
                 TextInput::make('snap_praca_cotacao_preco')
@@ -117,7 +119,10 @@ class CotacoesSectionForm
                     ->numeric()
                     ->required()
                     ->dehydrated()
-                    ->reactive(),
+                    ->reactive()
+                    ->afterStateHydrated(fn($state, callable $set) => $set('preco_liquido_saca', $state))
+                    // Sempre que mudar aqui, replica lá
+                    ->afterStateUpdated(fn($state, callable $set) => $set('preco_liquido_saca', $state)),
 
                 TextInput::make('snap_praca_cotacao_fator_valorizacao')
                     ->label('Fator de Valorização')

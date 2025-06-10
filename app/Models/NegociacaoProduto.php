@@ -40,4 +40,24 @@ class NegociacaoProduto extends Model
     {
         return $this->belongsTo(Produto::class);
     }
+
+    public function getTotalSemBonusRsAttribute(): float
+    {
+        return $this->snap_produto_preco_rs * $this->volume;
+    }
+
+    public function getTotalSemBonusUsAttribute(): float
+    {
+        return $this->snap_produto_preco_us * $this->volume;
+    }
+
+    public function getTotalComBonusRsAttribute(): float
+    {
+        return $this->negociacao_produto_preco_virtual_rs * $this->volume;
+    }
+
+    public function getTotalComBonusUsAttribute(): float
+    {
+        return $this->negociacao_produto_preco_virtual_us * $this->volume;
+    }
 }
