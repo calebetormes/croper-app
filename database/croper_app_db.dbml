@@ -153,17 +153,20 @@ Table pracas_cotacoes {
 Table negociacoes {
   id int [pk, increment]
   pedido_id int [unique]
-  //
+
+  // Datas principais
   data_versao date
   data_negocio date
   moeda_id int [ref: > moedas.id] // Ajustado para usar ID
-  //
+
+  // pessoas
   gerente_id bigint [ref: > users.id] // Renomeado de GRV
   vendedor_id bigint [ref: > users.id] // Renomeado de RTV
   cliente varchar //Razão Social
   endereco_cliente varchar
   cidade_cliente varchar
-  //
+
+  // Cultura e praça
   cultura_id int [ref: > culturas.id]
   praca_cotacao_id int [ref: > pracas_cotacoes.id]
   pagamento_id int [ref: > pagamentos.id] // Renomeado de data_pgto_contrato
@@ -171,7 +174,6 @@ Table negociacoes {
    
   //SNAP DE PREÇOS DAS PRAÇAS
   snap_praca_cotacao_preco decimal(12,2) //snapshot calculado de pracas_cotacoes
-  snap_praca_cotacao_preco_fixado bool 
   data_atualizacao_snap_preco_praca_cotacao date
 
   //VALORES
@@ -226,8 +228,6 @@ Table negociacoes_produtos {
   //campos snapshop para os preços recebidos do produto editaveis manualmente
   snap_produto_preco_rs decimal(12,2) 
   snap_produto_preco_us decimal(12,2) 
-  snap_custo_rs decimal(12,2) //AAAAA
-  snap_custo_us decimal(12,2) //AAAAA
   //
   preco_produto_valorizado_rs decimal(12,2) // snap_produto_preco_rs * indice_valorização 
   preco_produto_valorizado_us decimal(12,2) // snap_produto_preco_us * indice_valorização

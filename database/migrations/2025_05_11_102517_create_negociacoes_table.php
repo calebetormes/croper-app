@@ -27,7 +27,7 @@ return new class extends Migration {
             $table->foreignId('cultura_id')->constrained('culturas');
             $table->foreignId('praca_cotacao_id')->constrained('pracas_cotacoes');
             $table->foreignId('pagamento_id')->constrained('pagamentos');
-            //$table->date('data_entrega_graos');
+            $table->date('data_entrega_graos');
 
             // Snapshots de preço da praça
             //$table->decimal('snap_praca_cotacao_fator_valorizacao', 12, 2)->nullable();

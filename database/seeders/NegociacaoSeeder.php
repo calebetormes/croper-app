@@ -31,6 +31,7 @@ class NegociacaoSeeder extends Seeder
             'cultura_id' => 1, // Ex: Soja
             'praca_cotacao_id' => 1,
             'pagamento_id' => 1,
+            'data_entrega_graos' => now()->addDays(30),
 
             // Snapshot do preço da praça
             'snap_praca_cotacao_preco' => 118.50,

@@ -17,17 +17,16 @@ return new class extends Migration {
             $table->unsignedBigInteger('negociacao_id');
             $table->unsignedInteger('produto_id');
             $table->decimal('volume', 12, 2);
+            $table->decimal('indice_valorizacao', 12, 2);
 
             // Campos snapshot para os preços
             $table->decimal('snap_produto_preco_rs', 12, 2);
             $table->decimal('snap_produto_preco_us', 12, 2);
+
+            $table->decimal('preco_produto_valorizado_rs', 12, 2);
+            $table->decimal('preco_produto_valorizado_us', 12, 2);
+
             $table->date('data_atualizacao_snap_precos_produtos');
-
-            // formulas
-            $table->decimal('negociacao_produto_fator_valorizacao');
-            $table->decimal('negociacao_produto_preco_virtual_rs', 12, 2);
-            $table->decimal('negociacao_produto_preco_virtual_us', 12, 2);
-
 
             // Foreign keys
             $table->foreign('negociacao_id')

@@ -28,35 +28,6 @@ class CotacoesSectionForm
                     ->inline()
                     ->reactive(),
 
-                DatePicker::make('data_atualizacao_snap_preco_praca_cotacao')
-                    ->label('Preço fixado no dia')
-                    ->default(fn() => now()->toDateString())
-                    ->disabled()
-                    ->dehydrated()
-                    ->reactive()
-                    ->afterOrEqual(now()->subDays(3)->toDateString())
-                    ->validationMessages([
-                        'after_or_equal' => 'Já se passaram {$days} dias desde a última atualização de preços da praça. Selecione a praça atualizada',
-                    ])
-                    ->validationAttribute('Preço fixado no dia')
-                    ->afterStateHydrated(function ($component, $state) {
-                        // $state virá como string “YYYY-MM-DD” vinda do banco
-                        if ($state) {
-                            $selectedDate = Carbon::parse($state);
-                            $limite = Carbon::now()->subDays(3)->startOfDay();
-
-                            if ($selectedDate->lt($limite)) {
-                                // Se a data for anterior a (hoje − 3 dias),
-                                // limpamos imediatamente o campo praca_cotacao_id no form
-                                $component
-                                    ->getLivewire()
-                                    ->fill([
-                                        'praca_cotacao_id' => null,
-                                    ]);
-                            }
-                        }
-                    }),
-
                 Select::make('praca_cotacao_id')
                     ->label('Praça')
                     ->reactive()
@@ -124,13 +95,6 @@ class CotacoesSectionForm
                     // Sempre que mudar aqui, replica lá
                     ->afterStateUpdated(fn($state, callable $set) => $set('preco_liquido_saca', $state)),
 
-                TextInput::make('snap_praca_cotacao_fator_valorizacao')
-                    ->label('Fator de Valorização')
-                    ->numeric()
-                    ->required()
-                    ->dehydrated()
-                    ->reactive(),
-
                 Placeholder::make('data_praca_vencimento')
                     ->label('Data da Cotação')
                     ->content(
@@ -141,6 +105,35 @@ class CotacoesSectionForm
                     ->reactive(),
 
                 Hidden::make('snap_praca_cotacao_preco_fixado')->default(true)->dehydrated(),
+
+                DatePicker::make('data_atualizacao_snap_preco_praca_cotacao')
+                    ->label('Preço fixado no dia')
+                    ->default(fn() => now()->toDateString())
+                    ->disabled()
+                    ->dehydrated()
+                    ->reactive()
+                    ->afterOrEqual(now()->subDays(3)->toDateString())
+                    ->validationMessages([
+                        'after_or_equal' => 'Já se passaram {$days} dias desde a última atualização de preços da praça. Selecione a praça atualizada',
+                    ])
+                    ->validationAttribute('Preço fixado no dia')
+                    ->afterStateHydrated(function ($component, $state) {
+                        // $state virá como string “YYYY-MM-DD” vinda do banco
+                        if ($state) {
+                            $selectedDate = Carbon::parse($state);
+                            $limite = Carbon::now()->subDays(3)->startOfDay();
+
+                            if ($selectedDate->lt($limite)) {
+                                // Se a data for anterior a (hoje − 3 dias),
+                                // limpamos imediatamente o campo praca_cotacao_id no form
+                                $component
+                                    ->getLivewire()
+                                    ->fill([
+                                        'praca_cotacao_id' => null,
+                                    ]);
+                            }
+                        }
+                    }),
 
                 Actions::make([
                     Action::make('atualizar_preco_praca')
@@ -185,6 +178,6 @@ class CotacoesSectionForm
                         }),
                 ]),
             ])
-            ->columns(3);
+            ->columns(4);
     }
 }
