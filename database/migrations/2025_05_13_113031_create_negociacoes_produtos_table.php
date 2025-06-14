@@ -23,8 +23,8 @@ return new class extends Migration {
             $table->decimal('snap_produto_preco_rs', 12, 2);
             $table->decimal('snap_produto_preco_us', 12, 2);
 
-            $table->decimal('preco_produto_valorizado_rs', 12, 2);
-            $table->decimal('preco_produto_valorizado_us', 12, 2);
+            $table->decimal('preco_produto_valorizado_rs', 12, 2)->nullable();
+            $table->decimal('preco_produto_valorizado_us', 12, 2)->nullable();
 
             $table->date('data_atualizacao_snap_precos_produtos');
 

@@ -32,11 +32,12 @@ class EditNegociacao extends EditRecord
         ]);
     }
 
-    #[On('negociacaoProdutoCreated')]
-    #[On('negociacaoProdutoUpdated')]
-    #[On('negociacaoProdutoDeleted')]
     public function refreshValores(): void
     {
+        // 1) Recarrega o modelo para ter a relação atualizada
+        $this->record->refresh();
+
+        // 2) Obtém o estado atual do form
         $state = $this->form->getState();
         $produtos = $this->record->negociacaoProdutos()->get();
 
@@ -48,6 +49,7 @@ class EditNegociacao extends EditRecord
             'investimento_total_sacas' => $this->calculateInvestimento($state),
         ];
 
+        // 3) Preenche o form com os valores recalculados
         $this->form->fill(array_merge($state, $updates));
     }
 
@@ -62,20 +64,5 @@ class EditNegociacao extends EditRecord
         return $preco > 0 ? ($total / $preco) : 0;
     }
 
-    public function updatedPrecoLiquidoSaca($value): void
-    {
-        $state = $this->form->getState();
-        $state['investimento_total_sacas'] = $this->calculateInvestimento($state);
 
-        $this->form->fill($state);
-    }
-
-    public function updatedPrecoLiquidoSacaValorizado($value): void
-    {
-        $state = $this->form->getState();
-        $state['preco_liquido_saca_valorizado'] = $value;
-        $state['investimento_total_sacas'] = $this->calculateInvestimento($state);
-
-        $this->form->fill($state);
-    }
 }

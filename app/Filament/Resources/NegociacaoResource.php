@@ -11,20 +11,30 @@ use App\Filament\Resources\NegociacaoResource\Forms\Sections\StatusGeralSectionF
 use App\Filament\Resources\NegociacaoResource\Forms\Sections\StatusValidacoesSectionForm;
 use App\Filament\Resources\NegociacaoResource\Forms\Sections\ValoresSectionForm;
 use App\Filament\Resources\NegociacaoResource\Pages;
+use App\Filament\Resources\NegociacaoResource\Forms\Sections\NegociacaoProdutosSectionForm;
+
 use App\Filament\Resources\NegociacaoResource\RelationManagers\NegociacaoProdutosRelationManager;
 use App\Models\Negociacao;
 use App\Models\StatusNegociacao;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
 use Filament\Navigation\NavigationItem;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use App\Models\Produto;
+
 
 class NegociacaoResource extends Resource
 {
@@ -60,7 +70,8 @@ class NegociacaoResource extends Resource
             ValoresSectionForm::make(),
             StatusValidacoesSectionForm::make(),
             StatusGeralSectionForm::make(),
-            // ProdutosSectionForm::make(), // caso use
+            NegociacaoProdutosSectionForm::make(),
+
         ]);
     }
 
@@ -68,16 +79,17 @@ class NegociacaoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('data_negocio')
+                TextColumn::make('data_negocio')
                     ->sortable()
                     ->label('Data negócio')
                     ->date('d/m/Y'),
-                Tables\Columns\TextColumn::make('pedido_id')->label('ID do Pedido')->sortable(),
-                Tables\Columns\TextColumn::make('gerente.name')->label('GRV')->sortable(),
-                Tables\Columns\TextColumn::make('vendedor.name')->label('RTV')->sortable(),
-                Tables\Columns\TextColumn::make('cliente')->searchable(),
-                Tables\Columns\TextColumn::make('cultura.nome')->label('Cultura')->sortable(),
-                Tables\Columns\TextColumn::make('status_negociacao.nome')->label('Status')->sortable(),
+                TextColumn::make('pedido_id')->label('ID do Pedido')->sortable(),
+                TextColumn::make('gerente.name')->label('GRV')->sortable(),
+                TextColumn::make('vendedor.name')->label('RTV')->sortable(),
+                TextColumn::make('cliente')->searchable(),
+                TextColumn::make('cultura.nome')->label('Cultura')->sortable(),
+                TextColumn::make('status_negociacao.nome')->label('Status')->sortable(),
+                TextColumn::make('status_negociacao.nome')->label('Status')->sortable(),
             ])
             ->filters([
                 Filter::make('data_negocio')
@@ -121,12 +133,16 @@ class NegociacaoResource extends Resource
             ]);
     }
 
-    public static function getRelations(): array
+    /*
+        public static function getRelations(): array
     {
         return [
             NegociacaoProdutosRelationManager::class,
         ];
     }
+    */
+
+
 
     public static function getPages(): array
     {
