@@ -23,6 +23,8 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tab;
 use Filament\Navigation\NavigationItem;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -63,15 +65,35 @@ class NegociacaoResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            BasicInformationSectionForm::make(),
-            ClientInformationSectionForm::make(),
-            PagamentosSectionForm::make(),
-            CotacoesSectionForm::make(),
-            ValoresSectionForm::make(),
-            StatusValidacoesSectionForm::make(),
-            StatusGeralSectionForm::make(),
-            NegociacaoProdutosSectionForm::make(),
+            Tabs::make('Negociação')
+                ->tabs([
+                    Tabs\Tab::make('Informações Básicas')
+                        ->schema([
+                            BasicInformationSectionForm::make(),
+                            ClientInformationSectionForm::make(),
+                        ]),
 
+                    Tabs\Tab::make('Pagamentos e Cotações')
+                        ->schema([
+                            PagamentosSectionForm::make(),
+                            CotacoesSectionForm::make(),
+                        ]),
+
+                    Tabs\Tab::make('Produtos')
+                        ->schema([
+                            NegociacaoProdutosSectionForm::make(),
+                        ]),
+
+                    Tabs\Tab::make('Valores e Status')
+                        ->schema([
+                            ValoresSectionForm::make(),
+                            StatusValidacoesSectionForm::make(),
+                            StatusGeralSectionForm::make(),
+                        ]),
+
+
+                ])
+                ->columnSpanFull(),
         ]);
     }
 

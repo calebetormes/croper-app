@@ -35,7 +35,24 @@ class BasicInformationSectionForm
                     ->label('Moeda')
                     ->options(Moeda::pluck('sigla', 'id')->toArray())
                     ->required()
-                    ->inline(),
+                    ->inline()
+                    ->afterStateUpdated(function ($get, $set) {
+                        // 1) Pega os totais atuais
+                        $totalRs = $get('valor_total_pedido_rs') ?? 0;
+                        $totalUs = $get('valor_total_pedido_us') ?? 0;
+                        $rawPrecoSaca = $get('preco_liquido_saca') ?? '0';
+
+                        // 2) Normaliza o preço da saca
+                        $precoSaca = floatval(str_replace(',', '.', $rawPrecoSaca)) ?: 1;
+
+                        // 3) Descobre a sigla e escolhe a base
+                        $sigla = optional(Moeda::find($get('moeda_id')))->sigla;
+                        $base = strtoupper($sigla) === 'USD' ? $totalUs : $totalRs;
+
+                        // 4) Recalcula e seta
+                        $invest = $base / $precoSaca;
+                        $set('investimento_total_sacas', round($invest, 2));
+                    }),
 
                 Select::make('vendedor_id')
                     ->label('RTV')

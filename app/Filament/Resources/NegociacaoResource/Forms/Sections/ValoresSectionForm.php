@@ -6,6 +6,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use App\Models\Moeda;
 
 class ValoresSectionForm
 {
@@ -51,6 +52,7 @@ class ValoresSectionForm
                 TextInput::make('investimento_sacas_hectare')
                     ->label('Investimento (sacas/ha)')
                     ->numeric()
+                    ->reactive()
                     ->disabled()
                     ->dehydrated(),
 
@@ -72,6 +74,24 @@ class ValoresSectionForm
 
                         // atualiza o campo no form
                         $set('preco_liquido_saca_valorizado', round($precoValorizado, 2));
+
+                        // 3) Bônus Cliente Pacote
+                        // Busca totais já calculados no form
+                        $totalRs = $get('valor_total_pedido_rs') ?? 0;
+                        $totalRsVal = $get('valor_total_pedido_rs_valorizado') ?? 0;
+                        $totalUs = $get('valor_total_pedido_us') ?? 0;
+                        $totalUsVal = $get('valor_total_pedido_us_valorizado') ?? 0;
+                        $rawMoedaId = $get('moeda_id') ?? null;
+
+                        // Descobre sigla
+                        $sigla = optional(Moeda::find($rawMoedaId))->sigla;
+                        if (strtoupper($sigla) === 'USD') {
+                            $bonus = $totalUsVal - $totalUs;
+                        } else {
+                            $bonus = $totalRsVal - $totalRs;
+                        }
+
+                        $set('bonus_cliente_pacote', round($bonus, 2));
                     }),
 
                 TextInput::make('preco_liquido_saca')
@@ -91,16 +111,21 @@ class ValoresSectionForm
 
                 TextInput::make('bonus_cliente_pacote')
                     ->label('Bônus Cliente Pacote')
-                    ->numeric(),
+                    ->numeric()
+                    ->reactive()
+                    ->disabled()
+                    ->dehydrated(),
 
                 TextInput::make('cotacao_moeda_usd_brl')
                     ->label('Cotação USD/BRL')
-                    ->numeric()
-                    ->reactive(),
+                    ->numeric(),
 
                 TextInput::make('peso_total_kg')
                     ->label('Peso Total (kg)')
-                    ->numeric(),
+                    ->numeric()
+                    ->reactive()
+                    ->disabled()
+                    ->dehydrated(),
             ])
             ->columns(4);
     }

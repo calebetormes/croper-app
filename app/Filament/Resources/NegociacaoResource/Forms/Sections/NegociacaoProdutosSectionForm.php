@@ -119,7 +119,7 @@ class NegociacaoProdutosSectionForm
                         $rawPrecoSaca = $get('preco_liquido_saca') ?? '0';
                         $rawArea = $get('area_hectares') ?? '1'; // evita divisão por zero
                         $rawMoedaId = $get('moeda_id') ?? null;
-
+                        $sigla = optional(Moeda::find($rawMoedaId))->sigla;
                         $precoSaca = floatval(str_replace(',', '.', $rawPrecoSaca)) ?: 1;
                         $areaHectare = floatval(str_replace(',', '.', $rawArea)) ?: 1;
 
@@ -168,7 +168,6 @@ class NegociacaoProdutosSectionForm
                         //
                         // 6) Investimento total em sacas de 60 kg
                         //
-                        $sigla = optional(\App\Models\Moeda::find($rawMoedaId))->sigla;
                         $base = strtoupper($sigla) === 'USD' ? $totalUs : $totalRs;
                         $investSacas = $base / $precoSaca;
 
@@ -179,6 +178,21 @@ class NegociacaoProdutosSectionForm
                         //
                         $investPorHectare = $investSacas / $areaHectare;
                         $set('investimento_sacas_hectare', round($investPorHectare, 2));
+
+
+                        //
+                        // Peso Total (kg)
+                        //
+                        $pesoTotalKg = $investSacas * 60;
+                        $set('peso_total_kg', round($pesoTotalKg, 2));
+
+                        //
+                        // Bônus Cliente Pacote
+                        //
+                        $bonus = strtoupper($sigla) === 'USD'
+                            ? ($totalValorizadoUs - $totalUs)
+                            : ($totalValorizadoRs - $totalRs);
+                        $set('bonus_cliente_pacote', round($bonus, 2));
                     }),
             ]);
     }
