@@ -13,19 +13,31 @@ class ValoresSectionForm
             ->schema([
                 TextInput::make('valor_total_pedido_rs')
                     ->label('Valor Total R$')
-                    ->numeric(),
+                    ->numeric()
+                    ->reactive()
+                    ->disabled()
+                    ->dehydrated(),
 
                 TextInput::make('valor_total_pedido_us')
                     ->label('Valor Total U$')
-                    ->numeric(),
+                    ->numeric()
+                    ->reactive()
+                    ->disabled()
+                    ->dehydrated(),
 
                 TextInput::make('valor_total_pedido_rs_valorizado')
                     ->label('Valor Total R$ Valorizado')
-                    ->numeric(),
+                    ->numeric()
+                    ->reactive()
+                    ->disabled()
+                    ->dehydrated(),
 
                 TextInput::make('valor_total_pedido_us_valorizado')
                     ->label('Valor Total U$ Valorizado')
-                    ->numeric(),
+                    ->numeric()
+                    ->reactive()
+                    ->disabled()
+                    ->dehydrated(),
 
                 TextInput::make('investimento_total_sacas')
                     ->label('Investimento Total (sacas)')
@@ -37,11 +49,15 @@ class ValoresSectionForm
 
                 TextInput::make('indice_valorizacao_saca')
                     ->label('Índice Valorização (saca)')
-                    ->numeric(),
+                    ->numeric()
+                    ->reactive(),
 
                 TextInput::make('preco_liquido_saca')
                     ->label('Preço Líquido (saca)')
-                    ->numeric(),
+                    ->numeric()
+                    ->reactive()
+                    ->disabled()
+                    ->dehydrated(),
 
                 TextInput::make('preco_liquido_saca_valorizado')
                     ->label('Preço Líquido Valorizado (saca)')
