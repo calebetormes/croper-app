@@ -31,6 +31,8 @@ class Negociacao extends Model
         'bonus_cliente_pacote' => 'decimal:2',
         'peso_total_kg' => 'decimal:2',
         'cotacao_moeda_usd_brl' => 'decimal:2',
+        'data_entrega_graos' => 'date',
+
     ];
 
     protected static function booted()
@@ -63,6 +65,7 @@ class Negociacao extends Model
         'cultura_id',
         'praca_cotacao_id',
         'pagamento_id',
+        'data_entrega_graos',
 
         // Snapshots de preço da praça
         'snap_praca_cotacao_preco',
