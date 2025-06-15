@@ -196,10 +196,11 @@ Table negociacoes {
   //valorização da saca
   indice_valorizacao_saca decimal(12,2) // media dos fatores de valorização dos produtos
   preco_liquido_saca decimal(12,2) //recebe da praca_cotacao_preco
-  preco_liquido_saca_valorizado decimal(12,2) //snap_preco_liquido_saca * indice_valorizacao_saca
+  preco_liquido_saca_valorizado decimal(12,2) //snap_preco_liquido_saca + (snap_preco_liquido_saca* indice_valorizacao_saca)
 
   bonus_cliente_pacote decimal(12,2) //
-  peso_total_kg decimal(12,2) 
+  peso_saca //AAAAAAADICIONAR
+  peso_total_kg decimal(12,2) //investimento total em sacas * peso da saca
   
   //VALIDAÇÔES
   nivel_validacao_id int [ref: > niveis_validacao.id]

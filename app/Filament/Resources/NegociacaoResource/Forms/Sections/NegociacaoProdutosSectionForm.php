@@ -10,6 +10,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use App\Models\Produto;
+use App\Models\Moeda;
 use Closure;
 
 class NegociacaoProdutosSectionForm
@@ -112,41 +113,72 @@ class NegociacaoProdutosSectionForm
                     ->afterStateUpdated(function (Get $get, Set $set) {
                         $items = $get('negociacaoProdutos') ?? [];
 
-                        // 1) Total em R$
-                        $totalRs = collect($items)
-                            ->sum(
-                                fn($item) =>
-                                ($item['snap_produto_preco_rs'] ?? 0)
-                                * ($item['volume'] ?? 0)
-                            );
-                        $set('valor_total_pedido_rs', $totalRs);
+                        //
+                        // 1) Normalizações iniciais
+                        //
+                        $rawPrecoSaca = $get('preco_liquido_saca') ?? '0';
+                        $rawArea = $get('area_hectares') ?? '1'; // evita divisão por zero
+                        $rawMoedaId = $get('moeda_id') ?? null;
 
-                        // 2) Total em US$
-                        $totalUs = collect($items)
-                            ->sum(
-                                fn($item) =>
-                                ($item['snap_produto_preco_us'] ?? 0)
-                                * ($item['volume'] ?? 0)
-                            );
+                        $precoSaca = floatval(str_replace(',', '.', $rawPrecoSaca)) ?: 1;
+                        $areaHectare = floatval(str_replace(',', '.', $rawArea)) ?: 1;
+
+                        //
+                        // 2) Cálculo do total em R$ e total em US$
+                        //
+                        $totalRs = collect($items)->sum(
+                            fn($item) =>
+                            floatval(str_replace(',', '.', ($item['snap_produto_preco_rs'] ?? 0)))
+                            * floatval($item['volume'] ?? 0)
+                        );
+
+                        $totalUs = collect($items)->sum(
+                            fn($item) =>
+                            floatval(str_replace(',', '.', ($item['snap_produto_preco_us'] ?? 0)))
+                            * floatval($item['volume'] ?? 0)
+                        );
+
+                        $set('valor_total_pedido_rs', $totalRs);
                         $set('valor_total_pedido_us', $totalUs);
 
+                        //
+                        // 3) Cálculo da média de índice de valorização
+                        //
                         $averageIndice = collect($items)
-                            ->map(function ($item) {
-                                $raw = $item['indice_valorizacao'] ?? '0';
-                                $normalized = str_replace(',', '.', $raw);
-                                return is_numeric($normalized) ? (float) $normalized : 0.0;
-                            })
-                            ->filter(fn($v) => $v > 0 || $v === 0) // mantém só valores numéricos
+                            ->map(fn($item) => floatval(str_replace(',', '.', ($item['indice_valorizacao'] ?? 0))))
                             ->avg();
+
                         $set('indice_valorizacao_saca', $averageIndice);
 
-                        // 4) Valor Total R$ Valorizado
+                        //
+                        // 4) Totais valorizados em R$ e US$
+                        //
                         $totalValorizadoRs = $totalRs * (1 + $averageIndice);
-                        $set('valor_total_pedido_rs_valorizado', $totalValorizadoRs);
-
-                        // 5) Valor Total U$ Valorizado
                         $totalValorizadoUs = $totalUs * (1 + $averageIndice);
+
+                        $set('valor_total_pedido_rs_valorizado', $totalValorizadoRs);
                         $set('valor_total_pedido_us_valorizado', $totalValorizadoUs);
+
+                        //
+                        // 5) Preço da saca valorizado
+                        //
+                        $precoSacaValorizado = $precoSaca * (1 + $averageIndice);
+                        $set('preco_liquido_saca_valorizado', round($precoSacaValorizado, 2));
+
+                        //
+                        // 6) Investimento total em sacas de 60 kg
+                        //
+                        $sigla = optional(\App\Models\Moeda::find($rawMoedaId))->sigla;
+                        $base = strtoupper($sigla) === 'USD' ? $totalUs : $totalRs;
+                        $investSacas = $base / $precoSaca;
+
+                        $set('investimento_total_sacas', round($investSacas, 2));
+
+                        //
+                        // 7) Investimento em sacas por hectare
+                        //
+                        $investPorHectare = $investSacas / $areaHectare;
+                        $set('investimento_sacas_hectare', round($investPorHectare, 2));
                     }),
             ]);
     }
