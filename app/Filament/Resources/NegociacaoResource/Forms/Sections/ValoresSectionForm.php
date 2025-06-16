@@ -15,29 +15,45 @@ class ValoresSectionForm
         return Section::make('Valores')
             ->schema([
                 TextInput::make('valor_total_pedido_rs')
-                    ->label('Valor Total R$')
+                    ->label('Valor Total R$ com bonus')
                     ->numeric()
+                    ->prefix('R$')
+                    ->visible(function ($get) {
+                        return $get('moeda_id') == Moeda::where('sigla', 'BRL')->value('id');
+                    })
                     ->reactive()
                     ->disabled()
                     ->dehydrated(),
 
                 TextInput::make('valor_total_pedido_us')
-                    ->label('Valor Total U$')
+                    ->label('Valor Total U$ com bonus')
                     ->numeric()
+                    ->prefix('US$')
+                    ->visible(function ($get) {
+                        return $get('moeda_id') == Moeda::where('sigla', 'USS')->value('id');
+                    })
                     ->reactive()
                     ->disabled()
                     ->dehydrated(),
 
                 TextInput::make('valor_total_pedido_rs_valorizado')
-                    ->label('Valor Total R$ Valorizado')
+                    ->label('Valor Total R$ sem bonus')
                     ->numeric()
+                    ->prefix('R$')
+                    ->visible(function ($get) {
+                        return $get('moeda_id') == Moeda::where('sigla', 'BRL')->value('id');
+                    })
                     ->reactive()
                     ->disabled()
                     ->dehydrated(),
 
                 TextInput::make('valor_total_pedido_us_valorizado')
-                    ->label('Valor Total U$ Valorizado')
+                    ->label('Valor Total U$ sem bonus')
                     ->numeric()
+                    ->prefix('US$')
+                    ->visible(function ($get) {
+                        return $get('moeda_id') == Moeda::where('sigla', 'USS')->value('id');
+                    })
                     ->reactive()
                     ->disabled()
                     ->dehydrated(),
@@ -94,15 +110,16 @@ class ValoresSectionForm
                         $set('bonus_cliente_pacote', round($bonus, 2));
                     }),
 
+
                 TextInput::make('preco_liquido_saca')
-                    ->label('Preço Líquido (saca)')
+                    ->label('Preço Líquido (saca) sem bonus')
                     ->numeric()
                     ->reactive()
                     ->disabled()
                     ->dehydrated(),
 
                 TextInput::make('preco_liquido_saca_valorizado')
-                    ->label('Preço Líquido Valorizado (saca)')
+                    ->label('Preço Líquido (saca)')
                     ->numeric()
                     ->reactive()
                     ->disabled()
@@ -110,7 +127,7 @@ class ValoresSectionForm
 
 
                 TextInput::make('bonus_cliente_pacote')
-                    ->label('Bônus Cliente Pacote')
+                    ->label('Bônus do Cliente no Pacote')
                     ->numeric()
                     ->reactive()
                     ->disabled()
@@ -118,7 +135,10 @@ class ValoresSectionForm
 
                 TextInput::make('cotacao_moeda_usd_brl')
                     ->label('Cotação USD/BRL')
-                    ->numeric(),
+                    ->numeric()
+                    ->hidden()
+                    ->default(0)
+                    ->dehydrated(),
 
                 TextInput::make('peso_total_kg')
                     ->label('Peso Total (kg)')

@@ -22,9 +22,17 @@ class NegociacaoProdutosSectionForm
                 Repeater::make('negociacaoProdutos')
                     ->relationship('negociacaoProdutos')
                     ->label('Produtos')
-                    ->columns(4)
-                    ->collapsible()
+                    ->columns(3)
+                    ->collapsed()
+                    ->defaultItems(0)
                     ->createItemButtonLabel('Adicionar Produto')
+                    ->reorderable()
+                    ->grid(1)
+                    ->itemLabel(
+                        fn(array $state): ?string =>
+                        Produto::find($state['produto_id'])?->nome_composto
+                        ?? 'Novo Produto'
+                    )
                     ->schema([
                         Select::make('produto_id')
                             ->label('Produto')

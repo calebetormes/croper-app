@@ -12,6 +12,7 @@ use App\Filament\Resources\NegociacaoResource\Forms\Sections\StatusValidacoesSec
 use App\Filament\Resources\NegociacaoResource\Forms\Sections\ValoresSectionForm;
 use App\Filament\Resources\NegociacaoResource\Pages;
 use App\Filament\Resources\NegociacaoResource\Forms\Sections\NegociacaoProdutosSectionForm;
+use App\Filament\Resources\NegociacaoResource\Forms\Sections\QuantidadeMinimaSectionForm;
 
 use App\Filament\Resources\NegociacaoResource\RelationManagers\NegociacaoProdutosRelationManager;
 use App\Models\Negociacao;
@@ -36,6 +37,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use App\Models\Produto;
+
 
 
 class NegociacaoResource extends Resource
@@ -71,10 +73,6 @@ class NegociacaoResource extends Resource
                         ->schema([
                             BasicInformationSectionForm::make(),
                             ClientInformationSectionForm::make(),
-                        ]),
-
-                    Tabs\Tab::make('Pagamentos e Cotações')
-                        ->schema([
                             PagamentosSectionForm::make(),
                             CotacoesSectionForm::make(),
                         ]),
@@ -82,12 +80,13 @@ class NegociacaoResource extends Resource
                     Tabs\Tab::make('Produtos')
                         ->schema([
                             NegociacaoProdutosSectionForm::make(),
+                            QuantidadeMinimaSectionForm::make(),
                         ]),
 
                     Tabs\Tab::make('Valores e Status')
                         ->schema([
                             ValoresSectionForm::make(),
-                            StatusValidacoesSectionForm::make(),
+                            //StatusValidacoesSectionForm::make(),
                             StatusGeralSectionForm::make(),
                         ]),
 

@@ -87,4 +87,9 @@ class User extends Authenticatable
             ->logOnlyDirty()                                    // já existente: só registra atributos que mudaram
             ->dontSubmitEmptyLogs();                            // já existente: ignora quando não há mudanças
     }
+
+    public function hasAnyRole(array $roles): bool
+    {
+        return $this->roles()->whereIn('name', $roles)->exists();
+    }
 }
