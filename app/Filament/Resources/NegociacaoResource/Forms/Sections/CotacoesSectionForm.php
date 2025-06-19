@@ -2,18 +2,19 @@
 
 namespace App\Filament\Resources\NegociacaoResource\Forms\Sections;
 
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\ToggleButtons;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Actions;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\DatePicker;
 use App\Models\Cultura;
 use App\Models\PracaCotacao;
 use Carbon\Carbon;
+use Filament\Forms\Components\Actions;
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ToggleButtons;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 
 class CotacoesSectionForm
 {
@@ -21,6 +22,7 @@ class CotacoesSectionForm
     {
         return Section::make('Cotações')
             ->schema([
+                // 1) Cultura
                 ToggleButtons::make('cultura_id')
                     ->label('Cultura')
                     ->options(Cultura::pluck('nome', 'id')->toArray())
@@ -28,156 +30,144 @@ class CotacoesSectionForm
                     ->inline()
                     ->reactive(),
 
-                Select::make('praca_cotacao_id')
-                    ->label('Praça')
+                // 2) Cidade
+                Select::make('praca_cotacao_cidade')
+                    ->label('Cidade')
                     ->reactive()
-
-                    ->options(function ($get) {
-                        // Se não houver cultura ou moeda selecionada, retorna vazio
-                        if (!$get('cultura_id') || !$get('moeda_id')) {
-                            return [];
+                    ->options(fn(Get $get) => self::getCityOptions($get))
+                    ->afterStateHydrated(function (Get $get, Set $set, $state) {
+                        if (!$state && $get('praca_cotacao_id')) {
+                            $cot = PracaCotacao::find($get('praca_cotacao_id'));
+                            $set('praca_cotacao_cidade', $cot->cidade ?? null);
                         }
-
-
-                        return PracaCotacao::query()
-                            ->where('cultura_id', $get('cultura_id'))
-                            ->where('moeda_id', $get('moeda_id'))
-                            ->whereNotNull('cidade')
-                            ->orderBy('data_vencimento', 'desc')
-                            ->get()
-                            ->unique('cidade')
-                            ->mapWithKeys(function ($item) {
-                                $formattedDate = Carbon::parse($item->data_vencimento)->format('d/m/Y');
-                                return [
-                                    //$item->id => "{$item->cidade} – {$formattedDate}",
-                                    $item->id => "{$item->cidade}",
-                                ];
-                            })
-                            ->toArray();
                     })
+                    ->afterStateUpdated(fn(Get $get, Set $set) => self::resetOnCityChange($set))
+                    ->required(),
 
-                    // <-- aqui, adicionamos o getOptionLabelUsing:
-                    ->getOptionLabelUsing(function ($value) {
-                        if (!$value) {
-                            return null;
-                        }
-                        $cotacao = PracaCotacao::find($value);
-                        if (!$cotacao) {
-                            return null;
-                        }
-                        $data = Carbon::parse($cotacao->data_vencimento)->format('d/m/Y');
-                        return "{$cotacao->cidade} – {$data}";
-                    })
-
-                    ->disabled(fn($get) => !$get('cultura_id') || !$get('moeda_id'))
-                    ->required()
+                // 3) Vencimento
+                Select::make('praca_cotacao_id')
+                    ->label('Vencimento')
+                    ->reactive()
                     ->searchable()
-                    ->afterStateUpdated(function ($state, $set) {
-                        $cotacao = PracaCotacao::find($state);
-                        $preco = $cotacao?->praca_cotacao_preco;
-                        $data = $cotacao && $cotacao->data_vencimento
-                            ? Carbon::parse($cotacao->data_vencimento)->format('d/m/Y')
-                            : null;
-                        $set('data_praca_vencimento', $data);
-                        $set('snap_praca_cotacao_preco', $cotacao?->praca_cotacao_preco);
-                        $set('snap_praca_cotacao_fator_valorizacao', $cotacao?->fator_valorizacao);
-                        $set('data_atualizacao_snap_preco_praca_cotacao', date('Y-m-d'));
-                        $set('preco_liquido_saca', $preco);
-                    }),
+                    ->options(fn(Get $get) => self::getPracaOptions($get))
+                    ->getOptionLabelUsing(
+                        fn($value) =>
+                        $value
+                        ? Carbon::parse(PracaCotacao::find($value)->data_vencimento)->format('d/m/Y')
+                        : null
+                    )
+                    ->disabled(fn(Get $get) => !$get('praca_cotacao_cidade'))
+                    ->required()
+                    ->afterStateUpdated(fn($state, Set $set) => self::handlePracaSelection($state, $set)),
 
+                // 4) Preço da Praça
                 TextInput::make('snap_praca_cotacao_preco')
                     ->label('Preço da Praça')
                     ->numeric()
                     ->required()
-                    ->dehydrated()
                     ->reactive()
-                    ->afterStateHydrated(fn($state, callable $set) => $set('preco_liquido_saca', $state))
-                    // Sempre que mudar aqui, replica lá
-                    ->afterStateUpdated(fn($state, callable $set) => $set('preco_liquido_saca', $state)),
-
-                Placeholder::make('data_praca_vencimento')
-                    ->label('Data da Cotação')
-                    ->content(
-                        fn($get) => $get('praca_cotacao_id')
-                        ? Carbon::parse(PracaCotacao::find($get('praca_cotacao_id'))->data_vencimento)->format('d/m/Y')
-                        : 'Nenhuma cotação selecionada'
-                    )
-                    ->reactive(),
-
-                Hidden::make('snap_praca_cotacao_preco_fixado')->default(true)->dehydrated(),
-
-                DatePicker::make('data_atualizacao_snap_preco_praca_cotacao')
-                    ->label('Preço fixado no dia')
-                    ->default(fn() => now()->toDateString())
-                    ->disabled()
                     ->dehydrated()
+                    ->afterStateHydrated(fn($state, Set $set) => $set('preco_liquido_saca', $state))
+                    ->afterStateUpdated(fn($state, Set $set) => $set('preco_liquido_saca', $state)),
+
+                // 5) Flag preço fixado
+                Hidden::make('snap_praca_cotacao_preco_fixado')
+                    ->default(true)
+                    ->dehydrated(),
+
+                // 6) Data fixação de preço (apenas visualização em edição)
+                DatePicker::make('data_atualizacao_snap_preco_praca_cotacao')
+                    ->label('Preço fixado em')
+                    ->default(fn(Get $get) => $get('data_atualizacao_snap_preco_praca_cotacao'))
+                    //->disabled()
                     ->reactive()
                     ->afterOrEqual(now()->subDays(3)->toDateString())
                     ->validationMessages([
-                        'after_or_equal' => 'Já se passaram {$days} dias desde a última atualização de preços da praça. Selecione a praça atualizada',
+                        'after_or_equal' => 'Selecione uma cotação atualizada (máx. 3 dias).',
                     ])
-                    ->validationAttribute('Preço fixado no dia')
-                    ->afterStateHydrated(function ($component, $state) {
-                        // $state virá como string “YYYY-MM-DD” vinda do banco
-                        if ($state) {
-                            $selectedDate = Carbon::parse($state);
-                            $limite = Carbon::now()->subDays(3)->startOfDay();
+                    ->validationAttribute('Preço fixado em'),
 
-                            if ($selectedDate->lt($limite)) {
-                                // Se a data for anterior a (hoje − 3 dias),
-                                // limpamos imediatamente o campo praca_cotacao_id no form
-                                $component
-                                    ->getLivewire()
-                                    ->fill([
-                                        'praca_cotacao_id' => null,
-                                    ]);
-                            }
-                        }
-                    }),
-
+                // 7) Botões de ação
                 Actions::make([
                     Action::make('atualizar_preco_praca')
                         ->label('Atualizar Preço da Praça')
                         ->color('primary')
                         ->icon('heroicon-o-arrow-path')
-                        ->visible(fn($get) => $get('praca_cotacao_id'))
-                        ->action(function ($get, $set) {
-                            // 1) Cotação atual selecionada
-                            $current = PracaCotacao::find($get('praca_cotacao_id'));
-                            if (!$current) {
-                                return;
-                            }
-
-                            $cidade = $current->cidade;
-                            $cultura_id = $get('cultura_id');
-                            $moeda_id = $get('moeda_id');
-
-                            // 2) Busca a cotação MAIS RECENTE (data_vencimento mais alta) para a mesma cidade / cultura / moeda
-                            $nova = PracaCotacao::query()
-                                ->where('cidade', $cidade)
-                                ->where('cultura_id', $cultura_id)
-                                ->where('moeda_id', $moeda_id)
-                                ->whereNotNull('data_vencimento')
-                                ->orderBy('data_vencimento', 'desc')
-                                ->first();
-
-                            if (!$nova) {
-                                return;
-                            }
-
-                            // 3) Atribui o novo ID ao select
-                            $set('praca_cotacao_id', $nova->id);
-
-                            // 4) Atualiza os campos “snap_...” com base nessa nova cotação
-                            $set('snap_praca_cotacao_preco', $nova->praca_cotacao_preco);
-                            $set('snap_praca_cotacao_fator_valorizacao', $nova->fator_valorizacao);
-
-                            // 5) Marca a data de atualização como hoje
-                            $set('data_atualizacao_snap_preco_praca_cotacao', date('Y-m-d'));
-
-                        }),
+                        ->visible(fn(Get $get) => $get('praca_cotacao_id'))
+                        ->action(fn(Get $get, Set $set) => self::updateToLatestPrice($get, $set)),
                 ]),
             ])
             ->columns(4);
+    }
+
+    private static function getCityOptions(Get $get): array
+    {
+        if (!$get('cultura_id') || !$get('moeda_id')) {
+            return [];
+        }
+
+        return PracaCotacao::query()
+            ->where('cultura_id', $get('cultura_id'))
+            ->where('moeda_id', $get('moeda_id'))
+            ->whereNotNull('cidade')
+            ->orderBy('data_vencimento', 'desc')
+            ->pluck('cidade', 'cidade')
+            ->unique()
+            ->toArray();
+    }
+
+    private static function getPracaOptions(Get $get): array
+    {
+        if (!$get('cultura_id') || !$get('moeda_id') || !$get('praca_cotacao_cidade')) {
+            return [];
+        }
+
+        return PracaCotacao::query()
+            ->where('cultura_id', $get('cultura_id'))
+            ->where('moeda_id', $get('moeda_id'))
+            ->where('cidade', $get('praca_cotacao_cidade'))
+            ->orderBy('data_vencimento', 'desc')
+            ->get()
+            ->mapWithKeys(fn($item) => [
+                $item->id => Carbon::parse($item->data_vencimento)->format('d/m/Y'),
+            ])
+            ->toArray();
+    }
+
+    private static function resetOnCityChange(Set $set): void
+    {
+        $set('praca_cotacao_id', null);
+        $set('snap_praca_cotacao_preco', null);
+        $set('snap_praca_cotacao_fator_valorizacao', null);
+        $set('data_atualizacao_snap_preco_praca_cotacao', null);
+    }
+
+    private static function handlePracaSelection($state, Set $set): void
+    {
+        $cotacao = PracaCotacao::find($state);
+        $set('snap_praca_cotacao_preco', $cotacao?->praca_cotacao_preco);
+        $set('data_atualizacao_snap_preco_praca_cotacao', now()->toDateString());
+        $set('preco_liquido_saca', $cotacao?->praca_cotacao_preco);
+    }
+
+    private static function updateToLatestPrice(Get $get, Set $set): void
+    {
+        $current = PracaCotacao::find($get('praca_cotacao_id'));
+        if (!$current) {
+            return;
+        }
+
+        $latest = PracaCotacao::query()
+            ->where('cidade', $current->cidade)
+            ->where('cultura_id', $get('cultura_id'))
+            ->where('moeda_id', $get('moeda_id'))
+            ->orderBy('data_vencimento', 'desc')
+            ->first();
+
+        if ($latest) {
+            $set('praca_cotacao_id', $latest->id);
+            $set('snap_praca_cotacao_preco', $latest->praca_cotacao_preco);
+            $set('data_atualizacao_snap_preco_praca_cotacao', now()->toDateString());
+        }
     }
 }
