@@ -24,7 +24,7 @@ return new class extends Migration {
 
             // índice único composto: cidade + data_vencimento + moeda_id + cultura_id
             $table->unique(
-                ['cidade', 'data_vencimento', 'moeda_id', 'cultura_id'],
+                ['cidade', 'data_vencimento', 'cultura_id', 'moeda_id',],
                 'pracas_cotacoes_unico'
             );
 
