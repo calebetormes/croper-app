@@ -5,8 +5,8 @@ namespace App\Filament\Imports;
 use App\Models\PracaCotacao;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\ImportColumn;
-use Filament\Actions\Imports\Models\Import as ImportModel;
 use Illuminate\Support\Carbon;
+
 
 class PracaCotacaoImporter extends Importer
 {
@@ -70,10 +70,15 @@ class PracaCotacaoImporter extends Importer
     }
 
     /**
-     * Executado quando cada registro é salvo. Aqui adicionamos data_inclusao automático.
+     * Executado quando cada registro é salvo. Aqui parseamos a data e adicionamos data_inclusao.
      */
     public function saveRecord(): void
     {
+        // Parse da data de vencimento "d/m/Y" para formato Y-m-d
+        $rawDate = $this->record->data_vencimento;
+        $this->record->data_vencimento = Carbon::createFromFormat('d/m/Y', $rawDate)->toDateString();
+
+        // Preenche data de inclusão com timestamp atual
         $this->record->data_inclusao = Carbon::now();
 
         parent::saveRecord();
@@ -82,7 +87,7 @@ class PracaCotacaoImporter extends Importer
     /**
      * Corpo da notificação ao concluir o import.
      */
-    public static function getCompletedNotificationBody(ImportModel $import): string
+    public static function getCompletedNotificationBody(\Filament\Actions\Imports\Models\Import $import): string
     {
         return 'A importação foi concluída com sucesso.';
     }
@@ -90,7 +95,7 @@ class PracaCotacaoImporter extends Importer
     /**
      * Título da notificação ao concluir o import.
      */
-    public static function getCompletedNotificationTitle(ImportModel $import): string
+    public static function getCompletedNotificationTitle(\Filament\Actions\Imports\Models\Import $import): string
     {
         return 'Importação de Praças Concluída';
     }
