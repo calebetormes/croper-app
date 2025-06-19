@@ -50,6 +50,7 @@ class NegociacaoProdutosSectionForm
                                     // snapshot do produto
                                     $set('snap_produto_preco_rs', $produto->preco_rs);
                                     $set('snap_produto_preco_us', $produto->preco_us);
+                                    $set('indice_valorizacao', $produto->indice_valorizacao_produto);
                                     // data atualização só na criação
                                     if (!$get('data_atualizacao_snap_precos_produtos')) {
                                         $set('data_atualizacao_snap_precos_produtos', now());

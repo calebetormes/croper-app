@@ -1,0 +1,11 @@
+Classe,Princípio Ativo,Marca Comercial,Unidade de Peso,Família,Apresentação,Dose Sugerida (ha),Preço R$,Preço US$,Custo R$,Custo US$,Fator Multiplicador
+H,GLIFOSATO 720,BRADDOCK WG,kg,Herbicidas Agro,100 ml,1.5,150.0,30.0,120.0,24.0,1.25
+I,GLIFOSATO 540,BRADDOCK K,kg,Inseticidas Agro,250 g,1.0,140.0,28.0,112.0,22.0,1.25
+F,ATRAZINA WG,MIRA 900 WG,kg,Fungicidas Agro,200 ml,0.8,160.0,32.0,128.0,25.6,1.25
+BIO,"2,4 806 SL","MOL 2,4 D",L,Biológicos Agro,1 L,2.0,170.0,34.0,136.0,27.2,1.25
+ESP,DIQUAT 200,VENIA BR,L,Especialidades Agro,500 ml,0.5,155.0,31.0,124.0,24.8,1.25
+OL,CLETODIN 240,CARTAGO OU,L,Óleos Agro,750 ml,0.6,145.0,29.0,116.0,23.2,1.25
+POL,GLUFOSINATO 880 SG,OPTIBEX,L,Polímeros Agro,100 ml,1.2,165.0,33.0,132.0,26.4,1.25
+H,S-METALACLOR 960,PREVENT GOLD,kg,Herbicidas Agro,250 g,1.7,175.0,35.0,140.0,28.0,1.25
+I,FLUMIOXAZINA 480,TREMOR,kg,Inseticidas Agro,200 ml,0.9,135.0,27.0,108.0,21.6,1.25
+F,CARFENTRAZONE 400,FULLGUARD,kg,Fungicidas Agro,1 L,1.4,185.0,37.0,148.0,29.6,1.25

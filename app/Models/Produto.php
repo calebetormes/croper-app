@@ -23,7 +23,7 @@ class Produto extends Model
         'preco_us',
         'custo_rs',
         'custo_us',
-        'fator_multiplicador',
+        'indice_valorizacao_produto',
     ];
 
     public function classe()
@@ -76,4 +76,5 @@ class Produto extends Model
         // junta com separador
         return implode(' – ', $parts);
     }
+
 }

@@ -71,52 +71,47 @@ class ProdutoResource extends Resource
                     ->relationship('unidadePeso', 'sigla')
                     ->label('Unidade de Peso')
                     ->searchable()
-                    ->preload()
-                    ->required(),
+                    ->preload(),
 
                 Select::make('familia_id')
                     ->relationship('familia', 'nome')
                     ->label('Família')
                     ->searchable()
-                    ->preload()
-                    ->required(),
+                    ->preload(),
 
                 TextInput::make('apresentacao')
                     ->label('Apresentação')
-                    ->required()
-                    ->maxLength(255),
+                    ->required(),
 
                 TextInput::make('dose_sugerida_hectare')
-                    ->label('Dose Sugerida (ha)')
-                    ->required()
-                    ->maxLength(255),
+                    ->label('Dose Sugerida (ha)'),
 
                 TextInput::make('preco_rs')
                     ->label('Preço (R$)')
                     ->numeric()
-                    ->required(),
+                    ->default(0),
 
                 TextInput::make('preco_us')
                     ->label('Preço (US$)')
                     ->numeric()
-                    ->required(),
+                    ->default(0),
 
 
                 TextInput::make('custo_rs')
                     ->label('Custo (R$)')
                     ->numeric()
-                    ->required(),
+                    ->default(0),
 
                 TextInput::make('custo_us')
                     ->label('Custo (U$)')
                     ->numeric()
-                    ->required(),
+                    ->required()
+                    ->default(0),
 
-                TextInput::make('fator_multiplicador')
-                    ->label('Fator Multiplicador')
+                TextInput::make('indice_valorizacao_produto')
+                    ->label('Índice de valorizacao do Produto')
                     ->numeric()
-                    ->default(1)
-                    ->required(),
+                    ->default(1),
             ]);
     }
 

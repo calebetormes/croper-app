@@ -44,17 +44,17 @@ return new class extends Migration {
             $table->unsignedInteger('classe_id');
             $table->unsignedInteger('principio_ativo_id');
             $table->unsignedInteger('marca_comercial_id');
-            $table->unsignedInteger('tipo_peso_id');
-            $table->unsignedInteger('familia_id');
+            $table->unsignedInteger('tipo_peso_id')->nullable();
+            $table->unsignedInteger('familia_id')->nullable();
 
             $table->string('apresentacao');
-            $table->string('dose_sugerida_hectare');
+            $table->string('dose_sugerida_hectare')->nullable();
 
-            $table->decimal('preco_rs', 12, 2);
-            $table->decimal('preco_us', 12, 2);
-            $table->decimal('custo_rs', 12, 2);
-            $table->decimal('custo_us', 12, 2);
-            $table->decimal('fator_multiplicador', 12, 2)->nullable(); // peso do produto em kg
+            $table->decimal('preco_rs', 12, 2)->nullable();
+            $table->decimal('preco_us', 12, 2)->nullable();
+            $table->decimal('custo_rs', 12, 2)->nullable();
+            $table->decimal('custo_us', 12, 2)->nullable();
+            $table->decimal('indice_valorizacao_produto', 12, 2)->nullable(); // peso do produto em kg
 
             // chaves estrangeiras
             $table->foreign('classe_id')
@@ -76,6 +76,11 @@ return new class extends Migration {
             $table->foreign('familia_id')
                 ->references('id')->on('familias')
                 ->onUpdate('cascade')->onDelete('restrict');
+
+            $table->unique(
+                ['classe_id', 'principio_ativo_id', 'marca_comercial_id', 'apresentacao',],
+                'produto_unico'
+            );
         });
     }
 

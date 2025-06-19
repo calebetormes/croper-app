@@ -5,10 +5,12 @@ namespace App\Filament\Resources\ProdutoResource\Pages;
 use App\Filament\Resources\ProdutoResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
-use Filament\Forms\Components\FileUpload;
-use App\Filament\Resources\ProdutoResource\Pages\ProdutoImport;
-use Maatwebsite\Excel\Facades\Excel;
 use Filament\Notifications\Notification;
+use Filament\Actions\ImportAction;
+use App\Filament\Imports\ProdutoImporter;
+use Filament\Actions\ExportAction as PageExportAction;
+use App\Filament\Exports\ProdutoExporter;
+
 
 class ManageProdutos extends ManageRecords
 {
@@ -17,31 +19,33 @@ class ManageProdutos extends ManageRecords
     protected function getHeaderActions(): array
     {
         return [
-            //CreateAction::make(),
-            Actions\Action::make('importarCSV')
-                ->label('Importar CSV')
+            ImportAction::make()
+                ->label('Importar Produtos')
                 ->icon('heroicon-o-arrow-up-tray')
-                ->form([
-                    FileUpload::make('csv_file')
-                        ->label('Arquivo CSV')
-                        ->acceptedFileTypes(['text/csv', '.csv'])
-                        ->disk('local') // armazena em storage/app
-                        ->required(),
-                ])
-                ->action(function (array $data): void {
-                    // monta o caminho completo do CSV no disco local
-                    $relativePath = $data['csv_file'];
-                    $fullPath = storage_path('app/' . $relativePath);
-
-                    // importa em massa
-                    Excel::import(new ProdutoImport(), $fullPath);
-
-                    Notification::make()
-                        ->success()
-                        ->title('Importação concluída!')
-                        ->body('Todos os produtos foram importados com sucesso.')
-                        ->send();
+                ->importer(ProdutoImporter::class)           // 👈 aqui
+                ->after(function (\Filament\Actions\Imports\Models\Import $import) {
+                    $failed = $import->getFailedRowsCount();
+                    if ($failed > 0) {
+                        Notification::make()
+                            ->danger()
+                            ->title("{$failed} linhas falharam.")
+                            ->body('Confira o CSV de falhas no sino de notificações.')
+                            ->send();
+                    } else {
+                        Notification::make()
+                            ->success()
+                            ->title('Importação concluída')
+                            ->body("Foram importados {$import->successful_rows} produtos com sucesso!")
+                            ->send();
+                    }
                 }),
+
+            // Botão de export
+            PageExportAction::make()
+                ->label('Exportar CSV')
+                ->exporter(ProdutoExporter::class)
+                ->fileName('produtos_export.csv'),
+
             Actions\CreateAction::make(),
         ];
     }

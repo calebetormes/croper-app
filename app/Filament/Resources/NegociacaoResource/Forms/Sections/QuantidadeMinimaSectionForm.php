@@ -8,6 +8,8 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Livewire\Component as LivewireComponent;
+use Illuminate\Support\Arr;
+use App\Models\Produto;
 
 class QuantidadeMinimaSectionForm
 {
@@ -15,81 +17,75 @@ class QuantidadeMinimaSectionForm
     {
         return Section::make('')
             ->schema([
-                Hidden::make('status_defensivos')
-                    ->afterStateHydrated(function (Get $get, Set $set, LivewireComponent $livewire) {
-                        $negociacao = $livewire->getRecord();
-                        if (!$negociacao) {
-                            $set('status_defensivos', 0);
-                            return;
-                        }
-                        $count = $negociacao
-                            ->negociacaoProdutos()
-                            ->whereHas('produto.classe', fn($q) => $q->whereIn('nome', ['H', 'I', 'S']))
-                            ->count();
-                        $set('status_defensivos', $count);
-                    })
-                    ->dehydrateStateUsing(function (Get $get, LivewireComponent $livewire) {
-                        $negociacao = $livewire->getRecord();
-                        if (!$negociacao) {
-                            return 0;
-                        }
-                        return $negociacao
-                            ->negociacaoProdutos()
-                            ->whereHas('produto.classe', fn($q) => $q->whereIn('nome', ['H', 'I', 'S']))
-                            ->count();
-                    }),
 
                 Placeholder::make('status_defensivos_label')
-                    ->label('Quantidade Mínima de Defensivos')
-                    ->content(
-                        fn(Get $get) => $get('status_defensivos') >= 3
-                        ? '✅ Atingido'
-                        : '⚠️ Adicione mais defensivos à sua negociação'
-                    )
-                    ->extraAttributes(fn(Get $get) => [
-                        'class' => 'inline-block px-3 py-1 rounded-full text-sm font-medium ' . (
-                            $get('status_defensivos') >= 3
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        ),
-                    ]),
-
-                Hidden::make('status_especialidades')
-                    ->afterStateHydrated(function (Get $get, Set $set, LivewireComponent $livewire) {
-                        $negociacao = $livewire->getRecord();
-                        if (!$negociacao) {
-                            $set('status_especialidades', 0);
-                            return;
-                        }
-                        $count = $negociacao
-                            ->negociacaoProdutos()
-                            ->whereHas('produto.classe', fn($q) => $q->whereIn('nome', ['ESP', 'BIO', 'OL', 'POL']))
+                    ->label('Quantidade Mínima de Defensivos 3 (H, I, S)')
+                    ->content(function (Get $get) {
+                        $items = Arr::wrap($get('negociacaoProdutos'));
+                        $count = collect($items)
+                            ->filter(fn($item) => in_array(
+                                Produto::find($item['produto_id'])?->classe?->nome,
+                                ['H', 'I', 'S'],
+                            ))
                             ->count();
-                        $set('status_especialidades', $count);
+
+                        return $count >= 3
+                            ? "✅ Defensivos Selecionados: {$count}"
+                            : "⚠️ Defensivos Selecionados: {$count}";
                     })
-                    ->dehydrateStateUsing(function (Get $get, LivewireComponent $livewire) {
-                        $negociacao = $livewire->getRecord();
-                        if (!$negociacao) {
-                            return 0;
-                        }
-                        return $negociacao
-                            ->negociacaoProdutos()
-                            ->whereHas('produto.classe', fn($q) => $q->whereIn('nome', ['ESP', 'BIO', 'OL', 'POL']))
+                    ->extraAttributes(function (Get $get) {
+                        $items = Arr::wrap($get('negociacaoProdutos'));
+                        $count = collect($items)
+                            ->filter(fn($item) => in_array(
+                                Produto::find($item['produto_id'])?->classe?->nome,
+                                ['H', 'I', 'S'],
+                            ))
                             ->count();
-                    }),
 
+                        return [
+                            'class' => 'inline-block px-3 py-1 rounded-full text-sm font-medium ' .
+                                ($count >= 3
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-red-100 text-red-800'
+                                ),
+                        ];
+                    })
+                    ->reactive(),
+
+                // 2) Verificação de ESPECIALIDADES (ESP, BIO, OL, POL)
                 Placeholder::make('status_especialidades_label')
-                    ->label('Quantidade Mínima de Especialidades')
-                    ->content(
-                        fn(Get $get) => $get('status_especialidades') >= 2
-                        ? '✅ Atingido'
-                        : '⚠️ Adicione mais especialidades à sua negociação'
-                    )
-                    ->extraAttributes(fn(Get $get) => [
-                        'class' => $get('status_especialidades') >= 2
-                            ? 'text-green-500 font-semibold'
-                            : 'text-yellow-400 font-semibold',
-                    ]),
+                    ->label('Quantidade Mínima de Especialidades 2 (ESP, BIO, OL, POL)')
+                    ->content(function (Get $get) {
+                        $items = Arr::wrap($get('negociacaoProdutos'));
+                        $count = collect($items)
+                            ->filter(fn($item) => in_array(
+                                Produto::find($item['produto_id'])?->classe?->nome,
+                                ['ESP', 'BIO', 'OL', 'POL'],
+                            ))
+                            ->count();
+
+                        return $count >= 2
+                            ? "✅ Especialidades Selecionadas: {$count}"
+                            : "⚠️ Especialidades Selecionadas: {$count}";
+                    })
+                    ->extraAttributes(function (Get $get) {
+                        $items = Arr::wrap($get('negociacaoProdutos'));
+                        $count = collect($items)
+                            ->filter(fn($item) => in_array(
+                                Produto::find($item['produto_id'])?->classe?->nome,
+                                ['ESP', 'BIO', 'OL', 'POL'],
+                            ))
+                            ->count();
+
+                        return [
+                            'class' => 'inline-block px-3 py-1 rounded-full text-sm font-medium ' .
+                                ($count >= 2
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-yellow-100 text-yellow-800'
+                                ),
+                        ];
+                    })
+                    ->reactive(),
             ])
             ->columns(2);
     }
