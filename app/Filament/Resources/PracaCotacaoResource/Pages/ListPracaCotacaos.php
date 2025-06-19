@@ -9,6 +9,8 @@ use App\Filament\Imports\PracaCotacaoImporter;
 use Filament\Actions\ImportAction;
 use Filament\Notifications\Notification;
 use Filament\Actions\Imports\Models\Import as FilamentImport;
+use Filament\Tables\Actions\ExportAction;
+use Filament\Actions\CreateAction;
 
 class ListPracaCotacaos extends ListRecords
 {
@@ -40,7 +42,22 @@ class ListPracaCotacaos extends ListRecords
                     }
                 }),
 
-            Actions\CreateAction::make()
+            /*
+        ExportAction::make()
+            ->label('Exportar CSV')
+            ->filename('pracas_cotacao_export.csv')
+            ->columns([
+                'moeda' => 'moeda.nome',
+                'preco' => 'praca_cotacao_preco',
+                'cidade' => 'cidade',
+                'cultura' => 'cultura.nome',
+                'vencimento' => function ($record) {
+                    return $record->data_vencimento->format('d/m/Y');
+                },
+            ]),
+            */
+
+            CreateAction::make()
                 ->label('Nova Praça de Cotação'),
         ];
     }

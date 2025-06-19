@@ -6,8 +6,15 @@ use App\Models\PracaCotacao;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\ImportColumn;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rule;
 
-
+/**
+ * PracaCotacaoImporter
+ *
+ * Atenção: certifique-se de que as tabelas de Moeda e Cultura
+ * já possuam todos os valores usados no CSV (ex: 'Trigo').
+ * Se faltar algum, adicione-os antes de importar o CSV.
+ */
 class PracaCotacaoImporter extends Importer
 {
     /**
@@ -43,21 +50,14 @@ class PracaCotacaoImporter extends Importer
             ImportColumn::make('moeda_id')
                 ->label('Moeda')
                 ->guess(['moeda'])
-                ->relationship('moeda', 'nome')
-                ->requiredMapping(),
+                ->requiredMapping()
+                ->relationship('moeda', 'nome'),
 
             ImportColumn::make('cultura_id')
                 ->label('Cultura')
                 ->guess(['cultura'])
-                ->relationship('cultura', 'nome')
-                ->requiredMapping(),
-
-            ImportColumn::make('fator_valorizacao')
-                ->label('Fator de Valorização')
-                ->guess(['fator_valorizacao'])
                 ->requiredMapping()
-                ->numeric()
-                ->rules(['required', 'numeric']),
+                ->relationship('cultura', 'nome'),
         ];
     }
 

@@ -84,18 +84,6 @@ class PracaCotacaoResource extends Resource
                     })
                     ->inputMode('decimal'),
 
-                TextInput::make('fator_valorizacao')
-                    ->label('Fator de Valorização')
-                    ->required()
-                    ->numeric()
-                    ->reactive()
-                    ->prefix(function ($get) {
-                        $moedaId = $get('moeda_id');
-                        $moeda = Moeda::find($moedaId);
-                        return $moeda?->sigla ?? '';
-                    })
-                    ->inputMode('decimal'),
-
                 ToggleButtons::make('cultura_id')
                     ->label('Cultura')
                     ->options(
