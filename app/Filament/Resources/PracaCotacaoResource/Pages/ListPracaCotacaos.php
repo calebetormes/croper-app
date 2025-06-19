@@ -2,27 +2,29 @@
 
 namespace App\Filament\Resources\PracaCotacaoResource\Pages;
 
+use App\Filament\Exports\PracaCotacaoExporter;
+use App\Filament\Imports\PracaCotacaoImporter;
 use App\Filament\Resources\PracaCotacaoResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
-use App\Filament\Imports\PracaCotacaoImporter;
-use Filament\Actions\ImportAction;
 use Filament\Notifications\Notification;
+use Filament\Resources\Pages\ListRecords;
+use Filament\Actions\ImportAction;
+use Filament\Actions\ExportAction as PageExportAction;
 use Filament\Actions\Imports\Models\Import as FilamentImport;
-use Filament\Tables\Actions\ExportAction;
-use Filament\Actions\CreateAction;
 
 class ListPracaCotacaos extends ListRecords
 {
     protected static string $resource = PracaCotacaoResource::class;
 
+    /**
+     * Actions no cabeçalho da página: Importar, Exportar e Criar
+     */
     protected function getHeaderActions(): array
     {
         return [
             ImportAction::make()
                 ->label('Importar Praças')
                 ->importer(PracaCotacaoImporter::class)
-                // Processa inline: defina QUEUE_CONNECTION=sync no .env
                 ->after(function (FilamentImport $import) {
                     $failedCount = $import->getFailedRowsCount();
 
@@ -34,6 +36,7 @@ class ListPracaCotacaos extends ListRecords
                             ->send();
                     } else {
                         $successCount = $import->successful_rows;
+
                         Notification::make()
                             ->success()
                             ->title('Importação concluída')
@@ -42,22 +45,12 @@ class ListPracaCotacaos extends ListRecords
                     }
                 }),
 
-            /*
-        ExportAction::make()
-            ->label('Exportar CSV')
-            ->filename('pracas_cotacao_export.csv')
-            ->columns([
-                'moeda' => 'moeda.nome',
-                'preco' => 'praca_cotacao_preco',
-                'cidade' => 'cidade',
-                'cultura' => 'cultura.nome',
-                'vencimento' => function ($record) {
-                    return $record->data_vencimento->format('d/m/Y');
-                },
-            ]),
-            */
+            PageExportAction::make()
+                ->label('Exportar CSV')
+                ->exporter(PracaCotacaoExporter::class)
+                ->fileName('pracas_cotacao_export.csv'),
 
-            CreateAction::make()
+            Actions\CreateAction::make()
                 ->label('Nova Praça de Cotação'),
         ];
     }
