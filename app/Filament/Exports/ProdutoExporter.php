@@ -54,7 +54,7 @@ class ProdutoExporter extends Exporter
                 ->label('Custo US$'),
 
             ExportColumn::make('indice_valorizacao_produto')
-                ->label('Fator Multiplicador'),
+                ->label('Índice de Valorização do Produto'),
         ];
     }
 

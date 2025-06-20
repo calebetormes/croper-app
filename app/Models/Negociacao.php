@@ -87,7 +87,7 @@ class Negociacao extends Model
 
         // Validações e status
         'nivel_validacao_id',
-        'status_validacao',
+        //'status_validacao',
         'status_defensivos',
         'status_especialidades',
         'status_negociacao_id',

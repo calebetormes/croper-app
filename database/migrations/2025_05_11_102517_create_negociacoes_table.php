@@ -58,7 +58,7 @@ return new class extends Migration {
 
             // Validações
             $table->foreignId('nivel_validacao_id')->constrained('niveis_validacao');
-            $table->boolean('status_validacao')->default(false);
+            //$table->boolean('status_validacao')->default(false);
             $table->unsignedBigInteger('status_defensivos')->default(false);
             $table->unsignedBigInteger('status_especialidades')->default(false);
             $table->foreignId('status_negociacao_id')->default(1)->constrained('status_negociacoes');

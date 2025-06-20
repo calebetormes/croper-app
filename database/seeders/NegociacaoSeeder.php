@@ -53,7 +53,7 @@ class NegociacaoSeeder extends Seeder
 
             // Validações
             'nivel_validacao_id' => 1,
-            'status_validacao' => true,
+            //'status_validacao' => true,
             'status_defensivos' => 5,
             'status_especialidades' => 5,
             'status_negociacao_id' => 2,
