@@ -23,7 +23,7 @@ Table gerentes_vendedores {
   gerente_id bigint [ref: > users.id]
   vendedor_id bigint [ref: > users.id]
     indexes {
-    (gerente_id, Vendedor_id) [pk]
+    (gerente_id, vendedor_id) [pk]
   }
 }
 
@@ -69,6 +69,8 @@ Table produtos {
   custo_rs decimal(12,2)
   custo_us decimal(12,2)
   fator_multiplicador decimal(12,2) // Fator de multiplicação para o volume 
+  indice_valorizacao decimal(12,2) // Fator de valorização do produto
+  ativo boolean // Indica se o produto está ativo
 }
 
 Table produtos_classes {
@@ -170,8 +172,7 @@ Table negociacoes {
   cultura_id int [ref: > culturas.id]
   praca_cotacao_id int [ref: > pracas_cotacoes.id]
   pagamento_id int [ref: > pagamentos.id] // Renomeado de data_pgto_contrato
-  dat
-   
+  data_entrega_graos date // Renomeado de data_entrega_contrato
   //SNAP DE PREÇOS DAS PRAÇAS
   snap_praca_cotacao_preco decimal(12,2) //snapshot calculado de pracas_cotacoes
   data_atualizacao_snap_preco_praca_cotacao date
@@ -199,7 +200,7 @@ Table negociacoes {
   preco_liquido_saca_valorizado decimal(12,2) //snap_preco_liquido_saca + (snap_preco_liquido_saca* indice_valorizacao_saca)
 
   bonus_cliente_pacote decimal(12,2) //
-  peso_saca //AAAAAAADICIONAR
+  peso_saca decimal(12,2) //AAAAAAADICIONAR
   peso_total_kg decimal(12,2) //investimento total em sacas * peso da saca
   
   //VALIDAÇÔES
@@ -229,12 +230,25 @@ Table negociacoes_produtos {
   //campos snapshop para os preços recebidos do produto editaveis manualmente
   snap_produto_preco_rs decimal(12,2) 
   snap_produto_preco_us decimal(12,2) 
+  snap_produto_custo_rs decimal(12,2) // custo do produto
+  snap_produto_custo_us decimal(12,2) // custo do produto
+  //
+  preco_total_produto_negociacao_rs decimal(12,2) // (snap_produto_preco_rs * volume)
+  preco_total_produto_negociacao_us decimal(12,2) // (snap_produto_preco_us * volume)
+  custo_total_produto_negocicao_rs decimal(12,2) // (snap_produto_custo_rs * volume)
+  custo_total_produto_negocicao_us decimal(12,2) // (snap_produto_custo_us * volume)
+  //
+  preco_produto_valorizado_rs decimal(12,2) // snap_produto_preco_rs * indice_valorização 
+  preco_produto_valorizado_us decimal(12,2) // snap_produto_preco_us * indice_valorização decimal(12,2) // (100/1 - (snap_produto_custo_rs/snap_produto_preco_rs))
+  margem_faturamento_us decimal(12,2) // (100/1 - (snap_produto_custo_us/snap_produto_preco_us)) 
   //
   preco_produto_valorizado_rs decimal(12,2) // snap_produto_preco_rs * indice_valorização 
   preco_produto_valorizado_us decimal(12,2) // snap_produto_preco_us * indice_valorização
-  
+  //
   data_atualizacao_snap_precos_produtos date
   negociacao_produto_fator_valorizacao decimal(12,2)
+
+
 
 }
 

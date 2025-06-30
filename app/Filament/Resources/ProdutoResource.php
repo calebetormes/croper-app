@@ -6,6 +6,7 @@ use App\Filament\Resources\ProdutoResource\Pages;
 use App\Models\Produto;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -108,10 +109,20 @@ class ProdutoResource extends Resource
                     ->required()
                     ->default(0),
 
+                TextInput::make('fator_multiplicador')
+                    ->label('Fator de Multiplicação')
+                    ->placeholder('Volume conforme a embalagem')
+                    ->numeric(),
+
                 TextInput::make('indice_valorizacao_produto')
                     ->label('Índice de valorizacao do Produto')
-                    ->numeric()
-                    ->default(1),
+                    ->placeholder('Ívalorização do produto')
+                    ->numeric(),
+
+                ToggleButtons::make('ativo')
+                    ->label('Ativo')
+                    ->boolean()
+                    ->default(true),
             ]);
     }
 

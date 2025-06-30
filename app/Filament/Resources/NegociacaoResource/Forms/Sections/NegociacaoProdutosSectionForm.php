@@ -12,6 +12,7 @@ use Filament\Forms\Set;
 use App\Models\Produto;
 use App\Models\Moeda;
 use Closure;
+use function Livewire\after;
 
 class NegociacaoProdutosSectionForm
 {
@@ -50,6 +51,9 @@ class NegociacaoProdutosSectionForm
                                     // snapshot do produto
                                     $set('snap_produto_preco_rs', $produto->preco_rs);
                                     $set('snap_produto_preco_us', $produto->preco_us);
+                                    $set('snap_produto_custo_rs', $produto->custo_rs);
+                                    $set('snap_produto_custo_us', $produto->custo_us);
+                                    // preço total do produto na negociação
                                     $set('indice_valorizacao', $produto->indice_valorizacao_produto);
                                     // data atualização só na criação
                                     if (!$get('data_atualizacao_snap_precos_produtos')) {
@@ -61,7 +65,25 @@ class NegociacaoProdutosSectionForm
                         TextInput::make('volume')
                             ->label('Volume')
                             ->numeric()
-                            ->required(),
+                            ->required()
+                            ->reactive()
+                            ->afterStateUpdated(function (Get $get, Set $set) {
+
+                                $getPrecoRsRaw = $get('snap_produto_preco_rs') ?? '0';
+                                $getPrecoUsRaw = $get('snap_produto_preco_us') ?? '0';
+                                $getCustoRsRaw = $get('snap_produto_custo_rs') ?? '0';
+                                $getCustoUsRaw = $get('snap_produto_custo_us') ?? '0';
+                                $getVolumeRaw = $get('volume') ?? '0';
+
+                                $set('preco_total_produto_negociacao_rs', $getPrecoRsRaw * ($getVolumeRaw));
+                                $set('preco_total_produto_negociacao_us', $getPrecoUsRaw * ($getVolumeRaw));
+                                $set('custo_total_produto_negociacao_rs', $getCustoRsRaw * ($getVolumeRaw));
+                                $set('custo_total_produto_negociacao_us', $getCustoUsRaw * ($getVolumeRaw));
+
+                                $set('margem_faturamento_rs', $getPrecoRsRaw * ($getVolumeRaw) - $getCustoRsRaw * ($getVolumeRaw));
+                                $set('margem_faturamento_us', $getPrecoUsRaw * ($getVolumeRaw) - $getCustoUsRaw * ($getVolumeRaw));
+
+                            }),
 
                         TextInput::make('indice_valorizacao')
                             ->label('Índice de Valorização')
@@ -70,7 +92,6 @@ class NegociacaoProdutosSectionForm
                             ->live()
                             ->default(0)
                             ->required()
-
                             ->afterStateUpdated(function (Get $get, Set $set) {
                                 // Raw values (podem vir como string, com vírgula)
                                 $snapRsRaw = $get('snap_produto_preco_rs') ?? '0';
@@ -104,6 +125,57 @@ class NegociacaoProdutosSectionForm
                             ->numeric()
                             ->disabled()
                             ->dehydrated(),
+
+                        TextInput::make('preco_total_produto_negociacao_rs')
+                            ->label('Preço Total RS')
+                            ->numeric()
+                            ->disabled()
+                            ->dehydrated(),
+
+                        TextInput::make('preco_total_produto_negociacao_us')
+                            ->label('Preço Total US')
+                            ->numeric()
+                            ->disabled()
+                            ->dehydrated(),
+
+                        TextInput::make('snap_produto_custo_rs')
+                            ->label('Custo RS')
+                            ->numeric()
+                            ->disabled()
+                            ->dehydrated(),
+
+                        TextInput::make('snap_produto_custo_us')
+                            ->label('Custo US')
+                            ->numeric()
+                            ->disabled()
+                            ->dehydrated(),
+
+
+                        TextInput::make('custo_total_produto_negociacao_rs')
+                            ->label('Custo Total RS')
+                            ->numeric()
+                            ->disabled()
+                            ->dehydrated(),
+
+                        TextInput::make('custo_total_produto_negociacao_us')
+                            ->label('Custo Total US')
+                            ->numeric()
+                            ->disabled()
+                            ->dehydrated(),
+
+                        TextInput::make('margem_faturamento_rs')
+                            ->label('Margem Faturamento RS')
+                            ->numeric()
+                            ->disabled()
+                            ->dehydrated(),
+
+                        TextInput::make('margem_faturamento_us')
+                            ->label('Margem Faturamento US')
+                            ->numeric()
+                            ->disabled()
+                            ->dehydrated(),
+
+
 
                         TextInput::make('preco_produto_valorizado_rs')
                             ->label('Valorizado RS')

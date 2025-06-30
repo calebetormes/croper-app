@@ -54,6 +54,8 @@ return new class extends Migration {
             $table->decimal('preco_us', 12, 2)->nullable();
             $table->decimal('custo_rs', 12, 2)->nullable();
             $table->decimal('custo_us', 12, 2)->nullable();
+            $table->decimal('fator_multiplicador', 12, 2)->default(1.0); // Fator de multiplicação para o volume
+            $table->boolean('ativo')->default(true); // Indica se o produto está ativo
             $table->decimal('indice_valorizacao_produto', 12, 2)->nullable(); // peso do produto em kg
 
             // chaves estrangeiras

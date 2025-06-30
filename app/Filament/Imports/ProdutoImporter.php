@@ -90,11 +90,23 @@ class ProdutoImporter extends Importer
                 ->numeric()
                 ->rules(['nullable', 'numeric']),
 
+            ImportColumn::make('fator_multiplicador')
+                ->label('Fator de Multiplicação')
+                ->guess(['fator', 'multiplicador'])
+                ->numeric()
+                ->rules(['nullable', 'numeric']),
+
             ImportColumn::make('indice_valorizacao_produto')
                 ->label('Índice de Valorização do Produto')
                 ->guess(['fator', 'indice'])
                 ->numeric()
                 ->rules(['nullable', 'numeric']),
+
+            ImportColumn::make('ativo')
+                ->label('Ativo')
+                ->guess(['Ativo'])
+                ->rules(['boolean'])
+                ->boolean(),
         ];
     }
 
