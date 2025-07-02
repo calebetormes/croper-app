@@ -24,8 +24,8 @@ class NegociacaoProduto extends Model
         'snap_produto_custo_us',
         'preco_total_produto_negociacao_rs',
         'preco_total_produto_negociacao_us',
-        'custo_total_produto_negocicao_rs',
-        'custo_total_produto_negocicao_us',
+        'custo_total_produto_negociacao_rs',    // corrigido
+        'custo_total_produto_negociacao_us',    // corrigido
         'margem_faturamento_rs',
         'margem_faturamento_us',
         'preco_produto_valorizado_rs',
@@ -38,12 +38,19 @@ class NegociacaoProduto extends Model
         'indice_valorizacao' => 'decimal:2',
         'snap_produto_preco_rs' => 'decimal:2',
         'snap_produto_preco_us' => 'decimal:2',
+        'snap_produto_custo_rs' => 'decimal:2',
+        'snap_produto_custo_us' => 'decimal:2',
+        'preco_total_produto_negociacao_rs' => 'decimal:2',
+        'preco_total_produto_negociacao_us' => 'decimal:2',
+        'custo_total_produto_negociacao_rs' => 'decimal:2',
+        'custo_total_produto_negociacao_us' => 'decimal:2',
+        'margem_faturamento_rs' => 'decimal:2',
+        'margem_faturamento_us' => 'decimal:2',
         'preco_produto_valorizado_rs' => 'decimal:2',
         'preco_produto_valorizado_us' => 'decimal:2',
         'data_atualizacao_snap_precos_produtos' => 'date',
     ];
 
-    // Se quiser sempre incluir no JSON/array:
     protected $appends = [
         'total_preco_rs',
         'total_preco_us',

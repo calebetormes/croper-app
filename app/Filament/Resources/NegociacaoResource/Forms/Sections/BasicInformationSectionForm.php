@@ -21,21 +21,27 @@ class BasicInformationSectionForm
                     ->label('Pedido ID')
                     ->disabled()
                     ->hiddenOn('create'),
+
                 DatePicker::make('data_versao')
                     ->label('Data Versão')
                     ->default(now())
                     ->disabled()
                     ->hidden()
                     ->dehydrated(),
+
                 DatePicker::make('data_negocio')
                     ->label('Data da Negociação')
                     ->default(now())
                     ->required(),
+
                 ToggleButtons::make('moeda_id')
                     ->label('Moeda')
                     ->options(Moeda::pluck('sigla', 'id')->toArray())
                     ->required()
                     ->inline()
+                    ->reactive()
+                    ->live()
+
                     ->afterStateUpdated(function ($get, $set) {
                         // 1) Pega os totais atuais
                         $totalRs = $get('valor_total_pedido_rs') ?? 0;

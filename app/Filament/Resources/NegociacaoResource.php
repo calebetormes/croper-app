@@ -6,29 +6,18 @@ use App\Filament\Resources\NegociacaoResource\Forms\Sections\BasicInformationSec
 use App\Filament\Resources\NegociacaoResource\Forms\Sections\ClientInformationSectionForm;
 use App\Filament\Resources\NegociacaoResource\Forms\Sections\CotacoesSectionForm;
 use App\Filament\Resources\NegociacaoResource\Forms\Sections\PagamentosSectionForm;
-use App\Filament\Resources\NegociacaoResource\Forms\Sections\ProdutosSectionForm;
 use App\Filament\Resources\NegociacaoResource\Forms\Sections\StatusGeralSectionForm;
-use App\Filament\Resources\NegociacaoResource\Forms\Sections\StatusValidacoesSectionForm;
 use App\Filament\Resources\NegociacaoResource\Forms\Sections\ValoresSectionForm;
 use App\Filament\Resources\NegociacaoResource\Pages;
-use App\Filament\Resources\NegociacaoResource\Forms\Sections\NegociacaoProdutosSectionForm;
+use App\Filament\Resources\NegociacaoResource\Forms\Sections\NegociacaoProdutoSectionForm;
 use App\Filament\Resources\NegociacaoResource\Forms\Sections\QuantidadeMinimaSectionForm;
-
-use App\Filament\Resources\NegociacaoResource\RelationManagers\NegociacaoProdutosRelationManager;
 use App\Models\Negociacao;
 use App\Models\StatusNegociacao;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tab;
 use Filament\Navigation\NavigationItem;
 use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -36,9 +25,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+
 use Carbon\Carbon;
-use App\Models\Produto;
+
 
 
 
@@ -81,7 +70,7 @@ class NegociacaoResource extends Resource
 
                     Tabs\Tab::make('Produtos')
                         ->schema([
-                            NegociacaoProdutosSectionForm::make(),
+                            NegociacaoProdutoSectionForm::make(),
                             QuantidadeMinimaSectionForm::make(),
                         ]),
 
