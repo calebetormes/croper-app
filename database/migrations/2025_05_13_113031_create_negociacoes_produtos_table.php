@@ -20,18 +20,18 @@ return new class extends Migration {
             $table->decimal('indice_valorizacao', 12, 2);
 
             // Campos snapshot para os preços
-            $table->decimal('snap_produto_preco_rs', 12, 2);
-            $table->decimal('snap_produto_preco_us', 12, 2);
-            $table->decimal('snap_produto_custo_rs', 12, 2);
-            $table->decimal('snap_produto_custo_us', 12, 2);
+            $table->decimal('snap_produto_preco_rs', 12, 2)->nullable();
+            $table->decimal('snap_produto_preco_us', 12, 2)->nullable();
+            $table->decimal('snap_produto_custo_rs', 12, 2)->nullable();
+            $table->decimal('snap_produto_custo_us', 12, 2)->nullable();
             //
             $table->decimal('preco_total_produto_negociacao_rs', 12, 2)->nullable();
             $table->decimal('preco_total_produto_negociacao_us', 12, 2)->nullable();
             $table->decimal('custo_total_produto_negociacao_rs', 12, 2)->nullable();
             $table->decimal('custo_total_produto_negociacao_us', 12, 2)->nullable();
             //
-            $table->decimal('margem_faturamento_rs', 12, 2);
-            $table->decimal('margem_faturamento_us', 12, 2);
+            $table->decimal('margem_faturamento_rs', 12, 2)->nullable();
+            $table->decimal('margem_faturamento_us', 12, 2)->nullable();
             //
             $table->decimal('preco_produto_valorizado_rs', 12, 2)->nullable();
             $table->decimal('preco_produto_valorizado_us', 12, 2)->nullable();

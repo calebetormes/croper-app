@@ -71,21 +71,25 @@ class NegociacaoProdutoForm
                                     NegociacaoProdutoLogic::volumeAfterStateUpdated($get, $set)
                                 ),
 
-                            TextInput::make('preco_produto_valorizado_rs')
-                                ->label('Valorizado RS')
+                            TextInput::make('preco_total_produto_negociacao_rs')
+                                ->label('Valor Total do Produto na Negociação')
+                                ->prefix('BRL')
                                 ->numeric()
                                 ->disabled()
-                                ->dehydrated(true)
+                                ->dehydrated()
                                 ->visible(fn(Get $get) => $get('../../moeda_id') === 1)
                                 ->reactive(),
 
-                            TextInput::make('preco_produto_valorizado_us')
-                                ->label('Valorizado US')
+                            TextInput::make('preco_total_produto_negociacao_us')
+                                ->label('Valor Total do Produto na Negociação')
+                                ->prefix('USS')
                                 ->numeric()
                                 ->disabled()
-                                ->dehydrated(true)
+                                ->dehydrated()
                                 ->visible(fn(Get $get) => $get('../../moeda_id') === 2)
                                 ->reactive(),
+
+
                         ]),
 
                     Section::make('Detalhes do Produto')
@@ -103,73 +107,100 @@ class NegociacaoProdutoForm
                                     NegociacaoProdutoLogic::indiceValorizacaoAfterStateUpdated($get, $set)
                                 ),
 
-                            DatePicker::make('data_atualizacao_snap_precos_produtos')
-                                ->label('Data Atualização')
-                                ->default(fn(): \DateTime => now())
+                            TextInput::make('preco_produto_valorizado_rs')
+                                ->label('Preço do Produto (sem bonus)')
+                                ->prefix('BRL')
+                                ->numeric()
                                 ->disabled()
-                                ->dehydrated(true),
+                                ->dehydrated()
+                                ->visible(fn(Get $get) => $get('../../moeda_id') === 1)
+                                ->reactive(),
+
+                            TextInput::make('preco_produto_valorizado_us')
+                                ->label('Preço do Produto (sem bonus)')
+                                ->prefix('USS')
+                                ->numeric()
+                                ->disabled()
+                                ->dehydrated()
+                                ->visible(fn(Get $get) => $get('../../moeda_id') === 2)
+                                ->reactive(),
 
                             TextInput::make('snap_produto_preco_rs')
-                                ->label('Preço RS')
+                                ->label('Preço do Produto (com bonus)')
+                                ->prefix('BRL')
                                 ->numeric()
                                 ->disabled()
-                                ->dehydrated(true)
+                                ->dehydrated()
                                 ->visible(fn(Get $get) => $get('../../moeda_id') === 1)
                                 ->reactive(),
+
 
                             TextInput::make('snap_produto_preco_us')
-                                ->label('Preço US')
+                                ->label('Preço do Produto (com bonus)')
+                                ->prefix('USS')
                                 ->numeric()
                                 ->disabled()
-                                ->dehydrated(true)
+                                ->dehydrated()
                                 ->visible(fn(Get $get) => $get('../../moeda_id') === 2)
                                 ->reactive(),
 
-                            TextInput::make('preco_total_produto_negociacao_rs')
-                                ->label('Preço Total RS')
+                            TextInput::make('snap_produto_custo_rs')
+                                ->label('Custo do Produto (com bonus)')
+                                ->prefix('BRL')
                                 ->numeric()
                                 ->disabled()
-                                ->dehydrated(true)
+                                ->dehydrated()
                                 ->visible(fn(Get $get) => $get('../../moeda_id') === 1)
                                 ->reactive(),
 
-                            TextInput::make('preco_total_produto_negociacao_us')
-                                ->label('Preço Total US')
+                            TextInput::make('snap_produto_custo_us')
+                                ->label('Custo do Produto (com bonus)')
+                                ->prefix('USS')
                                 ->numeric()
                                 ->disabled()
-                                ->dehydrated(true)
+                                ->dehydrated()
                                 ->visible(fn(Get $get) => $get('../../moeda_id') === 2)
                                 ->reactive(),
 
+                            DatePicker::make('data_atualizacao_snap_precos_produtos')
+                                ->label('Data Atualização dos Preços do Produto')
+                                ->default(fn(): \DateTime => now())
+                                ->disabled()
+                                ->dehydrated(),
+
                             TextInput::make('custo_total_produto_negociacao_rs')
-                                ->label('Custo Total RS')
+                                ->label('Custo Total do Produto na NegociaçãoS')
+                                ->prefix('BRL')
                                 ->numeric()
                                 ->disabled()
-                                ->dehydrated(true)
+                                ->dehydrated()
                                 ->visible(fn(Get $get) => $get('../../moeda_id') === 1)
                                 ->reactive(),
 
                             TextInput::make('custo_total_produto_negociacao_us')
-                                ->label('Custo Total US')
+                                ->label('Custo Total do Produto na Negociação')
+                                ->prefix('USS')
                                 ->numeric()
                                 ->disabled()
-                                ->dehydrated(true)
+                                ->dehydrated()
                                 ->visible(fn(Get $get) => $get('../../moeda_id') === 2)
                                 ->reactive(),
 
                             TextInput::make('margem_faturamento_rs')
-                                ->label('Margem Faturamento RS')
+                                ->label('Margem Faturamento')
+                                ->prefix('BRL')
                                 ->numeric()
                                 ->disabled()
-                                ->dehydrated(true)
+                                ->dehydrated()
                                 ->visible(fn(Get $get) => $get('../../moeda_id') === 1)
                                 ->reactive(),
 
                             TextInput::make('margem_faturamento_us')
-                                ->label('Margem Faturamento US')
+                                ->label('Margem Faturamento')
+                                ->prefix('USS')
                                 ->numeric()
                                 ->disabled()
-                                ->dehydrated(true)
+                                ->dehydrated()
                                 ->visible(fn(Get $get) => $get('../../moeda_id') === 2)
                                 ->reactive(),
                         ]),
