@@ -16,6 +16,7 @@ use App\Models\Negociacao;
 use Filament\Notifications\Notification;
 
 
+
 class TableSchema
 {
     public static function make(Table $table): Table
@@ -29,18 +30,12 @@ class TableSchema
                 TextColumn::make('pedido_id')
                     ->label('ID do Pedido')
                     ->sortable(),
-                TextColumn::make('gerente.name')
-                    ->label('GRV')
-                    ->sortable(),
                 TextColumn::make('vendedor.name')
                     ->label('RTV')
                     ->sortable(),
                 TextColumn::make('cliente')
                     ->searchable(),
-                TextColumn::make('cultura.nome')
-                    ->label('Cultura')
-                    ->sortable(),
-                TextColumn::make('status_negociacao.nome')
+                TextColumn::make('statusNegociacao.nome')
                     ->label('Status')
                     ->sortable(),
             ])
