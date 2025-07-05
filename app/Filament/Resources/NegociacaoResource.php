@@ -2,40 +2,19 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\NegociacaoResource\Forms\Sections\BasicInformationSectionForm;
-use App\Filament\Resources\NegociacaoResource\Forms\Sections\ClientInformationSectionForm;
-use App\Filament\Resources\NegociacaoResource\Forms\Sections\CotacoesSectionForm;
-use App\Filament\Resources\NegociacaoResource\Forms\Sections\PagamentosSectionForm;
-use App\Filament\Resources\NegociacaoResource\Forms\Sections\StatusGeralSectionForm;
-use App\Filament\Resources\NegociacaoResource\Forms\Sections\ValoresSectionForm;
 use App\Filament\Resources\NegociacaoResource\Pages;
-use App\Filament\Resources\NegociacaoResource\Forms\Sections\NegociacaoProdutoSectionForm;
-use App\Filament\Resources\NegociacaoResource\Forms\Sections\QuantidadeMinimaSectionForm;
 use App\Models\Negociacao;
 use App\Models\StatusNegociacao;
-use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Components\Tabs;
 use Filament\Navigation\NavigationItem;
 use Filament\Resources\Resource;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Infolist;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\Grid;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\RepeatableEntry;
-
+use App\Filament\Resources\NegociacaoResource\Schemas\FormSchema;
+use App\Filament\Resources\NegociacaoResource\Schemas\TableSchema;
+use App\Filament\Resources\NegociacaoResource\Schemas\InfolistSchema;
 use Carbon\Carbon;
-
-
-
 
 class NegociacaoResource extends Resource
 {
@@ -63,148 +42,22 @@ class NegociacaoResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form->schema([
-            Tabs::make('Negociação')
-                ->tabs([
-                    Tabs\Tab::make('Informações Básicas')
-                        ->schema([
-                            BasicInformationSectionForm::make(),
-                            ClientInformationSectionForm::make(),
-                            PagamentosSectionForm::make(),
-                            CotacoesSectionForm::make(),
-                        ]),
-
-                    Tabs\Tab::make('Produtos')
-                        ->schema([
-                            NegociacaoProdutoSectionForm::make(),
-                            QuantidadeMinimaSectionForm::make(),
-                        ]),
-
-                    Tabs\Tab::make('Valores e Status')
-                        ->schema([
-                            ValoresSectionForm::make(),
-                            //StatusValidacoesSectionForm::make(),
-                            StatusGeralSectionForm::make(),
-                        ]),
-
-
-                ])
-                ->columnSpanFull(),
-        ]);
+        return $form
+            ->schema(
+                FormSchema::make()
+            );
     }
 
     public static function table(Table $table): Table
     {
-        return $table
-            ->columns([
-                TextColumn::make('data_negocio')
-                    ->sortable()
-                    ->label('Data negócio')
-                    ->date('d/m/Y'),
-                TextColumn::make('pedido_id')->label('ID do Pedido')->sortable(),
-                TextColumn::make('gerente.name')->label('GRV')->sortable(),
-                TextColumn::make('vendedor.name')->label('RTV')->sortable(),
-                TextColumn::make('cliente')->searchable(),
-                TextColumn::make('cultura.nome')->label('Cultura')->sortable(),
-                TextColumn::make('status_negociacao.nome')->label('Status')->sortable(),
-                TextColumn::make('status_negociacao.nome')->label('Status')->sortable(),
-            ])
-            ->filters([
-                Filter::make('data_negocio')
-                    ->label('Data')
-                    ->form([
-                        Forms\Components\DatePicker::make('from')->label('De'),
-                        Forms\Components\DatePicker::make('until')->label('Até'),
-                    ])
-                    ->query(
-                        fn($query, array $data) => $query
-                            ->when($data['from'], fn($q) => $q->whereDate('data_negocio', '>=', $data['from']))
-                            ->when($data['until'], fn($q) => $q->whereDate('data_negocio', '<=', $data['until']))
-                    ),
-
-                SelectFilter::make('gerente_id')
-                    ->multiple()
-                    ->label('Gerente')
-                    ->relationship('gerente', 'name')
-                    ->searchable(),
-
-                SelectFilter::make('vendedor_id')
-                    ->multiple()
-                    ->label('Vendedor')
-                    ->relationship('vendedor', 'name')
-                    ->searchable(),
-
-                SelectFilter::make('status_negociacao_id')
-                    ->label('Status')
-                    ->relationship('statusNegociacao', 'nome')
-                    ->searchable()
-                    ->multiple()
-                    ->preload(),
-            ])
-            ->actions([
-                EditAction::make(),
-                //->iconButton(),
-                ViewAction::make()
-                    ->label('Visualizar')
-                    ->icon('heroicon-o-eye')
-                    // opcional: abre num slide-over ao invés de página inteira
-                    ->slideOver()
-                    ->modalWidth('xl'),
-            ])
-            ->bulkActions([
-                DeleteBulkAction::make(),
-                //->iconButton(),
-            ]);
+        return TableSchema::make($table);
     }
 
-    /*
-        public static function getRelations(): array
-    {
-        return [
-            NegociacaoProdutosRelationManager::class,
-        ];
-    }
-    */
 
     public static function infolist(Infolist $infolist): Infolist
     {
-        return $infolist
-            ->schema([
-                Section::make('Informações Gerais')
-                    ->schema([
-                        Grid::make(3)->schema([
-                            TextEntry::make('pedido_id')->label('Pedido ID'),
-                            TextEntry::make('data_negocio')->label('Data Negócio')->date(),
-                            TextEntry::make('cliente')->label('Cliente'),
-                            TextEntry::make('cidade_cliente')->label('Cidade'),
-                            TextEntry::make('gerente.name')->label('Gerente'),
-                            TextEntry::make('vendedor.name')->label('Vendedor'),
-                            TextEntry::make('valor_total_pedido_rs')->label('Total (R$)')->money('BRL'),
-                            TextEntry::make('valor_total_pedido_us')->label('Total (US$)')->money('USD'),
-                            TextEntry::make('area_hectares')->label('Área (ha)'),
-                        ]),
-                    ]),
-
-                Section::make('Produtos da Negociação')
-                    ->schema([
-                        RepeatableEntry::make('negociacaoProdutos')
-                            ->schema([
-                                Grid::make(4)->schema([
-                                    TextEntry::make('produto.nome')->label('Produto'),
-                                    TextEntry::make('volume')->label('Volume'),
-                                    TextEntry::make('snap_produto_preco_rs')->label('Preço Unitário (R$)')->money('BRL'),
-                                    TextEntry::make('total_preco_rs')->label('Preço Total (R$)')->money('BRL'),
-                                    TextEntry::make('snap_produto_preco_us')->label('Preço Unitário (US$)')->money('USD'),
-                                    TextEntry::make('total_preco_us')->label('Preço Total (US$)')->money('USD'),
-                                    TextEntry::make('indice_valorizacao')->label('Índice Valorização'),
-                                ]),
-                            ])
-                            ->columns(1),
-                    ]),
-            ]);
+        return InfolistSchema::make($infolist);
     }
-
-
 
     public static function getPages(): array
     {
@@ -235,10 +88,6 @@ class NegociacaoResource extends Resource
         return $data;
     }
 
-    /**
-     * 1) Este hook é executado ANTES do Livewire “encher” o formulário (tanto no Create quanto no Edit).
-     * 2) Se já existir data_atualizacao_snap_preco_praca_cotacao > 3 dias atrás, então zera o campo praca_cotacao_id.
-     */
     protected static function mutateFormDataBeforeFill(array $data): array
     {
 
