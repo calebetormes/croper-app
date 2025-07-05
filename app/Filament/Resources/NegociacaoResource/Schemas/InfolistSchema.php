@@ -26,6 +26,7 @@ class InfolistSchema
                             TextEntry::make('valor_total_pedido_rs')->label('Total (R$)')->money('BRL'),
                             TextEntry::make('valor_total_pedido_us')->label('Total (US$)')->money('USD'),
                             TextEntry::make('area_hectares')->label('Área (ha)'),
+                            //
                         ]),
                     ]),
 
