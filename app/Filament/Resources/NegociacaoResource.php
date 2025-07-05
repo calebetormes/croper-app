@@ -16,6 +16,7 @@ use App\Filament\Resources\NegociacaoResource\Schemas\TableSchema;
 use App\Filament\Resources\NegociacaoResource\Schemas\InfolistSchema;
 use Carbon\Carbon;
 
+
 class NegociacaoResource extends Resource
 {
     protected static ?string $model = Negociacao::class;

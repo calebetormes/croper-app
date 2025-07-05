@@ -10,6 +10,11 @@ use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Forms\Components\DatePicker as FormDatePicker;
+use Filament\Tables\Actions\Action as TableAction;
+use App\Filament\Resources\NegociacaoResource\Forms\Sections\StatusGeralSectionForm;
+use App\Models\Negociacao;
+use Filament\Notifications\Notification;
+
 
 class TableSchema
 {
@@ -72,6 +77,26 @@ class TableSchema
             ])
             ->actions([
                 EditAction::make(),
+
+                TableAction::make('changeStatus')
+                    ->label('Alterar Status')
+                    //->icon('heroicon-o-adjustments')
+
+                    // injeta aqui o Section pronto:
+                    ->form([
+                        StatusGeralSectionForm::make(),
+                    ])
+                    ->action(function (Negociacao $record, array $data) {
+                        $record->fill($data)->save();
+                        Notification::make()
+                            ->title('Status atualizado com sucesso!')
+                            ->success()
+                            ->send();
+                    })
+                    ->requiresConfirmation()
+                    ->modalHeading('Alterar Status da Negociação')
+                    ->modalButton('Salvar'),
+
                 ViewAction::make()
                     ->label('Visualizar')
                     ->icon('heroicon-o-eye')
