@@ -203,6 +203,24 @@ class NegociacaoProdutoForm
                                 ->dehydrated()
                                 ->visible(fn(Get $get) => $get('../../moeda_id') === 2)
                                 ->reactive(),
+
+                            TextInput::make('margem_percentual_rs')
+                                ->label('Margem Percetual de Faturamento')
+                                ->prefix('%')
+                                ->numeric()
+                                ->disabled()
+                                ->dehydrated()
+                                ->visible(fn(Get $get) => $get('../../moeda_id') === 1)
+                                ->reactive(),
+
+                            TextInput::make('margem_percentual_us')
+                                ->label('Margem Percetual de Faturamento')
+                                ->prefix('%')
+                                ->numeric()
+                                ->disabled()
+                                ->dehydrated()
+                                ->visible(fn(Get $get) => $get('../../moeda_id') === 2)
+                                ->reactive(),
                         ]),
                 ])
                 ->afterStateUpdated(

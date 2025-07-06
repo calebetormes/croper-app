@@ -12,38 +12,6 @@ class Negociacao extends Model
 
     protected $table = 'negociacoes';
 
-    // Casts para datas, booleanos e valores decimais
-    protected $casts = [
-        'data_versao' => 'date',
-        'data_negocio' => 'date',
-        'data_atualizacao_snap_preco_praca_cotacao' => 'date',
-        'status_validacao' => 'boolean',
-        'valor_total_pedido_rs' => 'decimal:2',
-        'valor_total_pedido_us' => 'decimal:2',
-        'valor_total_pedido_rs_valorizado' => 'decimal:2',
-        'valor_total_pedido_us_valorizado' => 'decimal:2',
-        'area_hectares' => 'decimal:2',
-        'investimento_total_sacas' => 'decimal:2',
-        'investimento_sacas_hectare' => 'decimal:2',
-        'indice_valorizacao_saca' => 'decimal:2',
-        'preco_liquido_saca' => 'decimal:2',
-        'preco_liquido_saca_valorizado' => 'decimal:2',
-        'bonus_cliente_pacote' => 'decimal:2',
-        'peso_total_kg' => 'decimal:2',
-        'cotacao_moeda_usd_brl' => 'decimal:2',
-        'data_entrega_graos' => 'date',
-
-    ];
-
-    protected static function booted()
-    {
-        static::created(function (Negociacao $negociacao) {
-            $negociacao->updateQuietly([
-                'pedido_id' => str_pad($negociacao->id, 6, '0', STR_PAD_LEFT),
-            ]);
-        });
-    }
-
     protected $fillable = [
         'pedido_id',
 
@@ -83,11 +51,15 @@ class Negociacao extends Model
         'preco_liquido_saca',
         'preco_liquido_saca_valorizado',
         'bonus_cliente_pacote',
+        'peso_saca',
         'peso_total_kg',
+        'margem_faturamento_total_us',
+        'margem_faturamento_total_rs',
+        'margem_percentual_us', // (100/1 - (snap_produto_custo_us/snap_produto_preco_us)) * 100
+        'margem_percentual_rs', // (100/1 -
 
         // Validações e status
         'nivel_validacao_id',
-        //'status_validacao',
         'status_defensivos',
         'status_especialidades',
         'status_negociacao_id',
@@ -96,6 +68,49 @@ class Negociacao extends Model
         'observacoes',
         'cotacao_moeda_usd_brl',
     ];
+
+    // Casts para datas, booleanos e valores decimais
+    protected $casts = [
+        'data_versao' => 'date',
+        'data_negocio' => 'date',
+        'data_atualizacao_snap_preco_praca_cotacao' => 'date',
+        'status_validacao' => 'boolean',
+        'valor_total_pedido_rs' => 'decimal:2',
+        'valor_total_pedido_us' => 'decimal:2',
+        'valor_total_pedido_rs_valorizado' => 'decimal:2',
+        'valor_total_pedido_us_valorizado' => 'decimal:2',
+        'area_hectares' => 'decimal:2',
+        'investimento_total_sacas' => 'decimal:2',
+        'investimento_sacas_hectare' => 'decimal:2',
+        'indice_valorizacao_saca' => 'decimal:2',
+        'preco_liquido_saca' => 'decimal:2',
+        'preco_liquido_saca_valorizado' => 'decimal:2',
+        'bonus_cliente_pacote' => 'decimal:2',
+        'peso_total_kg' => 'decimal:2',
+        'cotacao_moeda_usd_brl' => 'decimal:2',
+        'data_entrega_graos' => 'date',
+        'snap_praca_cotacao_preco' => 'decimal:2',
+        'status_defensivos' => 'integer',
+        'status_especialidades' => 'integer',
+        'peso_saca' => 'decimal:2',
+        'margem_faturamento_total_us' => 'decimal:2',
+        'margem_faturamento_total_rs' => 'decimal:2',
+        'margem_percentual_us' => 'decimal:2', // (100/1 - (snap_produto_custo_us/snap_produto_preco_us)) * 100
+        'margem_percentual_rs' => 'decimal:2', // (100/1 - (snap_produto_custo_rs/snap_produto_preco_rs)) * 100
+
+    ];
+
+    public $timestamps = true;
+
+    protected static function booted()
+    {
+        static::created(function (Negociacao $negociacao) {
+            $negociacao->updateQuietly([
+                'pedido_id' => str_pad($negociacao->id, 6, '0', STR_PAD_LEFT),
+            ]);
+        });
+    }
+
 
     // Relações
     public function moeda()

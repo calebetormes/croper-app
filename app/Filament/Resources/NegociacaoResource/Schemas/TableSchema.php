@@ -4,6 +4,7 @@ namespace App\Filament\Resources\NegociacaoResource\Schemas;
 
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\ViewAction;
@@ -13,6 +14,7 @@ use Filament\Forms\Components\DatePicker as FormDatePicker;
 use Filament\Tables\Actions\Action as TableAction;
 use App\Filament\Resources\NegociacaoResource\Forms\Sections\StatusGeralSectionForm;
 use App\Models\Negociacao;
+use App\Models\StatusNegociacao;
 use Filament\Notifications\Notification;
 
 
@@ -38,6 +40,18 @@ class TableSchema
                 TextColumn::make('statusNegociacao.nome')
                     ->label('Status')
                     ->sortable(),
+
+                TextColumn::make('statusNegociacao.nome')
+                    ->label('Status')
+                    ->sortable()
+                    ->badge()
+                    ->colors([
+                        // Definir cor com base no texto do status
+                        'warning' => static fn($state): bool => in_array($state, ['Em análise', 'Pausada']),
+                        'success' => static fn($state): bool => in_array($state, ['Aprovado', 'Pagamento Recebido', 'Entrega de Grãos Realizada']),
+                        'danger' => static fn($state): bool => $state === 'Não Aprovado',
+                        'gray' => static fn($state): bool => $state === 'Concluído',
+                    ]),
             ])
             ->filters([
                 Filter::make('data_negocio')
@@ -71,11 +85,18 @@ class TableSchema
                     ->relationship('statusNegociacao', 'nome'),
             ])
             ->actions([
-                EditAction::make(),
+                EditAction::make()
+                    ->label(''),
+
+                ViewAction::make()
+                    ->label('')
+                    ->icon('heroicon-o-eye')
+                    ->slideOver()
+                    ->modalWidth('xl'),
 
                 TableAction::make('changeStatus')
-                    ->label('Alterar Status')
-                    //->icon('heroicon-o-adjustments')
+                    ->label('')
+                    ->icon('heroicon-o-adjustments-vertical')
 
                     // injeta aqui o Section pronto:
                     ->form([
@@ -92,11 +113,7 @@ class TableSchema
                     ->modalHeading('Alterar Status da Negociação')
                     ->modalButton('Salvar'),
 
-                ViewAction::make()
-                    ->label('Visualizar')
-                    ->icon('heroicon-o-eye')
-                    ->slideOver()
-                    ->modalWidth('xl'),
+
             ])
             ->bulkActions([
                 DeleteBulkAction::make(),

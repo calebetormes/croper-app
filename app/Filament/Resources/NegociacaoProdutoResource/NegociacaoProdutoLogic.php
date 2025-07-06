@@ -37,23 +37,65 @@ class NegociacaoProdutoLogic
 
     public static function volumeAfterStateUpdated($get = null, $set = null)
     {
+        // Se não houver getters ou setters, sai
         if (!$get || !$set) {
             return;
         }
 
-        $precoRs = $get('snap_produto_preco_rs') ?? 0;
-        $precoUs = $get('snap_produto_preco_us') ?? 0;
-        $custoRs = $get('snap_produto_custo_rs') ?? 0;
-        $custoUs = $get('snap_produto_custo_us') ?? 0;
-        $volume = $get('volume') ?? 0;
+        //
+        // 1) Obtenção dos valores base (preço e custo em R$ e US$) e do volume
+        //
+        $precoRs = $get('snap_produto_preco_rs') ?? 0;    // preço unitário em R$
+        $custoRs = $get('snap_produto_custo_rs') ?? 0;    // custo unitário em R$
+        $precoUs = $get('snap_produto_preco_us') ?? 0;    // preço unitário em US$
+        $custoUs = $get('snap_produto_custo_us') ?? 0;    // custo unitário em US$
+        $volume = $get('volume') ?? 0;    // quantidade negociada
 
-        $set('preco_total_produto_negociacao_rs', $precoRs * $volume);
-        $set('preco_total_produto_negociacao_us', $precoUs * $volume);
-        $set('custo_total_produto_negociacao_rs', $custoRs * $volume);
-        $set('custo_total_produto_negociacao_us', $custoUs * $volume);
+        //
+        // 2) Cálculo dos totais (preço * volume, custo * volume)
+        //
+        $totalPrecoRs = $precoRs * $volume;
+        $totalCustoRs = $custoRs * $volume;
+        $totalPrecoUs = $precoUs * $volume;
+        $totalCustoUs = $custoUs * $volume;
 
-        $set('margem_faturamento_rs', $precoRs * $volume - $custoRs * $volume);
-        $set('margem_faturamento_us', $precoUs * $volume - $custoUs * $volume);
+        $set('preco_total_produto_negociacao_rs', $totalPrecoRs);
+        $set('custo_total_produto_negociacao_rs', $totalCustoRs);
+        $set('preco_total_produto_negociacao_us', $totalPrecoUs);
+        $set('custo_total_produto_negociacao_us', $totalCustoUs);
+
+        //
+        // 3) Cálculo da margem absoluta (preço total - custo total)
+        //
+        $margemAbsRs = $totalPrecoRs - $totalCustoRs;
+        $margemAbsUs = $totalPrecoUs - $totalCustoUs;
+
+        $set('margem_faturamento_rs', $margemAbsRs);
+        $set('margem_faturamento_us', $margemAbsUs);
+
+        //
+        // 4) Cálculo da margem percentual:
+        //    fórmula: (1 - (custo unitário / preço unitário)) * 100
+        //
+        //    - Multiplicamos por 100 para converter em porcentagem
+        //    - Arredondamos para 2 casas decimais
+        //
+        if ($precoRs > 0) {
+            $margemPercRs = (1 - ($custoRs / $precoRs)) * 100;
+            $margemPercRs = round($margemPercRs, 2);
+        } else {
+            // evita divisão por zero
+            $margemPercRs = 0;
+        }
+        $set('margem_percentual_rs', $margemPercRs);
+
+        if ($precoUs > 0) {
+            $margemPercUs = (1 - ($custoUs / $precoUs)) * 100;
+            $margemPercUs = round($margemPercUs, 2);
+        } else {
+            $margemPercUs = 0;
+        }
+        $set('margem_percentual_us', $margemPercUs);
     }
 
     public static function indiceValorizacaoAfterStateUpdated($get = null, $set = null)

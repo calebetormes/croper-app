@@ -39,7 +39,7 @@ class FormSchema
                         ->schema([
                             ValoresSectionForm::make(),
                             //StatusValidacoesSectionForm::make(),
-                            StatusGeralSectionForm::make(),
+                            //StatusGeralSectionForm::make(),
                         ]),
 
 

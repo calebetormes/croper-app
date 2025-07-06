@@ -32,6 +32,8 @@ return new class extends Migration {
             //
             $table->decimal('margem_faturamento_rs', 12, 2)->nullable();
             $table->decimal('margem_faturamento_us', 12, 2)->nullable();
+            $table->decimal('margem_percentual_rs', 12, 2)->nullable(); // (100/1 - (snap_produto_custo_rs/snap_produto_preco_rs)) * 100
+            $table->decimal('margem_percentual_us', 12, 2)->nullable(); // (100/1 - (snap_produto_custo_us/snap_produto_pre
             //
             $table->decimal('preco_produto_valorizado_rs', 12, 2)->nullable();
             $table->decimal('preco_produto_valorizado_us', 12, 2)->nullable();

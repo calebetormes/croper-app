@@ -153,12 +153,12 @@ Table pracas_cotacoes {
 //ALTERADO 
 //lembrar de REMOVER FATOR DE VALORização no section pracas_cotacoes
 Table negociacoes {
-  id int [pk, increment]
-  pedido_id int [unique]
+  id int [pk, increment, unique, not null] // Adicionado unique para garantir unicidade
+  pedido_id varchar(6) [unique] // Renomeado de pedido para pedido_id e adicionado unique
 
   // Datas principais
   data_versao date
-  data_negocio date
+  data_negocio date [default: `now()`] // Renomeado de data para data_negocio
   moeda_id int [ref: > moedas.id] // Ajustado para usar ID
 
   // pessoas
@@ -183,6 +183,10 @@ Table negociacoes {
   valor_total_pedido_us decimal(12,2) //SOMA DOS snap_produto_preco_us * VOLUME
   valor_total_pedido_rs_valorizado decimal(12,2) //SOMA DOS (preco_produto_valorizado_rs * VOLUME) 
   valor_total_pedido_us_valorizado decimal(12,2) //SOMA DOS (preco_produto_valorizado_rs * VOLUME)
+  margem_faturamento_total_us decimal(12,2) //SOMA DOS (margem_faturamento_us * VOLUME)
+  margem_faturamento_total_rs decimal(12,2) //SOMA DOS (margem_faturamento_rs * VOLUME)
+  amrgem_percentual_total_us decimal(12,2) //SOMA DOS (margem_percentual_us * VOLUME)
+  amrgem_percentual_total_rs decimal(12,2) //SOMA DOS (
   
   
   
@@ -205,15 +209,16 @@ Table negociacoes {
   
   //VALIDAÇÔES
   nivel_validacao_id int [ref: > niveis_validacao.id]
-  status_validacao bool
   status_defensivos int
   status_especialidades int
-  status_negociacao_id int [ref: > status_negociacoes.id]
+  status_negociacao_id int [ref: > status_negociacoes.id, default: 1]
 
   
   observacoes text // Renomeado 
   cotacao_moeda_usd_brl decimal (12,2)//para posterior pesquisa
 
+  created_at timestamp
+  updated_at timestamp
 }
 
 
@@ -237,19 +242,19 @@ Table negociacoes_produtos {
   preco_total_produto_negociacao_us decimal(12,2) // (snap_produto_preco_us * volume)
   custo_total_produto_negocicao_rs decimal(12,2) // (snap_produto_custo_rs * volume)
   custo_total_produto_negocicao_us decimal(12,2) // (snap_produto_custo_us * volume)
+  margem_faturamento_us decimal(12,2) // (100/1 - (snap_produto_custo_us/snap_produto_preco_us)) 
+  margem_faturamento_rs decimal(12,2) // (100/1 - (snap_produto_custo_rs/snap_produto_preco_rs))
+  margem_percentual_us decimal(12,2) // (100/1 - (snap_produto_custo_us/snap_produto_preco_us)) * 100
+  margem_percentual_rs decimal(12,2) // (100/1 - (snap
   //
   preco_produto_valorizado_rs decimal(12,2) // snap_produto_preco_rs * indice_valorização 
   preco_produto_valorizado_us decimal(12,2) // snap_produto_preco_us * indice_valorização decimal(12,2) // (100/1 - (snap_produto_custo_rs/snap_produto_preco_rs))
-  margem_faturamento_us decimal(12,2) // (100/1 - (snap_produto_custo_us/snap_produto_preco_us)) 
   //
   preco_produto_valorizado_rs decimal(12,2) // snap_produto_preco_rs * indice_valorização 
   preco_produto_valorizado_us decimal(12,2) // snap_produto_preco_us * indice_valorização
   //
   data_atualizacao_snap_precos_produtos date
   negociacao_produto_fator_valorizacao decimal(12,2)
-
-
-
 }
 
 //--------------------------------------------------------------

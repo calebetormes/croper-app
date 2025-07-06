@@ -40,6 +40,10 @@ return new class extends Migration {
             $table->decimal('valor_total_pedido_us', 12, 2)->nullable();
             $table->decimal('valor_total_pedido_rs_valorizado', 12, 2)->nullable();
             $table->decimal('valor_total_pedido_us_valorizado', 12, 2)->nullable();
+            $table->decimal('margem_faturamento_total_us', 12, 2)->nullable();
+            $table->decimal('margem_faturamento_total_rs', 12, 2)->nullable();
+            $table->decimal('margem_percentual_us', 12, 2)->nullable(); // (100/1 - (snap_produto_custo_us/snap_produto_preco_us)) * 100
+            $table->decimal('margem_percentual_rs', 12, 2)->nullable(); // (100/1 - (snap_produto_custo_rs/snap_produto_pre
 
             //Deve ser feito uma verificação para ver se o pedido é em RS ou US
             //se for em RS, sera valor_total_pedido_rs dividido pelo preco_rs do produto
@@ -54,13 +58,13 @@ return new class extends Migration {
 
 
             $table->decimal('bonus_cliente_pacote', 12, 2)->nullable();
+            $table->decimal('peso_saca', 12, 2)->nullable();
             $table->decimal('peso_total_kg', 12, 2)->nullable();
 
             // Validações
             $table->foreignId('nivel_validacao_id')->constrained('niveis_validacao');
-            //$table->boolean('status_validacao')->default(false);
-            $table->unsignedBigInteger('status_defensivos')->default(false);
-            $table->unsignedBigInteger('status_especialidades')->default(false);
+            $table->integer('status_defensivos');
+            $table->integer('status_especialidades');
             $table->foreignId('status_negociacao_id')->default(1)->constrained('status_negociacoes');
 
 

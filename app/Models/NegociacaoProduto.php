@@ -28,6 +28,8 @@ class NegociacaoProduto extends Model
         'custo_total_produto_negociacao_us',    // corrigido
         'margem_faturamento_rs',
         'margem_faturamento_us',
+        'margem_percentual_rs', // (100/1 - (snap_produto_custo_rs/snap_produto_preco_rs)) * 100
+        'margem_percentual_us', // (100/1 - (snap_produto_custo_us/snap_produto_preco_us)) * 100
         'preco_produto_valorizado_rs',
         'preco_produto_valorizado_us',
         'data_atualizacao_snap_precos_produtos',
@@ -46,6 +48,8 @@ class NegociacaoProduto extends Model
         'custo_total_produto_negociacao_us' => 'decimal:2',
         'margem_faturamento_rs' => 'decimal:2',
         'margem_faturamento_us' => 'decimal:2',
+        'margem_percentual_rs' => 'decimal:2', // (100/1 - (snap_produto_custo_rs/snap_produto_preco_rs)) * 100
+        'margem_percentual_us' => 'decimal:2', // (100/1 - (snap_produto_custo_us/snap_produto_preco_us)) * 100
         'preco_produto_valorizado_rs' => 'decimal:2',
         'preco_produto_valorizado_us' => 'decimal:2',
         'data_atualizacao_snap_precos_produtos' => 'date',
