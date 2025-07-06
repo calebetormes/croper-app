@@ -11,6 +11,7 @@ use App\Filament\Resources\NegociacaoResource\Forms\Sections\ValoresSectionForm;
 use App\Filament\Resources\NegociacaoResource\Forms\Sections\NegociacaoProdutoSectionForm;
 use App\Filament\Resources\NegociacaoResource\Forms\Sections\QuantidadeMinimaSectionForm;
 use Filament\Forms\Components\Tabs;
+use Illuminate\Database\Eloquent\Model;
 
 
 
@@ -30,16 +31,19 @@ class FormSchema
                         ]),
 
                     Tabs\Tab::make('Produtos')
+                        ->disabled(fn(?Model $record) => !$record?->exists)
+                        ->dehydrated()
                         ->schema([
                             NegociacaoProdutoSectionForm::make(),
                             QuantidadeMinimaSectionForm::make(),
                         ]),
 
                     Tabs\Tab::make('Valores e Status')
+                        ->disabled(fn(?Model $record) => !$record?->exists)
+                        ->dehydrated()
                         ->schema([
                             ValoresSectionForm::make(),
-                            //StatusValidacoesSectionForm::make(),
-                            //StatusGeralSectionForm::make(),
+                            StatusGeralSectionForm::make(),
                         ]),
 
 

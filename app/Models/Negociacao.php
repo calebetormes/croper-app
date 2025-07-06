@@ -55,8 +55,8 @@ class Negociacao extends Model
         'peso_total_kg',
         'margem_faturamento_total_us',
         'margem_faturamento_total_rs',
-        'margem_percentual_us', // (100/1 - (snap_produto_custo_us/snap_produto_preco_us)) * 100
-        'margem_percentual_rs', // (100/1 -
+        'margem_percentual_total_us', // (100/1 - (snap_produto_custo_us/snap_produto_preco_us)) * 100
+        'margem_percentual_total_rs', // (100/1 -
 
         // Validações e status
         'nivel_validacao_id',
@@ -95,8 +95,8 @@ class Negociacao extends Model
         'peso_saca' => 'decimal:2',
         'margem_faturamento_total_us' => 'decimal:2',
         'margem_faturamento_total_rs' => 'decimal:2',
-        'margem_percentual_us' => 'decimal:2', // (100/1 - (snap_produto_custo_us/snap_produto_preco_us)) * 100
-        'margem_percentual_rs' => 'decimal:2', // (100/1 - (snap_produto_custo_rs/snap_produto_preco_rs)) * 100
+        'margem_percentual_total_us' => 'decimal:2', // (100/1 - (snap_produto_custo_us/snap_produto_preco_us)) * 100
+        'margem_percentual_total_rs' => 'decimal:2', // (100/1 - (snap_produto_custo_rs/snap_produto_preco_rs)) * 100
 
     ];
 

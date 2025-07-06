@@ -119,22 +119,49 @@ class NegociacaoProdutoLogic
         }
 
         $items = $get('negociacaoProdutos') ?? [];
+
+        // Receita e custos totais
         $totalRs = collect($items)
-            ->sum(
-                fn($item) =>
-                floatval(str_replace(',', '.', ($item['snap_produto_preco_rs'] ?? 0))) *
-                floatval($item['volume'] ?? 0)
-            );
+            ->sum(fn($i) => floatval(
+                str_replace(',', '.', $i['snap_produto_preco_rs'] ?? 0)
+            ) * floatval($i['volume'] ?? 0));
+
+        $totalCustoRs = collect($items)
+            ->sum(fn($i) => floatval(
+                str_replace(',', '.', $i['snap_produto_custo_rs'] ?? 0)
+            ) * floatval($i['volume'] ?? 0));
+
         $totalUs = collect($items)
-            ->sum(
-                fn($item) =>
-                floatval(str_replace(',', '.', ($item['snap_produto_preco_us'] ?? 0))) *
-                floatval($item['volume'] ?? 0)
-            );
+            ->sum(fn($i) => floatval(
+                str_replace(',', '.', $i['snap_produto_preco_us'] ?? 0)
+            ) * floatval($i['volume'] ?? 0));
 
-        $set('valor_total_pedido_rs', $totalRs);
-        $set('valor_total_pedido_us', $totalUs);
+        $totalCustoUs = collect($items)
+            ->sum(fn($i) => floatval(
+                str_replace(',', '.', $i['snap_produto_custo_us'] ?? 0)
+            ) * floatval($i['volume'] ?? 0));
 
+        // margens absolutas
+        $margemAbsRs = $totalRs - $totalCustoRs;
+        $margemAbsUs = $totalUs - $totalCustoUs;
+
+        // margens percentuais
+        $margemPercRs = $totalRs > 0 ? (1 - ($totalCustoRs / $totalRs)) * 100 : 0;
+        $margemPercUs = $totalUs > 0 ? (1 - ($totalCustoUs / $totalUs)) * 100 : 0;
+
+        // arredonda
+        $margemAbsRs = round($margemAbsRs, 2);
+        $margemAbsUs = round($margemAbsUs, 2);
+        $margemPercRs = round($margemPercRs, 2);
+        $margemPercUs = round($margemPercUs, 2);
+
+        // seta tudo no form state
+        $set('margem_faturamento_total_rs', $margemAbsRs);
+        $set('margem_faturamento_total_us', $margemAbsUs);
+        $set('margem_percentual_total_rs', $margemPercRs);
+        $set('margem_percentual_total_us', $margemPercUs);
+
+        // Cálculo do índice de valorização médio
         $averageIndice = collect($items)
             ->map(fn($item) => floatval(str_replace(',', '.', ($item['indice_valorizacao'] ?? 0))))
             ->avg();

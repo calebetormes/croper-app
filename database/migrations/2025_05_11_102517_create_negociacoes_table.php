@@ -13,13 +13,13 @@ return new class extends Migration {
 
             // Datas principais
             $table->date('data_versao')->nullable();
-            $table->date('data_negocio');
+            $table->date('data_negocio')->nullable();
             $table->foreignId('moeda_id')->constrained('moedas');
 
             // pessoas
             $table->foreignId('gerente_id')->constrained('users');
             $table->foreignId('vendedor_id')->constrained('users');
-            $table->string('cliente');
+            $table->string('cliente')->nullable();
             $table->string('endereco_cliente')->nullable();
             $table->string('cidade_cliente')->nullable();
 
@@ -27,7 +27,7 @@ return new class extends Migration {
             $table->foreignId('cultura_id')->constrained('culturas');
             $table->foreignId('praca_cotacao_id')->constrained('pracas_cotacoes');
             $table->foreignId('pagamento_id')->constrained('pagamentos');
-            $table->date('data_entrega_graos');
+            $table->date('data_entrega_graos')->nullable();
 
             // Snapshots de preço da praça
             //$table->decimal('snap_praca_cotacao_fator_valorizacao', 12, 2)->nullable();
@@ -42,8 +42,8 @@ return new class extends Migration {
             $table->decimal('valor_total_pedido_us_valorizado', 12, 2)->nullable();
             $table->decimal('margem_faturamento_total_us', 12, 2)->nullable();
             $table->decimal('margem_faturamento_total_rs', 12, 2)->nullable();
-            $table->decimal('margem_percentual_us', 12, 2)->nullable(); // (100/1 - (snap_produto_custo_us/snap_produto_preco_us)) * 100
-            $table->decimal('margem_percentual_rs', 12, 2)->nullable(); // (100/1 - (snap_produto_custo_rs/snap_produto_pre
+            $table->decimal('margem_percentual_total_us', 12, 2)->nullable(); // (100/1 - (snap_produto_custo_us/snap_produto_preco_us)) * 100
+            $table->decimal('margem_percentual_total_rs', 12, 2)->nullable(); // (100/1 - (snap_produto_custo_rs/snap_produto_pre
 
             //Deve ser feito uma verificação para ver se o pedido é em RS ou US
             //se for em RS, sera valor_total_pedido_rs dividido pelo preco_rs do produto
@@ -62,10 +62,10 @@ return new class extends Migration {
             $table->decimal('peso_total_kg', 12, 2)->nullable();
 
             // Validações
-            $table->foreignId('nivel_validacao_id')->constrained('niveis_validacao');
-            $table->integer('status_defensivos');
-            $table->integer('status_especialidades');
-            $table->foreignId('status_negociacao_id')->default(1)->constrained('status_negociacoes');
+            $table->foreignId('nivel_validacao_id')->constrained('niveis_validacao')->nullable();
+            $table->integer('status_defensivos')->nullable();
+            $table->integer('status_especialidades')->nullable();
+            $table->foreignId('status_negociacao_id')->default(1)->constrained('status_negociacoes')->nullable();
 
 
             $table->text('observacoes')->nullable();

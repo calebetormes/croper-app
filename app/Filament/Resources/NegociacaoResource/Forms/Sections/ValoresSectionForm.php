@@ -146,6 +146,51 @@ class ValoresSectionForm
                     ->reactive()
                     ->disabled()
                     ->dehydrated(),
+
+                TextInput::make('margem_faturamento_total_rs')
+                    ->label('Margem Faturamento (R$)')
+                    ->prefix('R$')
+                    ->disabled()
+                    ->dehydrated()
+                    ->reactive()
+                    ->visible(function ($get) {
+                        return $get('moeda_id') == Moeda::where('sigla', 'BRL')->value('id');
+                    }),
+
+                TextInput::make('margem_faturamento_total_us')
+                    ->label('Margem Faturamento (US$)')
+                    ->prefix('US$')
+                    ->disabled()
+                    ->dehydrated()
+                    ->reactive()
+                    ->visible(function ($get) {
+                        return $get('moeda_id') == Moeda::where('sigla', 'USS')->value('id');
+                    }),
+
+                TextInput::make('margem_percentual_total_rs')
+                    ->label('Margem Percentual (R$)')
+                    ->suffix('%')
+                    ->numeric()
+                    ->disabled()
+                    ->dehydrated()
+                    ->reactive()
+                    ->visible(function ($get) {
+                        return $get('moeda_id') == Moeda::where('sigla', 'BRL')->value('id');
+                    }),
+
+
+                TextInput::make('margem_percentual_total_us')
+                    ->label('Margem Percentual (US$)')
+                    ->suffix('%')
+                    ->numeric()
+                    ->disabled()
+                    ->dehydrated()
+                    ->reactive()
+                    ->visible(function ($get) {
+                        return $get('moeda_id') == Moeda::where('sigla', 'USS')->value('id');
+                    }),
+
+
             ])
             ->columns(4);
     }

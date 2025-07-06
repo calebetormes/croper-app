@@ -9,6 +9,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use App\Models\Moeda;
 use App\Models\User;
+use App\Filament\Resources\NegociacaoProdutoResource\Forms\NegociacaoProdutoLogic;
+
+
 
 class BasicInformationSectionForm
 {
@@ -37,12 +40,23 @@ class BasicInformationSectionForm
                 ToggleButtons::make('moeda_id')
                     ->label('Moeda')
                     ->options(Moeda::pluck('sigla', 'id')->toArray())
+                    //->default(fn(): int => Moeda::where('sigla', 'BRL')->value('id'))
                     ->required()
                     ->inline()
                     ->reactive()
                     ->live()
+                    //->disableOnEdit()
+                    ->disabledOn('edit')
 
                     ->afterStateUpdated(function ($get, $set) {
+
+                        // Força o repeater a re­executar toda a lógica de pricing
+                        NegociacaoProdutoLogic::produtoSelectAfterStateUpdated($get, $set);
+                        NegociacaoProdutoLogic::repeaterAfterStateUpdated($get, $set);
+                        NegociacaoProdutoLogic::volumeAfterStateUpdated($get, $set);
+                        NegociacaoProdutoLogic::indiceValorizacaoAfterStateUpdated($get, $set);
+                        NegociacaoProdutoLogic::repeaterAfterStateUpdated($get, $set);
+
                         // 1) Pega os totais atuais
                         $totalRs = $get('valor_total_pedido_rs') ?? 0;
                         $totalUs = $get('valor_total_pedido_us') ?? 0;

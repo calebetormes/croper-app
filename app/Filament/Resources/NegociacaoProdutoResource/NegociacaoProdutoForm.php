@@ -28,6 +28,7 @@ class NegociacaoProdutoForm
                 ->createItemButtonLabel('Adicionar Produto')
                 ->reorderable()
                 ->grid(1)
+                ->reactive()
                 ->itemLabel(
                     fn(array $state): ?string =>
                     Produto::find($state['produto_id'])?->nome_composto
