@@ -171,11 +171,26 @@ class ValoresSectionForm
                     ->label('Margem Percentual (R$)')
                     ->suffix('%')
                     ->numeric()
-                    ->disabled()
+                    //->disabled()
                     ->dehydrated()
                     ->reactive()
                     ->visible(function ($get) {
                         return $get('moeda_id') == Moeda::where('sigla', 'BRL')->value('id');
+                    })
+                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                        $marginRs = (float) $state;
+                        $marginUs = (float) ($get('margem_percentual_total_us') ?? 0);
+                        $margin = max($marginRs, $marginUs);
+
+                        if ($margin < 20) {
+                            $level = 3; // Gerente Nacional
+                        } elseif ($margin <= 28) {
+                            $level = 2; // Gerente Comercial
+                        } else {
+                            $level = 1; // Vendedor
+                        }
+
+                        $set('nivel_validacao_id', $level);
                     }),
 
 
@@ -183,12 +198,35 @@ class ValoresSectionForm
                     ->label('Margem Percentual (US$)')
                     ->suffix('%')
                     ->numeric()
-                    ->disabled()
+                    //->disabled()
                     ->dehydrated()
                     ->reactive()
                     ->visible(function ($get) {
                         return $get('moeda_id') == Moeda::where('sigla', 'USS')->value('id');
+                    })
+                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                        $marginUs = (float) ($get('margem_percentual_total_us') ?? 0);
+                        $marginRs = (float) ($get('margem_percentual_total_rs') ?? 0);
+                        $margin = max($marginRs, $marginUs);
+
+                        if ($margin < 20) {
+                            $level = 3;
+                        } elseif ($margin <= 28) {
+                            $level = 2;
+                        } else {
+                            $level = 1;
+                        }
+
+                        $set('nivel_validacao_id', $level);
                     }),
+
+                TextInput::make('nivel_validacao_id')
+                    ->label('Nível de Aprovação')
+                    ->disabled()
+                    ->reactive()
+                    //->default(fn($livewire) => $livewire->getRecord()->nivel_validacao_id)
+                    ->dehydrated()
+                    ->default(3),
 
 
             ])

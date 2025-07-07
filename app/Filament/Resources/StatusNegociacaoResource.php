@@ -30,7 +30,7 @@ class StatusNegociacaoResource extends Resource
                 ->icon(static::getNavigationIcon())
                 ->group(static::getNavigationGroup())
                 ->sort(static::getNavigationSort())
-                ->visible(fn () => in_array(auth()->user()?->role_id, [6, 5])),
+                ->visible(fn() => in_array(auth()->user()?->role_id, [6, 5])),
         ];
     }
 
@@ -48,7 +48,7 @@ class StatusNegociacaoResource extends Resource
                     ->maxLength(255),
                 Forms\Components\Textarea::make('descricao')
                     ->columnSpanFull(),
-                    Forms\Components\ColorPicker::make('cor'),
+                Forms\Components\ColorPicker::make('cor'),
                 Forms\Components\TextInput::make('ordem')
                     ->required()
                     ->numeric()

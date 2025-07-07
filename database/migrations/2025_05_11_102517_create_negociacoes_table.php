@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->foreignId('moeda_id')->constrained('moedas');
 
             // pessoas
-            $table->foreignId('gerente_id')->constrained('users');
+            $table->foreignId('gerente_id')->constrained('users')->nullable();
             $table->foreignId('vendedor_id')->constrained('users');
             $table->string('cliente')->nullable();
             $table->string('endereco_cliente')->nullable();
@@ -62,10 +62,10 @@ return new class extends Migration {
             $table->decimal('peso_total_kg', 12, 2)->nullable();
 
             // Validações
-            $table->foreignId('nivel_validacao_id')->constrained('niveis_validacao')->nullable();
+            $table->foreignId('nivel_validacao_id')->default(3)->constrained('niveis_validacao')->nullable();
             $table->integer('status_defensivos')->nullable();
             $table->integer('status_especialidades')->nullable();
-            $table->foreignId('status_negociacao_id')->default(1)->constrained('status_negociacoes')->nullable();
+            $table->foreignId('status_negociacao_id')->default(3)->constrained('status_negociacoes')->nullable();
 
 
             $table->text('observacoes')->nullable();

@@ -25,17 +25,23 @@ class InfolistSchema
                         Grid::make(4)->schema([
                             TextEntry::make('pedido_id')
                                 ->label('Pedido ID'),
+
                             TextEntry::make('data_negocio')
                                 ->label('Data da Negociação')
                                 ->date(),
+
                             TextEntry::make('cliente')
                                 ->label('Cliente'),
+
                             TextEntry::make('cultura.nome')
                                 ->label('Cultura'),
+
                             TextEntry::make('pracaCotacao.nome')
                                 ->label('Praça de Cotação'),
+
                             TextEntry::make('pagamento.nome')
                                 ->label('Vencimento'),
+
                             TextEntry::make('moeda.sigla')
                                 ->label('Moeda'),
 
@@ -43,6 +49,7 @@ class InfolistSchema
                                 ->label('Preço Snapshot (R$)')
                                 ->money('BRL')
                                 ->visible(fn() => $record->moeda_id === 1),
+
                             TextEntry::make('snap_praca_cotacao_preco')
                                 ->label('Preço Snapshot (US$)')
                                 ->money('USD')
@@ -50,6 +57,7 @@ class InfolistSchema
 
                             TextEntry::make('area_hectares')
                                 ->label('Área (ha)'),
+
                             TextEntry::make('peso_total_kg')
                                 ->label('Peso Total (kg)'),
 
@@ -57,6 +65,7 @@ class InfolistSchema
                                 ->label('Total Pedido (R$)')
                                 ->money('BRL')
                                 ->visible(fn() => $record->moeda_id === 1),
+
                             TextEntry::make('valor_total_pedido_us')
                                 ->label('Total Pedido (US$)')
                                 ->money('USD')
@@ -66,6 +75,7 @@ class InfolistSchema
                                 ->label('Preço Líquido saca (R$)')
                                 ->money('BRL')
                                 ->visible(fn() => $record->moeda_id === 1),
+
                             TextEntry::make('preco_liquido_saca')
                                 ->label('Preço Líquido saca (US$)')
                                 ->money('USD')
@@ -73,6 +83,27 @@ class InfolistSchema
 
                             TextEntry::make('statusNegociacao.nome')
                                 ->label('Status Negociação'),
+
+                            TextEntry::make('margem_percentual_total_rs')
+                                ->label('Margem (%)')
+                                ->suffix('%')
+                                ->visible(fn() => $record->moeda_id === 1),
+
+                            TextEntry::make('margem_percentual_total_us')
+                                ->label('Margem (%)')
+                                ->suffix('%')
+                                ->visible(fn() => $record->moeda_id === 2),
+
+                            TextEntry::make('margem_faturamento_total_rs')
+                                ->label('Margem Faturamento (R$)')
+                                ->money('BRL')
+                                ->visible(fn() => $record->moeda_id === 1),
+
+                            TextEntry::make('margem_faturamento_total_us')
+                                ->label('Margem Faturamento (US$)')
+                                ->money('USD')
+                                ->visible(fn() => $record->moeda_id === 2),
+
                             TextEntry::make('observacoes')
                                 ->label('Observações'),
                         ]),
@@ -94,7 +125,7 @@ class InfolistSchema
                                 // Linha resumida
                                 Grid::make(5)->schema([
                                     TextEntry::make('produto.nome_composto')
-                                        ->label('Produto')
+                                        ->label('')
                                         ->columnSpan(3),
 
                                     TextEntry::make('volume')

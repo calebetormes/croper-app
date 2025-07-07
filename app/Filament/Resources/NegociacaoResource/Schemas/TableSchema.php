@@ -16,6 +16,7 @@ use App\Filament\Resources\NegociacaoResource\Forms\Sections\StatusGeralSectionF
 use App\Models\Negociacao;
 use App\Models\StatusNegociacao;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -92,7 +93,11 @@ class TableSchema
                     ->label('')
                     ->icon('heroicon-o-eye')
                     ->slideOver()
-                    ->modalWidth('xl'),
+                    ->modalWidth('xl')
+                    ->visible(fn(): bool => in_array(
+                        Auth::user()->role?->name,
+                        ['Gerente Nacional', 'Admin']
+                    )),
 
                 TableAction::make('changeStatus')
                     ->label('')
@@ -111,6 +116,10 @@ class TableSchema
                     })
                     ->requiresConfirmation()
                     ->modalHeading('Alterar Status da Negociação')
+                    ->visible(fn(): bool => in_array(
+                        Auth::user()->role?->name,
+                        ['Gerente Nacional', 'Admin']
+                    ))
                     ->modalButton('Salvar'),
 
 
