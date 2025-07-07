@@ -9,6 +9,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Actions;
 use Filament\Infolists\Components\Actions\Action;
+use Filament\Infolists\Components\Actions\ModalAction;
 
 class InfolistSchema
 {
@@ -86,38 +87,142 @@ class InfolistSchema
                 ])
                     ->fullWidth(),
 
-                // Seção de Produtos
                 Section::make('Produtos')
                     ->schema([
                         RepeatableEntry::make('negociacaoProdutos')
                             ->schema([
+                                // Linha resumida
                                 Grid::make(5)->schema([
-                                    TextEntry::make('produto.nome')
-                                        ->label('Produto'),
+                                    TextEntry::make('produto.nome_composto')
+                                        ->label('Produto')
+                                        ->columnSpan(3),
+
                                     TextEntry::make('volume')
                                         ->label('Volume'),
-
-                                    TextEntry::make('snap_produto_preco_rs')
-                                        ->label('Preço Unit. (R$)')
-                                        ->money('BRL')
+                                    TextEntry::make('margem_percentual_rs')
+                                        ->label('Margem (%)')
+                                        ->suffix('%')
                                         ->visible(fn() => $record->moeda_id === 1),
-                                    TextEntry::make('snap_produto_preco_us')
-                                        ->label('Preço Unit. (US$)')
-                                        ->money('USD')
+                                    TextEntry::make('margem_percentual_us')
+                                        ->label('Margem (%)')
+                                        ->suffix('%')
                                         ->visible(fn() => $record->moeda_id === 2),
-
-                                    TextEntry::make('total_preco_rs')
-                                        ->label('Total (R$)')
-                                        ->money('BRL')
-                                        ->visible(fn() => $record->moeda_id === 1),
-                                    TextEntry::make('total_preco_us')
-                                        ->label('Total (US$)')
-                                        ->money('USD')
-                                        ->visible(fn() => $record->moeda_id === 2),
-
-                                    TextEntry::make('indice_valorizacao')
-                                        ->label('Índice Valorização'),
                                 ]),
+
+                                // Seção colapsável com todos os demais campos
+                                Section::make('Ver mai  detalhes do produto')
+                                    ->collapsible()
+                                    ->collapsed()
+                                    ->schema([
+                                        Grid::make(6)->schema([
+                                            // Índice
+                                            TextEntry::make('indice_valorizacao')
+                                                ->label('Índice Valorização'),
+
+                                            // Preço unitário (snap)
+                                            TextEntry::make('snap_produto_preco_rs')
+                                                ->label('Preço Unit. (R$)')
+                                                ->money('BRL')
+                                                ->visible(fn() => $record->moeda_id === 1),
+
+                                            TextEntry::make('snap_produto_preco_us')
+                                                ->label('Preço Unit. (US$)')
+                                                ->money('USD')
+                                                ->visible(fn() => $record->moeda_id === 2),
+
+                                            // Custo unitário (snap)
+                                            TextEntry::make('snap_produto_custo_rs')
+                                                ->label('Custo Unit. (R$)')
+                                                ->money('BRL')
+                                                ->visible(fn() => $record->moeda_id === 1),
+
+                                            TextEntry::make('snap_produto_custo_us')
+                                                ->label('Custo Unit. (US$)')
+                                                ->money('USD')
+                                                ->visible(fn() => $record->moeda_id === 2),
+
+                                            // Totais negociados
+                                            TextEntry::make('preco_total_produto_negociacao_rs')
+                                                ->label('Total Preço Neg. (R$)')
+                                                ->money('BRL')
+                                                ->visible(fn() => $record->moeda_id === 1),
+
+                                            TextEntry::make('preco_total_produto_negociacao_us')
+                                                ->label('Total Preço Neg. (US$)')
+                                                ->money('USD')
+                                                ->visible(fn() => $record->moeda_id === 2),
+
+                                            TextEntry::make('custo_total_produto_negociacao_rs')
+                                                ->label('Total Custo Neg. (R$)')
+                                                ->money('BRL')
+                                                ->visible(fn() => $record->moeda_id === 1),
+
+                                            TextEntry::make('custo_total_produto_negociacao_us')
+                                                ->label('Total Custo Neg. (US$)')
+                                                ->money('USD')
+                                                ->visible(fn() => $record->moeda_id === 2),
+
+                                            // Margem de faturamento
+                                            TextEntry::make('margem_faturamento_rs')
+                                                ->label('Margem Faturamento (R$)')
+                                                ->money('BRL')
+                                                ->visible(fn() => $record->moeda_id === 1),
+
+                                            TextEntry::make('margem_faturamento_us')
+                                                ->label('Margem Faturamento (US$)')
+                                                ->money('USD')
+                                                ->visible(fn() => $record->moeda_id === 2),
+
+                                            // Preço valorizado unitário
+                                            TextEntry::make('preco_produto_valorizado_rs')
+                                                ->label('Preço Valorizado (R$)')
+                                                ->money('BRL')
+                                                ->visible(fn() => $record->moeda_id === 1),
+
+                                            TextEntry::make('preco_produto_valorizado_us')
+                                                ->label('Preço Valorizado (US$)')
+                                                ->money('USD')
+                                                ->visible(fn() => $record->moeda_id === 2),
+
+                                            // Totais calculados
+
+                                            TextEntry::make('total_preco_rs')
+                                                ->label('Total (R$)')
+                                                ->money('BRL')
+                                                ->visible(fn() => $record->moeda_id === 1),
+
+                                            TextEntry::make('total_preco_us')
+                                                ->label('Total (US$)')
+                                                ->money('USD')
+                                                ->visible(fn() => $record->moeda_id === 2),
+
+                                            TextEntry::make('total_preco_valorizado_rs')
+                                                ->label('Total Valorizado (R$)')
+                                                ->money('BRL')
+                                                ->visible(fn() => $record->moeda_id === 1),
+
+                                            TextEntry::make('total_preco_valorizado_us')
+                                                ->label('Total Valorizado (US$)')
+                                                ->money('USD')
+                                                ->visible(fn() => $record->moeda_id === 2),
+
+                                            // Preço líquido da saca
+                                            TextEntry::make('preco_liquido_saca')
+                                                ->label('Preço Líquido saca (R$)')
+                                                ->money('BRL')
+                                                ->visible(fn() => $record->moeda_id === 1),
+
+                                            TextEntry::make('preco_liquido_saca')
+                                                ->label('Preço Líquido saca (US$)')
+                                                ->money('USD')
+                                                ->visible(fn() => $record->moeda_id === 2),
+
+                                            // Data de atualização
+                                            TextEntry::make('data_atualizacao_snap_precos_produtos')
+                                                ->label('Data Atualização')
+                                                ->date(),
+                                        ]),
+                                    ]),
                             ])
                             ->columns(1),
                     ]),
