@@ -34,7 +34,7 @@ class StatusGeralSectionForm
                             ->toArray()
                     )
                     ->colors([
-                        StatusNegociacao::where('nome', 'Em análise')->value('id') => 'warning',
+                        StatusNegociacao::where('nome', 'Em análise')->value('id'),
                         StatusNegociacao::where('nome', 'Aprovado')->value('id') => 'success',
                         StatusNegociacao::where('nome', 'Não Aprovado')->value('id') => 'danger',
                         StatusNegociacao::where('nome', 'Concluído')->value('id') => 'gray',
