@@ -19,11 +19,11 @@ class NegociacaoProdutoLogic
         }
 
         // snapshot
-        $set('snap_produto_preco_rs', $produto->preco_rs);
-        $set('snap_produto_preco_us', $produto->preco_us);
-        $set('snap_produto_custo_rs', $produto->custo_rs);
-        $set('snap_produto_custo_us', $produto->custo_us);
-        $set('indice_valorizacao', $produto->indice_valorizacao_produto);
+        $set('snap_produto_preco_rs', number_format($produto->preco_rs, 2, '.', ''));
+        $set('snap_produto_preco_us', number_format($produto->preco_us, 2, '.', ''));
+        $set('snap_produto_custo_rs', number_format($produto->custo_rs, 2, '.', ''));
+        $set('snap_produto_custo_us', number_format($produto->custo_us, 2, '.', ''));
+        $set('indice_valorizacao', number_format($produto->indice_valorizacao_produto, 2, '.', ''));
 
         if (!$get('data_atualizacao_snap_precos_produtos')) {
             $set('data_atualizacao_snap_precos_produtos', now());
@@ -108,8 +108,11 @@ class NegociacaoProdutoLogic
         $snapUs = floatval(str_replace(',', '.', $get('snap_produto_preco_us') ?? '0'));
         $indice = floatval(str_replace(',', '.', $get('indice_valorizacao') ?? '0'));
 
-        $set('preco_produto_valorizado_rs', $snapRs * (1 + $indice));
-        $set('preco_produto_valorizado_us', $snapUs * (1 + $indice));
+        $valorRs = number_format($snapRs * (1 + $indice), 2, '.', '');
+        $valorUs = number_format($snapUs * (1 + $indice), 2, '.', '');
+
+        $set('preco_produto_valorizado_rs', $valorRs);
+        $set('preco_produto_valorizado_us', $valorUs);
     }
 
     public static function repeaterAfterStateUpdated($get = null, $set = null)

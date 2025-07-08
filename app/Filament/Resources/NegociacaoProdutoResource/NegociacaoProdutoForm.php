@@ -12,6 +12,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use App\Models\Produto;
 use App\Filament\Resources\NegociacaoProdutoResource\Forms\NegociacaoProdutoLogic;
+use Illuminate\Support\Facades\Auth;
+
 
 class NegociacaoProdutoForm
 {
@@ -71,30 +73,11 @@ class NegociacaoProdutoForm
                                     fn(Get $get, Set $set) =>
                                     NegociacaoProdutoLogic::volumeAfterStateUpdated($get, $set)
                                 ),
-
-                            TextInput::make('preco_total_produto_negociacao_rs')
-                                ->label('Valor Total do Produto na Negociação')
-                                ->prefix('BRL')
-                                ->numeric()
-                                ->disabled()
-                                ->dehydrated()
-                                ->visible(fn(Get $get) => $get('../../moeda_id') === 1)
-                                ->reactive(),
-
-                            TextInput::make('preco_total_produto_negociacao_us')
-                                ->label('Valor Total do Produto na Negociação')
-                                ->prefix('USS')
-                                ->numeric()
-                                ->disabled()
-                                ->dehydrated()
-                                ->visible(fn(Get $get) => $get('../../moeda_id') === 2)
-                                ->reactive(),
-
-
                         ]),
 
                     Section::make('Detalhes do Produto')
                         ->columns(3)
+                        ->visible(fn(): bool => !Auth::user()?->hasAnyRole(['vendedor', 'gerente_comercial']))
                         ->schema([
                             TextInput::make('indice_valorizacao')
                                 ->label('Índice de Valorização')
@@ -168,6 +151,24 @@ class NegociacaoProdutoForm
                                 ->default(fn(): \DateTime => now())
                                 ->disabled()
                                 ->dehydrated(),
+
+                            TextInput::make('preco_total_produto_negociacao_rs')
+                                ->label('Valor Total do Produto na Negociação')
+                                ->prefix('BRL')
+                                ->numeric()
+                                ->disabled()
+                                ->dehydrated()
+                                ->visible(fn(Get $get) => $get('../../moeda_id') === 1)
+                                ->reactive(),
+
+                            TextInput::make('preco_total_produto_negociacao_us')
+                                ->label('Valor Total do Produto na Negociação')
+                                ->prefix('USS')
+                                ->numeric()
+                                ->disabled()
+                                ->dehydrated()
+                                ->visible(fn(Get $get) => $get('../../moeda_id') === 2)
+                                ->reactive(),
 
                             TextInput::make('custo_total_produto_negociacao_rs')
                                 ->label('Custo Total do Produto na NegociaçãoS')
