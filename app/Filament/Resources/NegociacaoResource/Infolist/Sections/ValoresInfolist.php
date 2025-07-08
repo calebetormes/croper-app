@@ -11,7 +11,7 @@ class ValoresInfolist
     public static function make(): InfolistSection
     {
         return InfolistSection::make('Valores')
-            ->columns(3)
+            ->columns(5)
             ->schema([
                 TextEntry::make('investimento_total_sacas')
                     ->label('Total de Sacas')
