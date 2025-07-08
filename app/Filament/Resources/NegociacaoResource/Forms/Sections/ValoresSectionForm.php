@@ -7,6 +7,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use App\Models\Moeda;
+use Illuminate\Database\Eloquent\Model;
 
 class ValoresSectionForm
 {

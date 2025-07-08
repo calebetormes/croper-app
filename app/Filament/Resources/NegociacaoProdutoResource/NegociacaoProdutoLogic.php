@@ -4,6 +4,7 @@ namespace App\Filament\Resources\NegociacaoProdutoResource\Forms;
 
 use App\Models\Produto;
 use App\Models\Moeda;
+use Illuminate\Support\Arr;
 
 class NegociacaoProdutoLogic
 {
@@ -115,6 +116,33 @@ class NegociacaoProdutoLogic
         $set('preco_produto_valorizado_us', $valorUs);
     }
 
+    public static function populateFromRaw(array $item, int $moedaId): array
+    {
+        // clonamos o item num state mutável
+        $state = $item;
+
+        // helpers para usar dentro das closures:
+        $get = fn(string $path) => Arr::get($state, $path);
+        $set = function (string $path, $value) use (&$state): void {
+            Arr::set($state, $path, $value);
+        };
+
+        // 1) escolheu produto?
+        //    isto vai popular preço/custo unitário no state via produtoSelectAfterStateUpdated
+        static::produtoSelectAfterStateUpdated($get, $set);
+
+        // 2) mudou volume?
+        //    isto vai popular totais no state via volumeAfterStateUpdated
+        static::volumeAfterStateUpdated($get, $set);
+
+        // 3) índice de valorização?
+        //    isto vai recalcular preço valorizado etc via indiceValorizacaoAfterStateUpdated
+        static::indiceValorizacaoAfterStateUpdated($get, $set);
+
+        // Pronto: state agora tem todos os campos que o Form preencheria.
+        return $state;
+    }
+
     public static function repeaterAfterStateUpdated($get = null, $set = null)
     {
         if (!$get || !$set) {
@@ -188,8 +216,9 @@ class NegociacaoProdutoLogic
 
         $base = strtoupper($sigla) === 'USD' ? $totalUs : $totalRs;
         $investSacas = $base / $precoSaca;
-        $set('investimento_total_sacas', round($investSacas, 2));
-        $set('investimento_sacas_hectare', round($investSacas / $areaHectare, 2));
+
+        $set('investimento_total_sacas', round($investSacas, 0));
+        $set('investimento_sacas_hectare', round($investSacas / $areaHectare, 0));
 
         $set('peso_total_kg', round($investSacas * 60, 2));
 
@@ -199,4 +228,6 @@ class NegociacaoProdutoLogic
 
         $set('bonus_cliente_pacote', round($bonus, 2));
     }
+
+
 }
