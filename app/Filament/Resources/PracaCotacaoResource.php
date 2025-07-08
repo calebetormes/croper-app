@@ -21,8 +21,13 @@ use Filament\Forms\Components\Select;
 use App\Models\Moeda;
 use App\Models\Cultura;
 use Filament\Navigation\NavigationItem;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Forms\Get;
 use Illuminate\Validation\Rule;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
+
 
 class PracaCotacaoResource extends Resource
 {
@@ -135,6 +140,50 @@ class PracaCotacaoResource extends Resource
             ])
             ->filters([
                 //
+                SelectFilter::make('moeda_id')
+                    ->multiple()
+                    ->label('Moeda')
+                    ->relationship('moeda', 'sigla')
+                    ->preload()
+                    ->searchable(),
+
+                SelectFilter::make('Cultura')
+                    ->multiple()
+                    ->label('Cultura')
+                    ->relationship('Cultura', 'nome')
+                    ->preload()
+                    ->searchable(),
+
+                // opcional: ocupa toda a largura
+                Filter::make('data_vencimento')
+                    ->label('Data de Vencimento')
+                    ->columns(2)
+                    ->form([
+                        DatePicker::make('from')
+                            ->label('Data Vencimento'),
+                        DatePicker::make('until')
+                            ->label('Até'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when($data['from'], fn($q) => $q->whereDate('data_vencimento', '>=', $data['from']))
+                            ->when($data['until'], fn($q) => $q->whereDate('data_vencimento', '<=', $data['until']));
+                    })
+                    ->indicator(function (array $data): ?string {
+                        if (!$data['from'] && !$data['until']) {
+                            return null;
+                        }
+
+                        if ($data['from'] && $data['until']) {
+                            return 'De ' . $data['from']->format('d/m/Y')
+                                . ' até ' . $data['until']->format('d/m/Y');
+                        }
+
+                        return $data['from']
+                            ? 'A partir de ' . $data['from']->format('d/m/Y')
+                            : 'Até ' . $data['until']->format('d/m/Y');
+                    }),
+
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

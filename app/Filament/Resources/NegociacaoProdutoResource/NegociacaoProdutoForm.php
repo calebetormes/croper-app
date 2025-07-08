@@ -69,6 +69,7 @@ class NegociacaoProdutoForm
                                 ->numeric()
                                 ->required()
                                 ->reactive()
+                                ->dehydrated()
                                 ->afterStateUpdated(
                                     fn(Get $get, Set $set) =>
                                     NegociacaoProdutoLogic::volumeAfterStateUpdated($get, $set)
@@ -77,15 +78,19 @@ class NegociacaoProdutoForm
 
                     Section::make('Detalhes do Produto')
                         ->columns(3)
-                        ->visible(fn(): bool => !Auth::user()?->hasAnyRole(['vendedor', 'gerente_comercial']))
+                        //->visible(fn(): bool => !Auth::user()?->hasAnyRole(['vendedor', 'gerente_comercial']))
+                        //->hidden(fn(): bool => Auth::user()?->hasAnyRole(['vendedor', 'gerente_comercial']))
+                        ->dehydrated()
                         ->schema([
                             TextInput::make('indice_valorizacao')
                                 ->label('Índice de Valorização')
+                                ->readOnly()
                                 ->numeric()
                                 ->placeholder('0.10 para 10%')
                                 ->live()
                                 ->default(0)
                                 ->required()
+                                ->dehydrated()
                                 ->afterStateUpdated(
                                     fn(Get $get, Set $set) =>
                                     NegociacaoProdutoLogic::indiceValorizacaoAfterStateUpdated($get, $set)
@@ -129,7 +134,7 @@ class NegociacaoProdutoForm
                                 ->reactive(),
 
                             TextInput::make('snap_produto_custo_rs')
-                                ->label('Custo do Produto (com bonus)')
+                                ->label('Custo do Produto')
                                 ->prefix('BRL')
                                 ->numeric()
                                 ->disabled()
@@ -138,7 +143,7 @@ class NegociacaoProdutoForm
                                 ->reactive(),
 
                             TextInput::make('snap_produto_custo_us')
-                                ->label('Custo do Produto (com bonus)')
+                                ->label('Custo do Produto')
                                 ->prefix('USS')
                                 ->numeric()
                                 ->disabled()
@@ -153,7 +158,7 @@ class NegociacaoProdutoForm
                                 ->dehydrated(),
 
                             TextInput::make('preco_total_produto_negociacao_rs')
-                                ->label('Valor Total do Produto na Negociação')
+                                ->label('Valor Total na Negociação')
                                 ->prefix('BRL')
                                 ->numeric()
                                 ->disabled()
@@ -162,7 +167,7 @@ class NegociacaoProdutoForm
                                 ->reactive(),
 
                             TextInput::make('preco_total_produto_negociacao_us')
-                                ->label('Valor Total do Produto na Negociação')
+                                ->label('Valor Total na Negociação')
                                 ->prefix('USS')
                                 ->numeric()
                                 ->disabled()
@@ -171,7 +176,7 @@ class NegociacaoProdutoForm
                                 ->reactive(),
 
                             TextInput::make('custo_total_produto_negociacao_rs')
-                                ->label('Custo Total do Produto na NegociaçãoS')
+                                ->label('Custo Total na NegociaçãoS')
                                 ->prefix('BRL')
                                 ->numeric()
                                 ->disabled()
@@ -180,7 +185,7 @@ class NegociacaoProdutoForm
                                 ->reactive(),
 
                             TextInput::make('custo_total_produto_negociacao_us')
-                                ->label('Custo Total do Produto na Negociação')
+                                ->label('Custo Total na Negociação')
                                 ->prefix('USS')
                                 ->numeric()
                                 ->disabled()
@@ -207,7 +212,7 @@ class NegociacaoProdutoForm
                                 ->reactive(),
 
                             TextInput::make('margem_percentual_rs')
-                                ->label('Margem Percetual de Faturamento')
+                                ->label('Margem Percetual')
                                 ->prefix('%')
                                 ->numeric()
                                 ->disabled()
@@ -216,7 +221,7 @@ class NegociacaoProdutoForm
                                 ->reactive(),
 
                             TextInput::make('margem_percentual_us')
-                                ->label('Margem Percetual de Faturamento')
+                                ->label('Margem Percetual ')
                                 ->prefix('%')
                                 ->numeric()
                                 ->disabled()

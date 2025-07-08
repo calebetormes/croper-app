@@ -169,7 +169,11 @@ class NegociacaoProdutoLogic
             ->map(fn($item) => floatval(str_replace(',', '.', ($item['indice_valorizacao'] ?? 0))))
             ->avg();
 
+        $averageIndice = number_format($averageIndice, 2, '.', '');
+
         $set('indice_valorizacao_saca', $averageIndice);
+        $set('valor_total_pedido_rs', $totalRs);
+        $set('valor_total_pedido_us', $totalUs);
         $set('valor_total_pedido_rs_valorizado', $totalRs * (1 + $averageIndice));
         $set('valor_total_pedido_us_valorizado', $totalUs * (1 + $averageIndice));
 
