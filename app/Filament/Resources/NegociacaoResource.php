@@ -15,6 +15,15 @@ use App\Filament\Resources\NegociacaoResource\Schemas\FormSchema;
 use App\Filament\Resources\NegociacaoResource\Schemas\TableSchema;
 use App\Filament\Resources\NegociacaoResource\Schemas\InfolistSchema;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Response;
+use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use App\Filament\Resources\NegociacaoResource\Infolist\Sections\DadosBasicosInfolist;
+use App\Filament\Resources\NegociacaoResource\Infolist\Sections\PracaCotacaoInfolist;
+use App\Filament\Resources\NegociacaoResource\Infolist\Sections\ProdutosInfolist;
+use App\Filament\Resources\NegociacaoResource\Infolist\Sections\StatusInfolist;
+use App\Filament\Resources\NegociacaoResource\Infolist\Sections\ValoresInfolist;
 
 
 class NegociacaoResource extends Resource

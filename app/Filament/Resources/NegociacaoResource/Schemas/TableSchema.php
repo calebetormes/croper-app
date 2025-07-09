@@ -17,6 +17,16 @@ use App\Models\Negociacao;
 use App\Models\StatusNegociacao;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Response;
+use Filament\Tables\Actions\Action;
+use Filament\Infolists\Infolist;
+use App\Filament\Resources\NegociacaoResource\Infolist\Sections\DadosBasicosInfolist;
+use App\Filament\Resources\NegociacaoResource\Infolist\Sections\PracaCotacaoInfolist;
+use App\Filament\Resources\NegociacaoResource\Infolist\Sections\ProdutosInfolist;
+use App\Filament\Resources\NegociacaoResource\Infolist\Sections\StatusInfolist;
+use App\Filament\Resources\NegociacaoResource\Infolist\Sections\ValoresInfolist;
+
 
 
 
@@ -121,6 +131,35 @@ class TableSchema
                         ['Gerente Nacional', 'Admin']
                     ))
                     ->modalButton('Salvar'),
+
+                Action::make('gerar_relatorio')
+                    ->label('')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->action(function (Negociacao $record) {
+                        // Monta o Infolist com as 5 seções
+                        $infolist = Infolist::make()
+                            ->record($record)
+                            ->sections([
+                                DadosBasicosInfolist::make(),
+                                PracaCotacaoInfolist::make(),
+                                ProdutosInfolist::make(),
+                                StatusInfolist::make(),
+                                ValoresInfolist::make(),
+                            ]);
+
+                        // Gera o PDF usando o template Blade
+                        $pdf = Pdf::loadView('reports.relatorio-negociacao', [
+                            'record' => $record,
+                            'infolist' => $infolist,
+                        ])
+                            ->setPaper('a4', 'portrait');
+
+                        // Retorna o download do PDF
+                        return Response::streamDownload(
+                            fn() => print ($pdf->output()),
+                            "relatorio-negociacao-{$record->id}.pdf"
+                        );
+                    }),
 
 
             ])
