@@ -26,6 +26,10 @@ use App\Filament\Resources\NegociacaoResource\Infolist\Sections\PracaCotacaoInfo
 use App\Filament\Resources\NegociacaoResource\Infolist\Sections\ProdutosInfolist;
 use App\Filament\Resources\NegociacaoResource\Infolist\Sections\StatusInfolist;
 use App\Filament\Resources\NegociacaoResource\Infolist\Sections\ValoresInfolist;
+use App\Filament\Resources\NegociacaoResource;
+use App\Filament\Resources\NegociacaoResource\InfolistSchema;
+
+
 
 
 
@@ -133,33 +137,11 @@ class TableSchema
                     ->modalButton('Salvar'),
 
                 Action::make('gerar_relatorio')
-                    ->label('')
+                    ->label('PDF')
                     ->icon('heroicon-o-arrow-down-tray')
-                    ->action(function (Negociacao $record) {
-                        // Monta o Infolist com as 5 seções
-                        $infolist = Infolist::make()
-                            ->record($record)
-                            ->sections([
-                                DadosBasicosInfolist::make(),
-                                PracaCotacaoInfolist::make(),
-                                ProdutosInfolist::make(),
-                                StatusInfolist::make(),
-                                ValoresInfolist::make(),
-                            ]);
-
-                        // Gera o PDF usando o template Blade
-                        $pdf = Pdf::loadView('reports.relatorio-negociacao', [
-                            'record' => $record,
-                            'infolist' => $infolist,
-                        ])
-                            ->setPaper('a4', 'portrait');
-
-                        // Retorna o download do PDF
-                        return Response::streamDownload(
-                            fn() => print ($pdf->output()),
-                            "relatorio-negociacao-{$record->id}.pdf"
-                        );
-                    }),
+                    // aponta para a rota do controller
+                    ->url(fn(Negociacao $record): string => route('relatorio.pdf', $record->id))
+                    ->openUrlInNewTab(),
 
 
             ])

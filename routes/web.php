@@ -11,6 +11,8 @@ use App\Filament\Resources\NegociacaoResource\Infolist\Sections\{
     ValoresInfolist,
 };
 
+use App\Http\Controllers\RelatorioNegociacaoController;
+
 Route::get('/', function () {
     return redirect('/admin');
 });
@@ -46,3 +48,6 @@ Route::get('/teste-relatorio', function () {
 
     return view('reports.relatorio-negociacao', compact('record', 'infolist'));
 });
+
+Route::get('/relatorios/negociacao/{id}', [RelatorioNegociacaoController::class, 'showPdf'])
+    ->name('relatorio.pdf');

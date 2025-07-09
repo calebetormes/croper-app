@@ -9,6 +9,8 @@ use App\Filament\Resources\NegociacaoResource\Infolist\Sections\ValoresInfolist;
 use App\Filament\Resources\NegociacaoResource\Infolist\Sections\ProdutosInfolist;
 use App\Filament\Resources\NegociacaoResource\Infolist\Sections\StatusInfolist;
 
+
+
 class InfolistSchema
 {
     public static function make(Infolist $infolist): Infolist
@@ -16,6 +18,7 @@ class InfolistSchema
         //$infolist->getRecord();
 
         return $infolist
+            ->name('relatorio_negociacao')
             ->columns(2)
             ->schema([
                 DadosBasicosInfolist::make(),
