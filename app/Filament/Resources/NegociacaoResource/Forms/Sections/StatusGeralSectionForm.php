@@ -16,7 +16,7 @@ class StatusGeralSectionForm
 {
     public static function make(): Section
     {
-        return Section::make('Status Geral')
+        return Section::make('')
 
             ->schema([
 

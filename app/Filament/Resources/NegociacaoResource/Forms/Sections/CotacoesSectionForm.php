@@ -16,6 +16,8 @@ use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Illuminate\Support\Facades\Auth;
+use App\Filament\Resources\NegociacaoResource\Logic\PrecoLiquidoSacaLogic;
+
 
 class CotacoesSectionForm
 {
@@ -68,14 +70,31 @@ class CotacoesSectionForm
                     ->required()
                     ->reactive()
                     ->dehydrated()
-                    ->afterStateHydrated(fn($state, Set $set) => $set('preco_liquido_saca', $state))
-                    ->afterStateUpdated(fn($state, Set $set) => $set('preco_liquido_saca', $state))
+                    ->afterStateHydrated(function ($state, Get $get, Set $set) {
+                        // 1) Mantém o valor bruto no preco_liquido_saca
+                        $set('preco_liquido_saca', $state);
+                        // 2) Recalcula já com o índice de valorização
+                        PrecoLiquidoSacaLogic::updatePrecoLiquidoSaca($get, $set);
+                    })
+                    ->afterStateUpdated(function ($state, Get $get, Set $set) {
+                        // ignora o $state cru e chama sempre a lógica completa
+                        PrecoLiquidoSacaLogic::updatePrecoLiquidoSaca($get, $set);
+                    })
                     ->hidden(fn() => in_array(Auth::user()->role_id, [1, 2])),
 
                 Hidden::make('snap_praca_cotacao_preco')
                     ->dehydrated()
-                    ->afterStateHydrated(fn($state, Set $set) => $set('preco_liquido_saca', $state))
-                    ->afterStateUpdated(fn($state, Set $set) => $set('preco_liquido_saca', $state)),
+                    ->afterStateHydrated(function ($state, Get $get, Set $set) {
+                        // 1) Mantém o valor bruto no preco_liquido_saca
+                        $set('preco_liquido_saca', $state);
+                        // 2) Recalcula já com o índice de valorização
+                        PrecoLiquidoSacaLogic::updatePrecoLiquidoSaca($get, $set);
+                    })
+                    ->afterStateUpdated(function ($state, Get $get, Set $set) {
+                        // ignora o $state cru e chama sempre a lógica completa
+                        PrecoLiquidoSacaLogic::updatePrecoLiquidoSaca($get, $set);
+                    }),
+
 
                 // 5) Flag preço fixado
                 Hidden::make('snap_praca_cotacao_preco_fixado')
@@ -175,6 +194,8 @@ class CotacoesSectionForm
             $set('praca_cotacao_id', $latest->id);
             $set('snap_praca_cotacao_preco', $latest->praca_cotacao_preco);
             $set('data_atualizacao_snap_preco_praca_cotacao', now()->toDateString());
+            //$set('preco_liquido_saca', $latest->praca_cotacao_preco);
+            PrecoLiquidoSacaLogic::updatePrecoLiquidoSaca($get, $set);
         }
     }
 }

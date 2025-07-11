@@ -13,7 +13,7 @@ class ValoresSectionVendedor
 {
     public static function make(): Section
     {
-        return Section::make('Valores — Vendedor')
+        return Section::make('')
             ->schema([
 
                 TextInput::make('valor_total_pedido_rs_valorizado')
