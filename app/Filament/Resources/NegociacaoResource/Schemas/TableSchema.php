@@ -139,8 +139,8 @@ class TableSchema
                 Action::make('gerar_relatorio')
                     ->label('PDF')
                     ->icon('heroicon-o-arrow-down-tray')
-                    // aponta para a rota do controller
-                    ->url(fn(Negociacao $record): string => route('relatorio.pdf', $record->id))
+                    ->tooltip('Gerar Relatório em PDF')
+                    ->url(fn(Negociacao $record): string => route('negociacoes.pdf', $record->id))
                     ->openUrlInNewTab(),
 
 

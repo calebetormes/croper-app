@@ -1,0 +1,138 @@
+/* pdf.css - layout completo para Browsershot (CSS Grid) */
+
+@page {
+    margin: 20mm 15mm 15mm 15mm;
+}
+
+body {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    color: #333;
+    line-height: 1.4;
+    margin: 0;
+}
+
+header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+        "logo company"
+        "logo subtitle";
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 2px solid #000;
+}
+
+header .logo {
+    grid-area: logo;
+    width: 120px;
+    height: auto;
+}
+
+header .company {
+    grid-area: company;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+header .subtitle {
+    grid-area: subtitle;
+    font-size: 14px;
+    color: #555;
+}
+
+footer {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 4px 0;
+    border-top: 1px solid #ccc;
+    font-size: 9px;
+    color: #666;
+}
+
+footer .left {
+    justify-self: start;
+}
+
+footer .page:after {
+    justify-self: end;
+    content: "Página " counter(page) " de " counter(pages);
+}
+
+.meta {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0 16px;
+    border-bottom: 1px solid #000;
+    padding: 4px 0;
+    margin: 8px 0;
+    font-size: 10px;
+}
+
+.section {
+    margin-bottom: 16px;
+}
+
+.section h3 {
+    background-color: #004080;
+    color: #fff;
+    padding: 6px 8px;
+    margin: 0 0 8px;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px 16px;
+    margin-bottom: 16px;
+    font-size: 10px;
+}
+
+.info-grid .item strong {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+table.produtos {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+    font-size: 10px;
+}
+
+table.produtos th,
+table.produtos td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    text-align: center;
+}
+
+table.produtos th {
+    background-color: #004080;
+    color: #fff;
+}
+
+table.produtos tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.totals {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, auto));
+    gap: 0 24px;
+    border-top: 1px solid #000;
+    padding-top: 8px;
+    font-size: 10px;
+    justify-content: end;
+}
+
+.totals .line strong {
+    font-weight: bold;
+}
