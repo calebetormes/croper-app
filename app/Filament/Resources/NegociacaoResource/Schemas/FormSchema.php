@@ -12,6 +12,8 @@ use App\Filament\Resources\NegociacaoResource\Forms\Sections\NegociacaoProdutoSe
 use App\Filament\Resources\NegociacaoResource\Forms\Sections\QuantidadeMinimaSectionForm;
 use Filament\Forms\Components\Tabs;
 use Illuminate\Database\Eloquent\Model;
+use App\Filament\Resources\NegociacaoResource\Forms\Sections\ValoresSectionVendedor;
+use App\Filament\Resources\NegociacaoResource\Forms\Sections\ValoresSectionRestricted;
 
 
 
@@ -42,7 +44,9 @@ class FormSchema
                         ->disabled(fn(?Model $record) => !$record?->exists)
                         ->dehydrated()
                         ->schema([
-                            ValoresSectionForm::make(),
+
+                            ValoresSectionVendedor::make(),
+                            ValoresSectionRestricted::make(),
                             StatusGeralSectionForm::make(),
                         ]),
 

@@ -40,17 +40,7 @@ class NegociacaoProdutoForm
                 )
                 ->schema([
                     // Exibe a moeda selecionada (1 = BRL, 2 = USD)
-                    Placeholder::make('moeda_label')
-                        ->label('Moeda Selecionada')
-                        ->content(
-                            fn(Get $get) =>
-                            $get('../../moeda_id') === 1
-                            ? 'BRL'
-                            : ($get('../../moeda_id') === 2 ? 'USD' : '')
-                        )
-                        ->reactive(),
-
-                    Section::make('Informações Básicas')
+                    Section::make('')
                         ->columns(2)
                         ->schema([
                             Select::make('produto_id')

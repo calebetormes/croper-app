@@ -218,7 +218,7 @@ class NegociacaoProdutoLogic
         $investSacas = $base / $precoSaca;
 
         $set('investimento_total_sacas', round($investSacas, 0));
-        $set('investimento_sacas_hectare', round($investSacas / $areaHectare, 0));
+        $set('investimento_sacas_hectare', round($investSacas / $areaHectare, 2));
 
         $set('peso_total_kg', round($investSacas * 60, 2));
 

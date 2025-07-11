@@ -12,7 +12,7 @@ class DetalhesProdutoHidden
 {
     public static function section(): Section
     {
-        return Section::make('Detalhes do Produto')
+        return Section::make('')
             ->columns(3)
             ->schema([
                 // Índice de Valorização

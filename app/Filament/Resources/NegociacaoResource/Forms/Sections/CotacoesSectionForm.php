@@ -15,6 +15,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Illuminate\Support\Facades\Auth;
 
 class CotacoesSectionForm
 {
@@ -66,6 +67,12 @@ class CotacoesSectionForm
                     ->numeric()
                     ->required()
                     ->reactive()
+                    ->dehydrated()
+                    ->afterStateHydrated(fn($state, Set $set) => $set('preco_liquido_saca', $state))
+                    ->afterStateUpdated(fn($state, Set $set) => $set('preco_liquido_saca', $state))
+                    ->hidden(fn() => in_array(Auth::user()->role_id, [1, 2])),
+
+                Hidden::make('snap_praca_cotacao_preco')
                     ->dehydrated()
                     ->afterStateHydrated(fn($state, Set $set) => $set('preco_liquido_saca', $state))
                     ->afterStateUpdated(fn($state, Set $set) => $set('preco_liquido_saca', $state)),
