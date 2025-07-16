@@ -1,63 +1,185 @@
+# Tutorial Passo a Passo para Publicar o Sistema Laravel + Filament
 
+Este guia unifica os principais comandos e etapas para provisionar o servidor, configurar DNS, clonar e fazer o deploy inicial, gerar SSL, rodar scripts pós-deploy e testar o sistema. No final, há um **resumo** com todas as ações essenciais.
 
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+---
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 1. Provisionamento do Servidor (CloudPanel)
 
-## About Laravel
+1. Acesse o painel do **CloudPanel** no seu servidor.
+2. Clique em **+ ADD SITE** e selecione **PHP Site**.
+   - Escolha o **nome de usuário** (ex: `barterapp-dev`) e o **domínio/subdomínio** (ex: `dev.croper.barterapp.com.br`).
+   - O CloudPanel já provisiona **Nginx**, **PHP-FPM** e configura logs centralizados.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 2. Configuração de DNS
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+No painel do seu provedor de domínio (p.ex. Cloudflare, Registro.br):
 
-## Learning Laravel
+1. **Registro A**  
+   - **Tipo**: A  
+   - **Nome**: `dev.croper`  
+   - **Aponta para**: `62.72.63.220`  
+   - **TTL**: `300`
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+2. **(Opcional) Registro AAAA**  
+   - Caso possua IPv6, crie também um AAAA apontando para o IPv6 do servidor.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+3. **Validação**  
+   ```bash
+   dig +short dev.croper.barterapp.com.br
+   ```
+   Deve retornar o IP configurado. Aguarde até 5 min para propagação.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 3. Clonagem do Repositório e Deploy Inicial
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Conecte-se via SSH (com sua chave já configurada):
 
-### Premium Partners
+```bash
+ssh root@62.72.63.220
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development/)**
-- **[Active Logic](https://activelogic.com)**
+### 3.1. Acessar a pasta raiz do site
 
-## Contributing
+```bash
+cd /home/barterapp-dev/htdocs
+# (Opcional) Limpar conteúdo antigo
+rm -rf ./*
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 3.2. Clonar o repositório
 
-## Code of Conduct
+```bash
+git clone https://github.com/calebetormes/croper-app.git
+cd croper-app
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 3.3. Instalar dependências PHP (Composer)
 
-## Security Vulnerabilities
+```bash
+composer install --no-dev --optimize-autoloader
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 3.4. Instalar dependências JavaScript (NPM)
 
-## License
+```bash
+npm install
+npm run build        # ou `npm run prod` para produção
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 3.5. Criar o Banco de Dados
+
+- Pelo **CloudPanel**: vá em **Database > + ADD DATABASE**, defina nome, usuário e senha.
+- Ou via terminal MySQL:
+  ```sql
+  CREATE DATABASE croper_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+  CREATE USER 'croper_user'@'localhost' IDENTIFIED BY 'senha_segura';
+  GRANT ALL PRIVILEGES ON croper_db.* TO 'croper_user'@'localhost';
+  FLUSH PRIVILEGES;
+  ```
+
+### 3.6. Configurar o `.env`
+
+```bash
+cp .env.example .env
+```
+Edite o `.env` para apontar ao seu banco:
+
+```
+APP_NAME="CroperApp"
+APP_URL=https://dev.croper.barterapp.com.br
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=croper_db
+DB_USERNAME=croper_user
+DB_PASSWORD=senha_segura
+```
+
+### 3.7. Gerar a chave de aplicação
+
+```bash
+php artisan key:generate
+```
+
+### 3.8. Rodar *migrations* e *seeders*
+
+```bash
+php artisan migrate --force
+php artisan db:seed --force
+```
+
+---
+
+## 4. Geração e Implantação de Certificado SSL
+
+O CloudPanel facilita o SSL via Let’s Encrypt:
+
+1. No CloudPanel, acesse **SSL/TLS**.
+2. Clique em **Actions > New Let’s Encrypt Certificate**.
+3. Selecione o site (`dev.croper.barterapp.com.br`) e confirme.
+4. Aguarde a emissão (< 1 min). O painel instala e configura automaticamente no Nginx.
+
+---
+
+## 5. Execução do `post-deploy.sh`
+
+No diretório raiz do projeto (`croper-app/`):
+
+```bash
+chmod +x post-deploy.sh
+./post-deploy.sh
+```
+
+Esse script automatiza:
+
+- Entrar e sair do modo de manutenção  
+- Otimização de autoload  
+- Publicação de assets Livewire  
+- Limpeza de caches (config, rota, view)  
+- Criação do *storage link*  
+- Execução de migrations e seeders  
+- Build front-end (npm)  
+- Ajustes de permissões em `storage` e `bootstrap/cache`  
+- Reinício de filas e serviços  
+- Geração de `RELEASE.txt` com a versão atual  
+
+---
+
+## 6. Testes Finais e Acesso
+
+1. Abra no navegador:  
+   ```
+   https://dev.croper.barterapp.com.br/admin/login
+   ```
+2. Verifique o cadeado verde (SSL OK).  
+3. Faça login no Filament e confira todos os recursos.  
+4. Caso algo falhe, verifique os logs em **CloudPanel > Logs** (app e Nginx).
+
+---
+
+## Resumo das Etapas
+
+1. **Provisionar servidor** (CloudPanel + PHP Site)  
+2. **Configurar DNS** (A e AAAA + validação com `dig`)  
+3. **Clonar repositório** e **instalar dependências** (Composer & NPM)  
+4. **Criar DB** e **configurar `.env`**  
+5. **Gerar APP_KEY** (`php artisan key:generate`)  
+6. **Rodar migrations & seeders** (`php artisan migrate && db:seed`)  
+7. **Gerar SSL** com Let’s Encrypt no CloudPanel  
+8. **Executar `post-deploy.sh`** para ajustes finais  
+9. **Testar** em `https://dev.croper.barterapp.com.br/admin/login`
+
+> **Dica**: para futuros deploys, basta:
+> ```bash
+> git pull
+> composer install --no-dev --optimize-autoloader
+> npm install && npm run build
+> php artisan migrate --force
+> ./post-deploy.sh
+> ```
+> e pronto! Monitorar logs regularmente e considerar automação com GitHub Actions + SSH.
