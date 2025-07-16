@@ -16,7 +16,7 @@ class StatusInfolist
     public static function make(): InfolistSection
     {
         return InfolistSection::make('Status')
-            ->columns(4)
+            ->columns(3)
             ->schema([
                 TextEntry::make('statusNegociacao.nome')
                     ->label('Status')
@@ -37,20 +37,10 @@ class StatusInfolist
                         '3' => 'danger',
                         default => 'secondary',
                     }),
+
                 TextEntry::make('observacoes')
                     ->label('Observações'),
-                Actions::make([
-                    Action::make('changeStatus')
-                        ->label('Alterar Status')
-                        ->icon('heroicon-o-adjustments-vertical')
-                        ->size(ActionSize::Large)
-                        ->form([StatusGeralSectionForm::make()])
-                        ->modalHeading('Alterar Status da Negociação')
-                        ->modalWidth('xl')
-                        ->requiresConfirmation()
-                        //->action(fn(array $data, Negociacao $record): void => $record->fill($data)->save())
-                        ->button(),
-                ]),
+
             ]);
     }
 }
