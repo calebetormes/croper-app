@@ -1,0 +1,37 @@
+# .github/workflows/deploy.yml
+
+name: Deploy via SSH
+
+# Dispara a cada push na branch main
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) Faz checkout do seu código
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2) Conecta via SSH e executa o seu deploy.sh
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.SERVER_HOST }}        # Ex: 62.72.63.220 ou dev.croper.barterapp.com.br
+          username: ${{ secrets.SERVER_USER }}    # Ex: root
+          key:      ${{ secrets.SERVER_SSH_KEY }} # Sua chave privada SSH (cole inteira no secret)
+          port:     22
+          script: |
+            # Vá para a pasta do projeto no servidor
+            cd /home/barterapp-dev-croper/htdocs/croper-app/
+
+            # Atualize o repositório e force a versão da main
+            git fetch --all
+            git reset --hard origin/main
+
+            # Execute o seu script de deploy
+            ./deploy.sh
