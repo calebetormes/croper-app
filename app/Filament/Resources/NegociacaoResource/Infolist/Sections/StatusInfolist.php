@@ -16,7 +16,7 @@ class StatusInfolist
     public static function make(): InfolistSection
     {
         return InfolistSection::make('Status')
-            ->columns(3)
+            ->columns(2)
             ->schema([
                 TextEntry::make('statusNegociacao.nome')
                     ->label('Status')
@@ -29,7 +29,7 @@ class StatusInfolist
                         default => 'secondary',
                     }),
                 TextEntry::make('nivelValidacao.nome')
-                    ->label('Nível de Validação')
+                    ->label('Nível de Validação ')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         '1' => 'primary',
