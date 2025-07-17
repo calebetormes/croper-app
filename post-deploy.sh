@@ -169,4 +169,4 @@ fi
 # -----------------------------------------------------------------------------
 # FINALIZAÇÃO
 # -----------------------------------------------------------------------------
-echo "✅ Deploy concluído com sucesso AEEOOAA!"
+echo "✅ Deploy concluído com sucesso AEEOOAAIII!"
