@@ -137,7 +137,7 @@ class TableSchema
                     ->modalButton('Salvar'),
 
                 Action::make('gerar_relatorio')
-                    ->label('AA')
+                    ->label('PDF')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->tooltip('Gerar Relatório em PDF')
                     ->url(fn(Negociacao $record): string => route('negociacoes.pdf', $record->id))
