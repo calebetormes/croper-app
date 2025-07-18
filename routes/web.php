@@ -9,5 +9,6 @@ Route::get('/', function () {
     return redirect('/admin');
 });
 
-Route::get('negociacoes/{id}/pdf', [ReportController::class, 'gerarPdf'])
+
+Route::get('/negociacoes/{id}/pdf', [ReportController::class, 'gerarPdf'])
     ->name('negociacoes.pdf');

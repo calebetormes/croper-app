@@ -8,15 +8,8 @@ use Illuminate\Http\Response;
 
 class ReportController extends Controller
 {
-    /**
-     * Gera o PDF da negociação usando PdfReportService (Spatie Browsershot).
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function gerarPdf(int $id): Response
     {
-        // Busca a negociação com os relacionamentos necessários
         $record = Negociacao::with([
             'moeda',
             'gerente',
@@ -27,14 +20,11 @@ class ReportController extends Controller
             'negociacaoProdutos.produto',
         ])->findOrFail($id);
 
-        // Renderiza a view Blade para HTML
-        $html = view('report', compact('record'))->render();
+        $pdfContent = PdfReportService::generate('report', compact('record'));
 
-        // Gera o PDF (binário) a partir do HTML
-        $pdfContent = PdfReportService::generate($html);
-
-        // Retorna o PDF direto na resposta HTTP
-        return response($pdfContent)
-            ->header('Content-Type', 'application/pdf');
+        return response($pdfContent, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="negociacao-' . $record->pedido_id . '.pdf"',
+        ]);
     }
 }
