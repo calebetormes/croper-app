@@ -150,34 +150,64 @@
     {{-- Produtos negociados --}}
     <section class="section">
         <h3>Produtos</h3>
-        <table>
+        <table width="100%" border="1" cellspacing="0" cellpadding="4">
             <thead>
                 <tr>
                     <th>Produto</th>
                     <th>Volume</th>
-                    <th>Preço R$</th>
-                    <th>Preço US$</th>
-                    <th>Margem %</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($record->negociacaoProdutos as $item)
                     <tr>
-                        <td>{{ $item->produto->nome ?? '—' }}</td>
+                        {{-- Nome composto do produto --}}
+                        <td>{{ $item->produto->nome_composto ?? '—' }}</td>
                         <td>{{ number_format($item->volume, 2, ',', '.') }}</td>
-                        <td>R$ {{ number_format($item->snap_produto_preco_rs, 2, ',', '.') }}</td>
-                        <td>US$ {{ number_format($item->snap_produto_preco_us, 2, ',', '.') }}</td>
-                        <td>{{ number_format($item->margem_percentual_rs, 2, ',', '.') }}%</td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
     </section>
 
+
+    {{-- Condições Gerais (compacto) --}}
+    <section class="section">
+        <h3>Condições Gerais</h3>
+        <div style="
+        border: 1px solid #999;
+        padding: 4px;
+        font-size: 8px;
+        line-height: 1.1;
+        max-height: 120px;
+        overflow: hidden;
+    ">
+            <ol style="margin: 0; padding-left: 12px;">
+                <li>Pedido válido somente após aprovação do departamento de crédito.</li>
+                <li>Caso o(s) valor(es) ajustado(s) para a venda do(s) produto(s) acima especificado(s) seja(m)
+                    equivalentes em dólares norte‐americanos, fica acordado que, na data de liquidação do preço total
+                    e/ou parcial pelo CLIENTE, esta mesma quantia deverá ser transformada obrigatoriamente para Reais,
+                    mediante simples conversão pela taxa de venda PTAX-800 (opção 5) do dia anterior.</li>
+                <li>O não pagamento da quantia ajustada, na data de vencimento, importará juros de 1% ao mês, correção
+                    pro rata die e multa de 10% sobre o valor, além de custas e honorários advocatícios.</li>
+                <li>O CLIENTE autoriza a CROPER AGRO SOLUTIONS a emitir o boleto bancário conforme valor acordado
+                    (conversão em Reais para vendas em dólares).</li>
+                <li>Este pedido poderá sofrer alterações de quantidades, preços ou prazos de entrega, inclusive
+                    cancelamento por caso fortuito ou força maior.</li>
+                <li>As partes declaram ter lido e concordado com todos os termos, renunciando ao direito de
+                    arrependimento.</li>
+                <li>Em operações de crédito, autoriza‐se consulta ao SCR (Banco Central) e a serviços de proteção ao
+                    crédito para análise cadastral.</li>
+                <li>As partes submetem‐se ao Marco Civil da Internet (Lei 12.965/14, Dec 8.771/16) e à LGPD (Lei
+                    13.709/18).</li>
+            </ol>
+        </div>
+    </section>
+
+
     {{-- Rodapé de assinatura --}}
     <div class="signature">
         <p>Assinatura: ___________________________</p>
-        <p>{{ $record->cliente_nome }}</p>
+        <p>{{ $record->cliente }}</p>
     </div>
 
     {{-- Rodapé técnico --}}
