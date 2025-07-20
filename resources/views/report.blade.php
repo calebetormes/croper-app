@@ -33,42 +33,119 @@
             <div
                 style="display: table-cell; width: 30%; vertical-align: middle; text-align: right; font-size: 11px; line-height: 1.6;">
                 <strong>Pedido Id:</strong> {{ str_pad($record->pedido_id, 6, '0', STR_PAD_LEFT) }}<br>
-                <strong>Emissão:</strong> {{ now()->format('d/m/Y') }}<br>
-                <strong>Previsão de Entrega:</strong> {{ $record->data_entrega_formatada ?? '—' }}<br>
-                <strong>Página:</strong> 1
+                <strong>RTV:</strong> {{ $record->vendedor->name ?? '—' }}<br>
+                <strong>GRV:</strong> {{ $record->gerente->name ?? '—' }}
             </div>
         </div>
     </header>
 
-    {{-- Bloco com dados principais --}}
+    {{-- Dados do Cliente --}}
     <section class="section">
-        <div class="box">
-            <div class="box-col">
-                <strong>Cliente:</strong> {{ $record->cliente_nome ?? '—' }}<br>
-                <strong>Gerente:</strong> {{ $record->gerente->nome ?? '—' }}
+        <h3></h3>
+        <div style="display: table; width: 100%; font-size: 11px; line-height: 1.4;">
+            {{-- Coluna 1: identificação e endereço --}}
+            <div style="display: table-cell; width: 50%; vertical-align: top;">
+                <strong>Razão Social:</strong> {{ $record->cliente }}<br>
+                <strong>Endereço:</strong> {{ $record->endereco_cliente }}<br>
+                <strong>Cidade:</strong> {{ $record->cidade_cliente }}
             </div>
-            <div class="box-col">
-                <strong>Moeda:</strong> {{ $record->moeda->sigla ?? '—' }}<br>
-                <strong>Data Entrega:</strong> {{ $record->data_entrega_formatada ?? '—' }}<br>
-                <strong>Praça:</strong> {{ $record->pracaCotacao->praca_nome ?? '—' }}
+
+            {{-- Coluna 2: área, vendedor e gerente --}}
+            <div style="display: table-cell; width: 50%; vertical-align: top;">
+                <strong>Área (ha):</strong> {{ number_format($record->area_hectares, 2, ',', '.') }}<br>
+
             </div>
         </div>
     </section>
 
-    {{-- Bloco com cotação --}}
+
+
+
+
+    {{-- Dados de Praça / Cotação em 5 colunas (usar preco_liquido_saca_valorizado) --}}
+    @php
+        use Carbon\Carbon;
+    @endphp
+
     <section class="section">
-        <div class="box">
-            <div class="box-col">
-                <strong>Cultura:</strong> {{ $record->cultura->nome ?? '—' }}<br>
-                <strong>Área (ha):</strong> {{ number_format($record->area_cultivo_ha, 2, ',', '.') }}
+        <h3></h3>
+        <div style="display: table; width: 100%; font-size: 11px; line-height: 1.4;">
+
+            {{-- Coluna 1: Cidade --}}
+            <div style="display: table-cell; width: 20%; vertical-align: top; padding-right: 5px;">
+                <strong>Praça:</strong><br>
+                {{ $record->pracaCotacao->cidade ?? '—' }}
             </div>
-            <div class="box-col">
-                <strong>Cotação:</strong> R$ {{ number_format($record->snap_valor_saca_rs, 2, ',', '.') }} /
-                US$ {{ number_format($record->snap_valor_saca_us, 2, ',', '.') }}<br>
-                <strong>Margem Esperada:</strong> {{ number_format($record->margem_esperada_percentual, 2, ',', '.') }}%
+
+            {{-- Coluna 3: Data Vencimento --}}
+            <div style="display: table-cell; width: 20%; vertical-align: top; padding: 0 5px;">
+                <strong>Data Vencimento:</strong><br>
+                {{ $record->pracaCotacao->data_vencimento
+    ? Carbon::parse($record->pracaCotacao->data_vencimento)->format('d/m/Y')
+    : '—' }}
+            </div>
+
+            {{-- Coluna 4: Moeda / Cultura --}}
+            <div style="display: table-cell; width: 20%; vertical-align: top; padding: 0 5px;">
+                <strong>Moeda / Cultura:</strong><br>
+                {{ $record->pracaCotacao->moeda->sigla ?? '—' }}
+                &nbsp;/&nbsp;
+                {{ $record->pracaCotacao->cultura->nome ?? '—' }}
+            </div>
+
+            {{-- Coluna 5: Preço da Saca Valorizado --}}
+            <div style="display: table-cell; width: 20%; vertical-align: top; padding-left: 5px;">
+                <strong>Valor da Saca (R$):</strong><br>
+                {{ number_format($record->preco_liquido_saca_valorizado ?? 0, 2, ',', '.') }}
+            </div>
+
+        </div>
+    </section>
+
+    {{-- Valores Financeiros --}}
+    <section class="section">
+        <h3></h3>
+        <div style="display: table; width: 100%; font-size: 11px; line-height: 1.4;">
+
+            <div style="display: table-row;">
+
+                {{-- Valor total conforme moeda selecionada --}}
+                @if($record->moeda->sigla === 'BRL')
+                    <div style="display: table-cell; width: 20%; vertical-align: top; padding-right: 5px;">
+                        <strong>Valor Total R$:</strong><br>
+                        R$ {{ number_format($record->valor_total_pedido_rs_valorizado, 2, ',', '.') }}
+                    </div>
+                @else
+                    <div style="display: table-cell; width: 20%; vertical-align: top; padding-right: 5px;">
+                        <strong>Valor Total US$:</strong><br>
+                        US$ {{ number_format($record->valor_total_pedido_us_valorizado, 2, ',', '.') }}
+                    </div>
+                @endif
+
+                {{-- Investimento total em sacas --}}
+                <div style="display: table-cell; width: 20%; vertical-align: top; padding: 0 5px;">
+                    <strong>Total (sacas):</strong><br>
+                    {{ number_format($record->investimento_total_sacas, 2, ',', '.') }}
+                </div>
+
+                {{-- Investimento por hectare --}}
+                <div style="display: table-cell; width: 20%; vertical-align: top; padding: 0 5px;">
+                    <strong>(sacas/ha):</strong><br>
+                    {{ number_format($record->investimento_sacas_hectare, 2, ',', '.') }}
+                </div>
+
+                {{-- Peso total em kg --}}
+                <div style="display: table-cell; width: 20%; vertical-align: top; padding-left: 5px;">
+                    <strong>Peso Total (kg):</strong><br>
+                    {{ number_format($record->peso_total_kg, 2, ',', '.') }}
+                </div>
+
             </div>
         </div>
     </section>
+
+
+
 
     {{-- Produtos negociados --}}
     <section class="section">

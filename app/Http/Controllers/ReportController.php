@@ -10,6 +10,8 @@ class ReportController extends Controller
 {
     public function gerarPdf(int $id): Response
     {
+        // Carrega os atributos simples automaticamente,
+        // e faz eager load apenas das relações definidas no model
         $record = Negociacao::with([
             'moeda',
             'gerente',
@@ -17,6 +19,8 @@ class ReportController extends Controller
             'cultura',
             'pracaCotacao',
             'pagamento',
+            'nivelValidacao',
+            'statusNegociacao',
             'negociacaoProdutos.produto',
         ])->findOrFail($id);
 
