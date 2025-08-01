@@ -132,7 +132,7 @@ class BasicInformationSectionForm
                     ->disabled(fn() => auth()->user()?->role?->name === 'Vendedor')
                     ->searchable()
                     ->required()
-                    ->default(1)
+                    //->default(1)
                     ->dehydrated(),
             ])
             ->columns(3);
