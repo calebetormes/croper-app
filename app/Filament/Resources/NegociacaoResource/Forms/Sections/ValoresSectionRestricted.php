@@ -3,12 +3,13 @@
 namespace App\Filament\Resources\NegociacaoResource\Forms\Sections;
 
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\TextInput; // mantém para campos que continuam editáveis
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use App\Models\Moeda;
-
+use Illuminate\Support\Facades\Auth;
 
 class ValoresSectionRestricted
 {
@@ -19,30 +20,46 @@ class ValoresSectionRestricted
             ->hidden(fn() => in_array(Auth::user()->role_id, [1, 2]))
             ->schema([
 
-                TextInput::make('valor_total_pedido_rs')
-                    ->label('Valor Total R$ com bonus')
-                    ->numeric()
-                    ->prefix('R$')
-                    ->visible(function ($get) {
-                        return $get('moeda_id') == \App\Models\Moeda::where('sigla', 'BRL')->value('id');
-                    })
-                    ->reactive()
-                    ->disabled()
-                    ->dehydrated()
-                    ->hidden(fn() => in_array(Auth::user()->role_id, [1, 2])),
+                // --- Valor Total R$ (valorizado) ---
+                Placeholder::make('valor_total_pedido_rs_valorizado_fmt')
+                    ->label('Valor Total R$')
+                    ->content(
+                        fn(Get $get) =>
+                        'R$ ' . number_format((float) ($get('valor_total_pedido_rs_valorizado') ?? 0), 2, ',', '.')
+                    )
+                    ->live(),
 
-                TextInput::make('valor_total_pedido_us')
-                    ->label('Valor Total U$ com bonus')
-                    ->numeric()
-                    ->prefix('US$')
-                    ->visible(function ($get) {
-                        return $get('moeda_id') == \App\Models\Moeda::where('sigla', 'USS')->value('id');
-                    })
-                    ->reactive()
-                    ->disabled()
-                    ->dehydrated()
-                    ->hidden(fn() => in_array(Auth::user()->role_id, [1, 2])),
+                Hidden::make('valor_total_pedido_rs_valorizado')->dehydrated(),
 
+                // --- Valor Total R$ com bônus (exibição) ---
+                Placeholder::make('valor_total_pedido_rs_fmt')
+                    ->label('Valor Total R$ com bônus')
+                    ->content(
+                        fn(Get $get) =>
+                        'R$ ' . number_format((float) ($get('valor_total_pedido_rs') ?? 0), 2, ',', '.')
+                    )
+                    ->visible(
+                        fn(Get $get) =>
+                        $get('moeda_id') == Moeda::where('sigla', 'BRL')->value('id')
+                    )
+                    ->live(),
+                Hidden::make('valor_total_pedido_rs')->dehydrated(),
+
+                // --- Valor Total U$ com bônus (exibição) ---
+                Placeholder::make('valor_total_pedido_us_fmt')
+                    ->label('Valor Total U$ com bônus')
+                    ->content(
+                        fn(Get $get) =>
+                        'US$ ' . number_format((float) ($get('valor_total_pedido_us') ?? 0), 2, '.', ',')
+                    )
+                    ->visible(
+                        fn(Get $get) =>
+                        $get('moeda_id') == Moeda::where('sigla', 'USS')->value('id')
+                    )
+                    ->live(),
+                Hidden::make('valor_total_pedido_us')->dehydrated(),
+
+                // --- Índice Valorização (saca) (continua editável) ---
                 TextInput::make('indice_valorizacao_saca')
                     ->label('Índice Valorização (saca)')
                     ->numeric()
@@ -50,125 +67,134 @@ class ValoresSectionRestricted
                     ->afterStateUpdated(function (Get $get, Set $set) {
                         $rawIndice = $get('indice_valorizacao_saca') ?? '0';
                         $rawPrecoSaca = $get('preco_liquido_saca') ?? '0';
-                        $indice = floatval(str_replace(',', '.', $rawIndice));
-                        $precoSaca = floatval(str_replace(',', '.', $rawPrecoSaca));
-                        $precoVal = $precoSaca * (1 + $indice);
 
-                        $set('preco_liquido_saca_valorizado', round($precoVal, 2));
+                        $indice = (float) str_replace(',', '.', $rawIndice);
+                        // se vier em %, converte p/ fator
+                        $indiceF = $indice > 1 ? $indice / 100 : $indice;
+                        $precoSaca = (float) str_replace(',', '.', $rawPrecoSaca);
 
-                        $totalRs = $get('valor_total_pedido_rs') ?? 0;
-                        $totalRsVal = $get('valor_total_pedido_rs_valorizado') ?? 0;
-                        $totalUs = $get('valor_total_pedido_us') ?? 0;
-                        $totalUsVal = $get('valor_total_pedido_us_valorizado') ?? 0;
+                        $set('preco_liquido_saca_valorizado', round($precoSaca * (1 + $indiceF), 2));
+
+                        $totalRs = (float) ($get('valor_total_pedido_rs') ?? 0);
+                        $totalRsV = (float) ($get('valor_total_pedido_rs_valorizado') ?? 0);
+                        $totalUs = (float) ($get('valor_total_pedido_us') ?? 0);
+                        $totalUsV = (float) ($get('valor_total_pedido_us_valorizado') ?? 0);
                         $sigla = optional(Moeda::find($get('moeda_id')))->sigla;
-                        $bonus = strtoupper($sigla) === 'USD'
-                            ? $totalUsVal - $totalUs
-                            : $totalRsVal - $totalRs;
+
+                        $bonus = strtoupper((string) $sigla) === 'USD'
+                            ? ($totalUsV - $totalUs)
+                            : ($totalRsV - $totalRs);
 
                         $set('bonus_cliente_pacote', round($bonus, 2));
                     }),
 
+                // --- Preço Líquido (saca) sem bônus ---
+                Placeholder::make('preco_liquido_saca_fmt')
+                    ->label('Preço Líquido (saca) sem bônus')
+                    ->content(
+                        fn(Get $get) =>
+                        'R$ ' . number_format((float) ($get('preco_liquido_saca') ?? 0), 2, ',', '.')
+                    )
+                    ->live(),
+                Hidden::make('preco_liquido_saca')->dehydrated(),
 
-                TextInput::make('preco_liquido_saca')
-                    ->label('Preço Líquido (saca) sem bonus')
-                    ->numeric()
-                    ->reactive()
-                    ->disabled()
-                    ->dehydrated(),
-
-                TextInput::make('bonus_cliente_pacote')
+                // --- Bônus do Cliente no Pacote ---
+                Placeholder::make('bonus_cliente_pacote_fmt')
                     ->label('Bônus do Cliente no Pacote')
-                    ->numeric()
-                    ->reactive()
-                    ->disabled()
-                    ->dehydrated(),
+                    ->content(
+                        fn(Get $get) =>
+                        'R$ ' . number_format((float) ($get('bonus_cliente_pacote') ?? 0), 2, ',', '.')
+                    )
+                    ->live(),
+                Hidden::make('bonus_cliente_pacote')->dehydrated(),
 
-                TextInput::make('cotacao_moeda_usd_brl')
-                    ->label('Cotação USD/BRL')
-                    ->numeric()
-                    ->hidden()
+                // --- Cotação USD/BRL (permanece oculto/cru) ---
+                Hidden::make('cotacao_moeda_usd_brl')
                     ->default(0)
                     ->dehydrated(),
 
-                TextInput::make('margem_faturamento_total_rs')
+                // --- Margem Faturamento (R$) ---
+                Placeholder::make('margem_faturamento_total_rs_fmt')
                     ->label('Margem Faturamento (R$)')
-                    ->prefix('R$')
-                    ->disabled()
-                    ->dehydrated()
-                    ->reactive()
-                    ->visible(function ($get) {
-                        return $get('moeda_id') == Moeda::where('sigla', 'BRL')->value('id');
-                    }),
+                    ->content(
+                        fn(Get $get) =>
+                        'R$ ' . number_format((float) ($get('margem_faturamento_total_rs') ?? 0), 2, ',', '.')
+                    )
+                    ->visible(
+                        fn(Get $get) =>
+                        $get('moeda_id') == Moeda::where('sigla', 'BRL')->value('id')
+                    )
+                    ->live(),
+                Hidden::make('margem_faturamento_total_rs')->dehydrated(),
 
-                TextInput::make('margem_faturamento_total_us')
+                // --- Margem Faturamento (US$) ---
+                Placeholder::make('margem_faturamento_total_us_fmt')
                     ->label('Margem Faturamento (US$)')
-                    ->prefix('US$')
-                    ->disabled()
-                    ->dehydrated()
-                    ->reactive()
-                    ->visible(function ($get) {
-                        return $get('moeda_id') == Moeda::where('sigla', 'USS')->value('id');
-                    }),
+                    ->content(
+                        fn(Get $get) =>
+                        'US$ ' . number_format((float) ($get('margem_faturamento_total_us') ?? 0), 2, '.', ',')
+                    )
+                    ->visible(
+                        fn(Get $get) =>
+                        $get('moeda_id') == Moeda::where('sigla', 'USS')->value('id')
+                    )
+                    ->live(),
+                Hidden::make('margem_faturamento_total_us')->dehydrated(),
 
-                TextInput::make('margem_percentual_total_rs')
+                // --- Margem Percentual (R$) ---
+                Placeholder::make('margem_percentual_total_rs_fmt')
                     ->label('Margem Percentual (R$)')
-                    ->suffix('%')
-                    ->numeric()
+                    ->content(
+                        fn(Get $get) =>
+                        number_format((float) ($get('margem_percentual_total_rs') ?? 0), 2, ',', '.') . ' %'
+                    )
+                    ->visible(
+                        fn(Get $get) =>
+                        $get('moeda_id') == Moeda::where('sigla', 'BRL')->value('id')
+                    )
+                    ->live(),
+                Hidden::make('margem_percentual_total_rs')
                     ->dehydrated()
-                    ->reactive()
-                    ->visible(function ($get) {
-                        return $get('moeda_id') == Moeda::where('sigla', 'BRL')->value('id');
-                    })
                     ->afterStateUpdated(function (Get $get, Set $set, $state) {
                         $marginRs = (float) $state;
                         $marginUs = (float) ($get('margem_percentual_total_us') ?? 0);
                         $margin = max($marginRs, $marginUs);
 
-                        if ($margin < 20) {
-                            $level = 3;
-                        } elseif ($margin <= 28) {
-                            $level = 2;
-                        } else {
-                            $level = 1;
-                        }
-
+                        $level = $margin < 20 ? 3 : ($margin <= 28 ? 2 : 1);
                         $set('nivel_validacao_id', $level);
                     }),
 
-                TextInput::make('margem_percentual_total_us')
+                // --- Margem Percentual (US$) ---
+                Placeholder::make('margem_percentual_total_us_fmt')
                     ->label('Margem Percentual (US$)')
-                    ->suffix('%')
-                    ->numeric()
+                    ->content(
+                        fn(Get $get) =>
+                        number_format((float) ($get('margem_percentual_total_us') ?? 0), 2, ',', '.') . ' %'
+                    )
+                    ->visible(
+                        fn(Get $get) =>
+                        $get('moeda_id') == Moeda::where('sigla', 'USS')->value('id')
+                    )
+                    ->live(),
+                Hidden::make('margem_percentual_total_us')
                     ->dehydrated()
-                    ->reactive()
-                    ->visible(function ($get) {
-                        return $get('moeda_id') == Moeda::where('sigla', 'USS')->value('id');
-                    })
                     ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                        $marginUs = (float) ($get('margem_percentual_total_us') ?? 0);
+                        $marginUs = (float) $state;
                         $marginRs = (float) ($get('margem_percentual_total_rs') ?? 0);
                         $margin = max($marginRs, $marginUs);
 
-                        if ($margin < 20) {
-                            $level = 3;
-                        } elseif ($margin <= 28) {
-                            $level = 2;
-                        } else {
-                            $level = 1;
-                        }
-
+                        $level = $margin < 20 ? 3 : ($margin <= 28 ? 2 : 1);
                         $set('nivel_validacao_id', $level);
                     }),
 
-                TextInput::make('nivel_validacao_id')
+                // --- Nível de Aprovação ---
+                Placeholder::make('nivel_validacao_id_fmt')
                     ->label('Nível de Aprovação')
-                    ->disabled()
-                    ->reactive()
-                    ->dehydrated()
-                    ->default(3),
-
-
-
+                    ->content(fn(Get $get) => (string) ($get('nivel_validacao_id') ?? 3))
+                    ->live(),
+                Hidden::make('nivel_validacao_id')
+                    ->default(3)
+                    ->dehydrated(),
             ]);
     }
 }
