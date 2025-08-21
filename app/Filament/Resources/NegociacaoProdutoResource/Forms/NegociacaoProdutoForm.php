@@ -57,7 +57,7 @@ class NegociacaoProdutoForm
                                 ),
 
                             TextInput::make('volume')
-                                ->label('VolumeB')
+                                ->label('Volume')
                                 ->numeric()
                                 ->live(onBlur: true)        // só dispara ao sair do campo
                                 ->required()
