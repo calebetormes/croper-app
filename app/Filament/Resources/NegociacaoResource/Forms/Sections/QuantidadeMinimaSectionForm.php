@@ -25,7 +25,7 @@ class QuantidadeMinimaSectionForm
                         $count = collect($items)
                             ->filter(fn($item) => in_array(
                                 Produto::find($item['produto_id'])?->classe?->nome,
-                                ['H', 'I', 'S'],
+                                ['H', 'I', 'S', 'F'],
                             ))
                             ->count();
 
