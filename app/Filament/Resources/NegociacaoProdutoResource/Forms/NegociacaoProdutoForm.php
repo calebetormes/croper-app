@@ -57,15 +57,24 @@ class NegociacaoProdutoForm
                                 ),
 
                             TextInput::make('volume')
-                                ->label('Volume')
+                                ->label('VolumeB')
                                 ->numeric()
+                                ->live(onBlur: true)        // só dispara ao sair do campo
                                 ->required()
-                                ->reactive()
-                                ->dehydrated()
-                                ->afterStateUpdated(
-                                    fn(Get $get, Set $set) =>
-                                    NegociacaoProdutoLogic::volumeAfterStateUpdated($get, $set)
-                                ),
+                                ->dehydrated()              // opcional (true por padrão)
+                                ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                    // Se o usuário apagou tudo, considera 0
+                                    if ($state === '' || !is_numeric($state)) {
+                                        $state = 0;
+                                    }
+
+                                    // Como o gatilho é onBlur, não há “briga” em setar o próprio campo
+                                    // (garante tipo numérico antes de sua lógica)
+                                    $set('volume', (float) $state);
+
+                                    // Sua lógica de totais
+                                    NegociacaoProdutoLogic::volumeAfterStateUpdated($get, $set);
+                                }),
                         ]),
 
                     Auth::user()?->hasAnyRole(['vendedor', 'gerente_comercial'])

@@ -43,6 +43,7 @@ class NegociacaoProdutoLogic
             return;
         }
 
+
         //
         // 1) Obtenção dos valores base (preço e custo em R$ e US$) e do volume
         //
@@ -55,6 +56,11 @@ class NegociacaoProdutoLogic
         //
         // 2) Cálculo dos totais (preço * volume, custo * volume)
         //
+
+        $volume = (float) ($volume ?: 0);
+        $precoRs = (float) ($precoRs ?: 0);
+        $custoRs = (float) ($custoRs ?: 0);
+
         $totalPrecoRs = $precoRs * $volume;
         $totalCustoRs = $custoRs * $volume;
         $totalPrecoUs = $precoUs * $volume;
