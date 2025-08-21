@@ -51,7 +51,7 @@ class ProdutosInfolist
 
                                 //Margem de Lucro
                                 TextEntry::make('margem_percentual_rs')
-                                    ->label('Resultado')
+                                    ->label('Margem')
                                     ->formatStateUsing(fn($state) => number_format($state, 2, ',', '.') . ' %'),
                             ]),
 
