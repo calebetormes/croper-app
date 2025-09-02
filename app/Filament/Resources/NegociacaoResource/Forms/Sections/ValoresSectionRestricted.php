@@ -18,9 +18,8 @@ class ValoresSectionRestricted
         // Regra de visibilidade para itens "restritos" (apenas para UI/editáveis)
         $canSeeRestricted = fn() => !in_array(Auth::user()->role_id, [1, 2]);
 
-        return Section::make('Valores — Restritos')
+        return Section::make(heading: '')
             ->columns(4)
-            // ->hidden(...) REMOVIDO
             ->schema([
 
                 // --- Valor Total R$ (valorizado) ---
