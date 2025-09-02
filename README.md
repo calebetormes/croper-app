@@ -39,7 +39,7 @@ No painel do seu provedor de domínio (p.ex. Cloudflare, Registro.br):
 Conecte-se via SSH (com sua chave já configurada):
 
 ```bash
-ssh root@62.72.63.220
+ssh root@???????
 ```
 
 ### 3.1. Acessar a pasta raiz do site
