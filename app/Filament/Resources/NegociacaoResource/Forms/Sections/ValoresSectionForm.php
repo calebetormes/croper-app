@@ -70,8 +70,9 @@ class ValoresSectionForm
                     })
                     ->reactive()
                     ->disabled()
-                    ->dehydrated()
-                    ->hidden(fn() => in_array(Auth::user()->role_id, [1, 2])),
+                    ->hidden(fn() => in_array(Auth::user()->role_id, [1, 2]))
+                    ->dehydrated(),
+
 
                 TextInput::make('valor_total_pedido_us')
                     ->label('Valor Total U$ com bonus')
@@ -82,8 +83,8 @@ class ValoresSectionForm
                     })
                     ->reactive()
                     ->disabled()
-                    ->dehydrated()
-                    ->hidden(fn() => in_array(Auth::user()->role_id, [1, 2])),
+                    //->hidden(fn() => in_array(Auth::user()->role_id, [1, 2]))
+                    ->dehydrated(),
 
 
 

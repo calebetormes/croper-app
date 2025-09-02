@@ -15,9 +15,12 @@ class ValoresSectionRestricted
 {
     public static function make(): Section
     {
+        // Regra de visibilidade para itens "restritos" (apenas para UI/editáveis)
+        $canSeeRestricted = fn() => !in_array(Auth::user()->role_id, [1, 2]);
+
         return Section::make('Valores — Restritos')
             ->columns(4)
-            ->hidden(fn() => in_array(Auth::user()->role_id, [1, 2]))
+            // ->hidden(...) REMOVIDO
             ->schema([
 
                 // --- Valor Total R$ (valorizado) ---
@@ -27,9 +30,12 @@ class ValoresSectionRestricted
                         fn(Get $get) =>
                         'R$ ' . number_format((float) ($get('valor_total_pedido_rs_valorizado') ?? 0), 2, ',', '.')
                     )
-                    ->live(),
+                    ->live()
+                    ->visible($canSeeRestricted),
 
-                Hidden::make('valor_total_pedido_rs_valorizado')->dehydrated(),
+                Hidden::make('valor_total_pedido_rs_valorizado')
+                    ->dehydrated()
+                    ->dehydratedWhenHidden(),
 
                 // --- Valor Total R$ com bônus (exibição) ---
                 Placeholder::make('valor_total_pedido_rs_fmt')
@@ -40,10 +46,14 @@ class ValoresSectionRestricted
                     )
                     ->visible(
                         fn(Get $get) =>
-                        $get('moeda_id') == Moeda::where('sigla', 'BRL')->value('id')
+                        $canSeeRestricted()
+                        && $get('moeda_id') == Moeda::where('sigla', 'BRL')->value('id')
                     )
                     ->live(),
-                Hidden::make('valor_total_pedido_rs')->dehydrated(),
+
+                Hidden::make('valor_total_pedido_rs')
+                    ->dehydrated()
+                    ->dehydratedWhenHidden(),
 
                 // --- Valor Total U$ com bônus (exibição) ---
                 Placeholder::make('valor_total_pedido_us_fmt')
@@ -54,16 +64,21 @@ class ValoresSectionRestricted
                     )
                     ->visible(
                         fn(Get $get) =>
-                        $get('moeda_id') == Moeda::where('sigla', 'USS')->value('id')
+                        $canSeeRestricted()
+                        && $get('moeda_id') == Moeda::where('sigla', 'USD')->value('id')
                     )
                     ->live(),
-                Hidden::make('valor_total_pedido_us')->dehydrated(),
+
+                Hidden::make('valor_total_pedido_us')
+                    ->dehydrated()
+                    ->dehydratedWhenHidden(),
 
                 // --- Índice Valorização (saca) (continua editável) ---
                 TextInput::make('indice_valorizacao_saca')
                     ->label('Índice Valorização (saca)')
                     ->numeric()
                     ->reactive()
+                    ->visible($canSeeRestricted) // só quem pode ver a seção restrita enxerga/edita
                     ->afterStateUpdated(function (Get $get, Set $set) {
                         $rawIndice = $get('indice_valorizacao_saca') ?? '0';
                         $rawPrecoSaca = $get('preco_liquido_saca') ?? '0';
@@ -95,8 +110,12 @@ class ValoresSectionRestricted
                         fn(Get $get) =>
                         'R$ ' . number_format((float) ($get('preco_liquido_saca') ?? 0), 2, ',', '.')
                     )
-                    ->live(),
-                Hidden::make('preco_liquido_saca')->dehydrated(),
+                    ->live()
+                    ->visible($canSeeRestricted),
+
+                Hidden::make('preco_liquido_saca')
+                    ->dehydrated()
+                    ->dehydratedWhenHidden(),
 
                 // --- Bônus do Cliente no Pacote ---
                 Placeholder::make('bonus_cliente_pacote_fmt')
@@ -105,13 +124,18 @@ class ValoresSectionRestricted
                         fn(Get $get) =>
                         'R$ ' . number_format((float) ($get('bonus_cliente_pacote') ?? 0), 2, ',', '.')
                     )
-                    ->live(),
-                Hidden::make('bonus_cliente_pacote')->dehydrated(),
+                    ->live()
+                    ->visible($canSeeRestricted),
+
+                Hidden::make('bonus_cliente_pacote')
+                    ->dehydrated()
+                    ->dehydratedWhenHidden(),
 
                 // --- Cotação USD/BRL (permanece oculto/cru) ---
                 Hidden::make('cotacao_moeda_usd_brl')
                     ->default(0)
-                    ->dehydrated(),
+                    ->dehydrated()
+                    ->dehydratedWhenHidden(),
 
                 // --- Margem Faturamento (R$) ---
                 Placeholder::make('margem_faturamento_total_rs_fmt')
@@ -122,10 +146,14 @@ class ValoresSectionRestricted
                     )
                     ->visible(
                         fn(Get $get) =>
-                        $get('moeda_id') == Moeda::where('sigla', 'BRL')->value('id')
+                        $canSeeRestricted()
+                        && $get('moeda_id') == Moeda::where('sigla', 'BRL')->value('id')
                     )
                     ->live(),
-                Hidden::make('margem_faturamento_total_rs')->dehydrated(),
+
+                Hidden::make('margem_faturamento_total_rs')
+                    ->dehydrated()
+                    ->dehydratedWhenHidden(),
 
                 // --- Margem Faturamento (US$) ---
                 Placeholder::make('margem_faturamento_total_us_fmt')
@@ -136,10 +164,14 @@ class ValoresSectionRestricted
                     )
                     ->visible(
                         fn(Get $get) =>
-                        $get('moeda_id') == Moeda::where('sigla', 'USS')->value('id')
+                        $canSeeRestricted()
+                        && $get('moeda_id') == Moeda::where('sigla', 'USD')->value('id')
                     )
                     ->live(),
-                Hidden::make('margem_faturamento_total_us')->dehydrated(),
+
+                Hidden::make('margem_faturamento_total_us')
+                    ->dehydrated()
+                    ->dehydratedWhenHidden(),
 
                 // --- Margem Percentual (R$) ---
                 Placeholder::make('margem_percentual_total_rs_fmt')
@@ -150,11 +182,14 @@ class ValoresSectionRestricted
                     )
                     ->visible(
                         fn(Get $get) =>
-                        $get('moeda_id') == Moeda::where('sigla', 'BRL')->value('id')
+                        $canSeeRestricted()
+                        && $get('moeda_id') == Moeda::where('sigla', 'BRL')->value('id')
                     )
                     ->live(),
+
                 Hidden::make('margem_percentual_total_rs')
                     ->dehydrated()
+                    ->dehydratedWhenHidden()
                     ->afterStateUpdated(function (Get $get, Set $set, $state) {
                         $marginRs = (float) $state;
                         $marginUs = (float) ($get('margem_percentual_total_us') ?? 0);
@@ -173,11 +208,14 @@ class ValoresSectionRestricted
                     )
                     ->visible(
                         fn(Get $get) =>
-                        $get('moeda_id') == Moeda::where('sigla', 'USS')->value('id')
+                        $canSeeRestricted()
+                        && $get('moeda_id') == Moeda::where('sigla', 'USD')->value('id')
                     )
                     ->live(),
+
                 Hidden::make('margem_percentual_total_us')
                     ->dehydrated()
+                    ->dehydratedWhenHidden()
                     ->afterStateUpdated(function (Get $get, Set $set, $state) {
                         $marginUs = (float) $state;
                         $marginRs = (float) ($get('margem_percentual_total_rs') ?? 0);
@@ -191,10 +229,13 @@ class ValoresSectionRestricted
                 Placeholder::make('nivel_validacao_id_fmt')
                     ->label('Nível de Aprovação')
                     ->content(fn(Get $get) => (string) ($get('nivel_validacao_id') ?? 3))
-                    ->live(),
+                    ->live()
+                    ->visible($canSeeRestricted),
+
                 Hidden::make('nivel_validacao_id')
                     ->default(3)
-                    ->dehydrated(),
+                    ->dehydrated()
+                    ->dehydratedWhenHidden(),
             ]);
     }
 }
