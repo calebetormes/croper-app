@@ -37,7 +37,7 @@ class UserResource extends Resource
                 ->icon(static::getNavigationIcon())
                 ->group(static::getNavigationGroup())
                 ->sort(static::getNavigationSort())
-                ->visible(fn () => in_array(auth()->user()?->role_id, [1, 2, 3, 4, 5])),
+                ->visible(fn() => in_array(auth()->user()?->role_id, [1, 2, 3, 4, 5])),
         ];
     }
 
@@ -66,8 +66,8 @@ class UserResource extends Resource
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->label('Senha')
-                    ->disabled(fn ($record) => isset($record) && $record->exists)  // Verifica se o registro existe antes de desabilitar
-                    ->dehydrated(fn ($state) => ! empty($state))  // Só atualiza a senha se o campo não estiver vazio
+                    //->disabled(fn ($record) => isset($record) && $record->exists)  // Verifica se o registro existe antes de desabilitar
+                    //->dehydrated(fn ($state) => ! empty($state))  // Só atualiza a senha se o campo não estiver vazio
                     ->maxLength(255),
 
                 Forms\Components\Select::make('role_id')
@@ -77,12 +77,14 @@ class UserResource extends Resource
                     ->reactive()
                     ->default(1)
                     // só Administrador e Gerente Nacional podem alterar o papel
-                    ->disabled(fn (): bool => ! in_array(auth()->user()->role->name, ['Admin', 'Gerente Nacional'])
+                    ->disabled(
+                        fn(): bool => !in_array(auth()->user()->role->name, ['Admin', 'Gerente Nacional'])
                     )
                     // opcional: tooltip explicando por que está bloqueado
-                    ->helperText(fn (): ?string => auth()->user()->role->name === 'Administrador' || auth()->user()->role->name === 'Gerente Nacional'
-                            ? null
-                            : 'Somente Administrador pode alterar este campo'
+                    ->helperText(
+                        fn(): ?string => auth()->user()->role->name === 'Administrador' || auth()->user()->role->name === 'Gerente Nacional'
+                        ? null
+                        : 'Somente Administrador pode alterar este campo'
                     )
                     ->dehydrated(),
 
@@ -93,12 +95,12 @@ class UserResource extends Resource
                     ->relationship('vendedores', 'name')
                     ->label('Vendedores')
                     ->reactive()
-                    ->visible(fn ($get) => in_array($get('role_id'), [2, 3, 4]))
+                    ->visible(fn($get) => in_array($get('role_id'), [2, 3, 4]))
                     ->relationship(
                         'vendedores',
                         'name',
-                        fn ($query) => $query
-                            ->whereHas('role', fn ($q) => $q->where('name', 'Vendedor'))
+                        fn($query) => $query
+                            ->whereHas('role', fn($q) => $q->where('name', 'Vendedor'))
                     )
                     ->preload()
                     ->searchable()
@@ -108,24 +110,26 @@ class UserResource extends Resource
                     ->label('Gerente')
                     ->maxItems(1)
                     ->reactive()
-                    ->visible(fn ($get) => in_array($get('role_id'), [1]))
+                    ->visible(fn($get) => in_array($get('role_id'), [1]))
 
                     // só Administrador e Gerente Nacional podem alterar
-                    ->disabled(fn (): bool => ! in_array(auth()->user()->role->name, ['Admin', 'Gerente Nacional'])
+                    ->disabled(
+                        fn(): bool => !in_array(auth()->user()->role->name, ['Admin', 'Gerente Nacional'])
                     )
-                    ->helperText(fn (): ?string => auth()->user()->role->name === 'Administrador' || auth()->user()->role->name === 'Gerente Nacional'
-                            ? null
-                            : 'Somente Administrador pode alterar este campo'
+                    ->helperText(
+                        fn(): ?string => auth()->user()->role->name === 'Administrador' || auth()->user()->role->name === 'Gerente Nacional'
+                        ? null
+                        : 'Somente Administrador pode alterar este campo'
                     )
 
                     // padrão: já seleciona o gerente comercial logado
-                    ->default(fn (): array => [auth()->id()])
+                    ->default(fn(): array => [auth()->id()])
 
                     ->relationship(
                         'gerentes',
                         'name',
-                        fn ($query) => $query
-                            ->whereHas('role', fn ($q) => $q->whereIn('name', [
+                        fn($query) => $query
+                            ->whereHas('role', fn($q) => $q->whereIn('name', [
                                 'Gerente Comercial',
                                 'Gerente Nacional',
                                 'Administrador',
@@ -193,7 +197,9 @@ class UserResource extends Resource
 
         if ($role === 'Gerente Comercial') {
             // Só vê os vendedores subordinados
-            $query->whereHas('gerentes', fn (Builder $q) => $q->where('id', $user->id)
+            $query->whereHas(
+                'gerentes',
+                fn(Builder $q) => $q->where('id', $user->id)
             );
         } elseif ($role === 'Vendedor') {
             // Vendedor só vê o próprio cadastro
