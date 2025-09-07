@@ -9,6 +9,7 @@ class Produto extends Model
 {
     use HasFactory;
 
+    // A tabela já bate com a convenção ("produtos"), então não precisa declarar $table.
     public $timestamps = false;
 
     protected $fillable = [
@@ -23,8 +24,38 @@ class Produto extends Model
         'preco_us',
         'custo_rs',
         'custo_us',
+        'fator_multiplicador',
+        'ativo',
         'indice_valorizacao_produto',
     ];
+
+    /**
+     * Defaults em memória (espelha os defaults da migration).
+     */
+    protected $attributes = [
+        'fator_multiplicador' => 1.0,
+        'ativo' => true,
+    ];
+
+    /**
+     * Casts coerentes com a migration (12,2 nos decimais).
+     */
+    protected $casts = [
+        'preco_rs' => 'decimal:2',
+        'preco_us' => 'decimal:2',
+        'custo_rs' => 'decimal:2',
+        'custo_us' => 'decimal:2',
+        'fator_multiplicador' => 'decimal:2',
+        'indice_valorizacao_produto' => 'decimal:2',
+        'ativo' => 'boolean',
+    ];
+
+    /**
+     * Se for útil em APIs/JSON.
+     */
+    protected $appends = ['nome_composto'];
+
+    // ----------------- Relacionamentos -----------------
 
     public function classe()
     {
@@ -51,30 +82,37 @@ class Produto extends Model
         return $this->belongsTo(Familia::class, 'familia_id');
     }
 
+    // ----------------- Accessors / Scopes -----------------
+
     /**
-     * Rótulo composto para Filament e para exibição geral.
+     * Rótulo composto para Filament e exibição geral.
      */
     public function getNomeCompostoAttribute(): string
     {
         $parts = [];
 
-        if ($this->classe) {
+        if ($this->relationLoaded('classe') ? $this->classe : $this->classe()->exists()) {
             $parts[] = $this->classe->nome;
         }
 
-        if ($this->principioAtivo) {
+        if ($this->relationLoaded('principioAtivo') ? $this->principioAtivo : $this->principioAtivo()->exists()) {
             $parts[] = $this->principioAtivo->nome;
         }
 
-        if ($this->marcaComercial) {
+        if ($this->relationLoaded('marcaComercial') ? $this->marcaComercial : $this->marcaComercial()->exists()) {
             $parts[] = $this->marcaComercial->nome;
         }
 
-        // sempre existe no banco, mesmo que vazio
-        $parts[] = $this->apresentacao;
+        $parts[] = (string) $this->apresentacao;
 
-        // junta com separador
-        return implode(' – ', $parts);
+        return implode(' – ', array_filter($parts));
     }
 
+    /**
+     * Escopo prático para consultar apenas produtos ativos.
+     */
+    public function scopeAtivos($query)
+    {
+        return $query->where('ativo', true);
+    }
 }

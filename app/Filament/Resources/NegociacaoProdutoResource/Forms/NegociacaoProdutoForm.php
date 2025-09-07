@@ -45,11 +45,53 @@ class NegociacaoProdutoForm
                         ->schema([
                             Select::make('produto_id')
                                 ->label('Produto')
-                                ->relationship('produto', 'nome')
+                                ->relationship(
+                                    name: 'produto',
+                                    titleAttribute: 'apresentacao', // precisa ser coluna real
+                                    modifyQueryUsing: fn($query) => $query->where('ativo', true)
+                                )
                                 ->searchable()
                                 ->preload()
                                 ->live()
+                                // label para registros carregados via relacionamento
                                 ->getOptionLabelFromRecordUsing(fn(Produto $r) => $r->nome_composto)
+                                // busca customizada simulando o nome_composto no SQL
+                                ->getSearchResultsUsing(function (string $search) {
+                                    return Produto::query()
+                                        ->from('produtos')
+                                        ->leftJoin('produtos_classes as pc', 'pc.id', '=', 'produtos.classe_id')
+                                        ->leftJoin('principios_ativos as pa', 'pa.id', '=', 'produtos.principio_ativo_id')
+                                        ->leftJoin('marcas_comerciais as mc', 'mc.id', '=', 'produtos.marca_comercial_id')
+                                        ->where('produtos.ativo', true)
+                                        ->selectRaw("
+                produtos.id,
+                CONCAT_WS(' – ',
+                    pc.nome,
+                    pa.nome,
+                    mc.nome,
+                    produtos.apresentacao
+                ) as nome_composto_sql
+            ")
+                                        ->whereRaw("
+                CONCAT_WS(' – ',
+                    pc.nome,
+                    pa.nome,
+                    mc.nome,
+                    produtos.apresentacao
+                ) LIKE ?
+            ", ["%{$search}%"])
+                                        ->orderBy('nome_composto_sql')
+                                        ->limit(50)
+                                        ->get()
+                                        ->mapWithKeys(fn($row) => [$row->id => $row->nome_composto_sql])
+                                        ->toArray();
+                                })
+                                // label quando já existe valor salvo
+                                ->getOptionLabelUsing(
+                                    fn($id) =>
+                                    Produto::with(['classe', 'principioAtivo', 'marcaComercial'])
+                                        ->find($id)?->nome_composto
+                                )
                                 ->required()
                                 ->afterStateUpdated(
                                     fn(Get $get, Set $set) =>
