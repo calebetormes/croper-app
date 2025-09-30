@@ -47,22 +47,30 @@ class NegociacaoProdutoForm
                                 ->label('Produto')
                                 ->relationship(
                                     name: 'produto',
-                                    titleAttribute: 'apresentacao', // precisa ser coluna real
-                                    modifyQueryUsing: fn($query) => $query->where('ativo', true)
+                                    titleAttribute: 'apresentacao',
+                                    modifyQueryUsing: function ($query, $livewire, ?\App\Models\NegociacaoProduto $record) {
+                                        $produtoId = $record?->produto_id; // registro atual, se existir
+                            
+                                        $query->where(function ($q) use ($produtoId) {
+                                            $q->where('ativo', true);
+
+                                            if ($produtoId) {
+                                                $q->orWhere('id', $produtoId);
+                                            }
+                                        });
+                                    }
                                 )
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                // label para registros carregados via relacionamento
                                 ->getOptionLabelFromRecordUsing(fn(Produto $r) => $r->nome_composto)
-                                // busca customizada simulando o nome_composto no SQL
                                 ->getSearchResultsUsing(function (string $search) {
                                     return Produto::query()
                                         ->from('produtos')
                                         ->leftJoin('produtos_classes as pc', 'pc.id', '=', 'produtos.classe_id')
                                         ->leftJoin('principios_ativos as pa', 'pa.id', '=', 'produtos.principio_ativo_id')
                                         ->leftJoin('marcas_comerciais as mc', 'mc.id', '=', 'produtos.marca_comercial_id')
-                                        ->where('produtos.ativo', true)
+                                        ->where('produtos.ativo', true) // só busca ativos
                                         ->selectRaw("
                 produtos.id,
                 CONCAT_WS(' – ',
@@ -86,10 +94,8 @@ class NegociacaoProdutoForm
                                         ->mapWithKeys(fn($row) => [$row->id => $row->nome_composto_sql])
                                         ->toArray();
                                 })
-                                // label quando já existe valor salvo
                                 ->getOptionLabelUsing(
-                                    fn($id) =>
-                                    Produto::with(['classe', 'principioAtivo', 'marcaComercial'])
+                                    fn($id) => Produto::with(['classe', 'principioAtivo', 'marcaComercial'])
                                         ->find($id)?->nome_composto
                                 )
                                 ->required()
