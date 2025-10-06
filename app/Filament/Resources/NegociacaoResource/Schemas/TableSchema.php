@@ -138,6 +138,10 @@ class TableSchema
 
                 Action::make('gerar_relatorio')
                     ->label('')
+                    ->visible(fn(): bool => in_array(
+                        Auth::user()->role?->name,
+                        ['Gerente Nacional', 'Admin']
+                    ))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->tooltip('Gerar Relatório em PDF')
                     ->url(fn(Negociacao $record): string => route('negociacoes.pdf', $record->id))

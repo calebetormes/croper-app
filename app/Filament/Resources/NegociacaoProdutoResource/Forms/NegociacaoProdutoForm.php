@@ -39,16 +39,19 @@ class NegociacaoProdutoForm
                     ?? 'Novo Produto'
                 )
                 ->schema([
-                    // Exibe a moeda selecionada (1 = BRL, 2 = USD)
                     Section::make('')
                         ->columns(2)
                         ->schema([
                             Select::make('produto_id')
                                 ->label('Produto')
+                                ->searchable()
+                                ->preload()
+                                ->live()
+                                ->required()
                                 ->relationship(
                                     name: 'produto',
                                     titleAttribute: 'apresentacao',
-                                    modifyQueryUsing: function ($query, $livewire, ?\App\Models\NegociacaoProduto $record) {
+                                    modifyQueryUsing: function ($query, ?\App\Models\NegociacaoProduto $record) {
                                         $produtoId = $record?->produto_id; // registro atual, se existir
                             
                                         $query->where(function ($q) use ($produtoId) {
@@ -60,45 +63,15 @@ class NegociacaoProdutoForm
                                         });
                                     }
                                 )
-                                ->searchable()
-                                ->preload()
-                                ->live()
-                                ->getOptionLabelFromRecordUsing(fn(Produto $r) => $r->nome_composto)
-                                ->getSearchResultsUsing(function (string $search) {
-                                    return Produto::query()
-                                        ->from('produtos')
-                                        ->leftJoin('produtos_classes as pc', 'pc.id', '=', 'produtos.classe_id')
-                                        ->leftJoin('principios_ativos as pa', 'pa.id', '=', 'produtos.principio_ativo_id')
-                                        ->leftJoin('marcas_comerciais as mc', 'mc.id', '=', 'produtos.marca_comercial_id')
-                                        ->where('produtos.ativo', true) // só busca ativos
-                                        ->selectRaw("
-                produtos.id,
-                CONCAT_WS(' – ',
-                    pc.nome,
-                    pa.nome,
-                    mc.nome,
-                    produtos.apresentacao
-                ) as nome_composto_sql
-            ")
-                                        ->whereRaw("
-                CONCAT_WS(' – ',
-                    pc.nome,
-                    pa.nome,
-                    mc.nome,
-                    produtos.apresentacao
-                ) LIKE ?
-            ", ["%{$search}%"])
-                                        ->orderBy('nome_composto_sql')
-                                        ->limit(50)
-                                        ->get()
-                                        ->mapWithKeys(fn($row) => [$row->id => $row->nome_composto_sql])
-                                        ->toArray();
-                                })
-                                ->getOptionLabelUsing(
+
+                                ->getOptionLabelFromRecordUsing(fn(Produto $r): mixed => $r->nome_composto)
+
+                                /*->getOptionLabelUsing(
                                     fn($id) => Produto::with(['classe', 'principioAtivo', 'marcaComercial'])
                                         ->find($id)?->nome_composto
-                                )
-                                ->required()
+                                )*/
+
+
                                 ->afterStateUpdated(
                                     fn(Get $get, Set $set) =>
                                     NegociacaoProdutoLogic::produtoSelectAfterStateUpdated($get, $set)

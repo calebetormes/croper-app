@@ -115,4 +115,32 @@ class Produto extends Model
     {
         return $query->where('ativo', true);
     }
+
+    public static function searchOptions(string $search): array
+    {
+        return self::query()
+            ->from('produtos')
+            ->leftJoin('produtos_classes as pc', 'pc.id', '=', 'produtos.classe_id')
+            ->leftJoin('principios_ativos as pa', 'pa.id', '=', 'produtos.principio_ativo_id')
+            ->leftJoin('marcas_comerciais as mc', 'mc.id', '=', 'produtos.marca_comercial_id')
+            ->where('produtos.ativo', true)
+            ->selectRaw("
+                produtos.id,
+                CONCAT_WS(' – ', pc.nome, pa.nome, mc.nome, produtos.apresentacao) as nome_composto_sql
+            ")
+            ->whereRaw("
+                CONCAT_WS(' – ', pc.nome, pa.nome, mc.nome, produtos.apresentacao) LIKE ?
+            ", ["%{$search}%"])
+            ->orderBy('nome_composto_sql')
+            ->limit(50)
+            ->get()
+            ->mapWithKeys(fn($row) => [$row->id => $row->nome_composto_sql])
+            ->toArray();
+    }
+
+    public static function optionLabel(int|string $id): ?string
+    {
+        return self::with(['classe', 'principioAtivo', 'marcaComercial'])
+            ->find($id)?->nome_composto;
+    }
 }
