@@ -11,5 +11,6 @@ class Pagamento extends Model
     protected $fillable = [
         'data_pagamento',
         'data_entrega',
+        'ativo',
     ];
 }

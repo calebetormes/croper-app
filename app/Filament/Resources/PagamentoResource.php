@@ -13,6 +13,10 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Navigation\NavigationItem;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ToggleButtons;
+use Filament\Forms\Components\DatePicker;
 
 class PagamentoResource extends Resource
 {
@@ -30,7 +34,7 @@ class PagamentoResource extends Resource
                 ->icon(static::getNavigationIcon())
                 ->group(static::getNavigationGroup())
                 ->sort(static::getNavigationSort())
-                ->visible(fn () => in_array(auth()->user()?->role_id, [4, 5])),
+                ->visible(fn() => in_array(auth()->user()?->role_id, [4, 5])),
         ];
     }
 
@@ -43,8 +47,14 @@ class PagamentoResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\DatePicker::make('data_pagamento'),
-                Forms\Components\DatePicker::make('data_entrega'),
+                DatePicker::make('data_pagamento'),
+                DatePicker::make('data_entrega'),
+                //Forms\Components\Toggle::make('ativo')->default(true),
+
+                ToggleButtons::make('ativo')
+                    ->label('Ativo')
+                    ->boolean()
+                    ->default(true),
             ]);
     }
 
@@ -58,8 +68,10 @@ class PagamentoResource extends Resource
                 Tables\Columns\TextColumn::make('data_entrega')
                     ->date()
                     ->sortable(),
+                Tables\Columns\BooleanColumn::make('ativo')->sortable(),
             ])
             ->filters([
+
                 //
             ])
             ->actions([

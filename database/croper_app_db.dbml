@@ -107,6 +107,7 @@ Table pagamentos {
   id int [pk, increment]
   data_pagamento date
   data_entrega date
+  ativo boolean
 }
 
 
@@ -150,8 +151,7 @@ Table pracas_cotacoes {
   fator_valorizacao decimal (12,2)
 }
 
-//ALTERADO 
-//lembrar de REMOVER FATOR DE VALORização no section pracas_cotacoes
+
 Table negociacoes {
   id int [pk, increment, unique, not null] // Adicionado unique para garantir unicidade
   pedido_id varchar(6) [unique] // Renomeado de pedido para pedido_id e adicionado unique
@@ -222,9 +222,6 @@ Table negociacoes {
 }
 
 
-//--------------------------------------------------------------
-// ALTERADA
-//--------------------------------------------------------------
 Table negociacoes_produtos { 
   id int [pk, increment]
   negociacao_id int [ref: > negociacoes.id]

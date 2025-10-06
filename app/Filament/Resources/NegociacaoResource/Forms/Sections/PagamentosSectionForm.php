@@ -16,11 +16,31 @@ class PagamentosSectionForm
             ->schema([
                 Select::make('pagamento_id')
                     ->label('Data de Pagamento')
-                    ->options(Pagamento::all()->pluck('data_pagamento', 'id')->mapWithKeys(fn ($v, $k) => [$k => Carbon::parse($v)->format('d/m/Y')])->toArray())
+                    ->options(function (callable $get) {
+                        $query = \App\Models\Pagamento::query()
+                            ->where('ativo', true);
+
+                        // mantém o pagamento atual mesmo se estiver inativo
+                        if ($id = $get('pagamento_id')) {
+                            $query->orWhere('id', $id);
+                        }
+
+                        return $query
+                            ->orderByDesc('data_pagamento')
+                            ->get()
+                            ->mapWithKeys(fn($p) => [
+                                $p->id => \Carbon\Carbon::parse($p->data_pagamento)->format('d/m/Y'),
+                            ])
+                            ->toArray();
+                    })
                     ->searchable()
                     ->required()
                     ->reactive()
-                    ->afterStateUpdated(fn ($state, $set) => $set('data_entrega_graos', Pagamento::find($state)?->data_entrega)),
+                    ->afterStateUpdated(
+                        fn($state, $set) =>
+                        $set('data_entrega_graos', \App\Models\Pagamento::find($state)?->data_entrega)
+                    ),
+
                 DatePicker::make('data_entrega_graos')
                     ->label('Data de Entrega dos Grãos')
                     ->required()
