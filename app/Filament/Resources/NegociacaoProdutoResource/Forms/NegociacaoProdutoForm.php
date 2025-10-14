@@ -44,7 +44,7 @@ class NegociacaoProdutoForm
                         ->schema([
                             Select::make('produto_id')
                                 ->label('Produto')
-                                ->searchable()
+                                //->searchable()
                                 ->preload()
                                 ->live()
                                 ->required()
