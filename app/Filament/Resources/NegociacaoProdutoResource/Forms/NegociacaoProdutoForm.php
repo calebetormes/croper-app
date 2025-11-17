@@ -96,7 +96,65 @@ class NegociacaoProdutoForm
                                     // Sua lógica de totais
                                     NegociacaoProdutoLogic::volumeAfterStateUpdated($get, $set);
                                 }),
-                        ]),
+
+                                TextInput::make('indice_valorizacao')
+                                    ->label('Índice de Valorização')
+                                    ->numeric()
+                                    ->placeholder('0.10 para 10%')
+                                    ->live()
+                                    ->default(0)
+                                    ->required()
+                                    ->dehydrated()
+                                    ->afterStateHydrated(
+                                        fn(Get $get, Set $set) =>
+                                        NegociacaoProdutoLogic::indiceValorizacaoAfterStateUpdated($get, $set)
+                                    )
+                                    ->afterStateUpdated(
+                                        fn(Get $get, Set $set) =>
+                                        NegociacaoProdutoLogic::indiceValorizacaoAfterStateUpdated($get, $set)
+                                    ),
+
+                                                    TextInput::make('preco_produto_valorizado_rs')
+                                    ->label('Preço do Produto ')
+                                    ->prefix('BRL')
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->visible(fn(Get $get) => $get('../../moeda_id') === 1)
+                                    ->reactive(),
+
+                                TextInput::make('preco_produto_valorizado_us')
+                                    ->label('Preço do Produto')
+                                    ->prefix('USS')
+                                    ->numeric()
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->visible(fn(Get $get) => $get('../../moeda_id') === 2)
+                                    ->reactive(),
+                                            ]),
+
+                                            DatePicker::make('data_atualizacao_snap_precos_produtos')
+                                    ->label('Data Atualização dos Preços do Produto')
+                                    ->default(fn(): \DateTime => now())
+                                    ->disabled()
+                                    ->dehydrated(),
+
+                                TextInput::make('preco_total_produto_negociacao_rs')
+                                    ->label('Valor Total na Negociação')
+                                    ->prefix('BRL')
+                                    ->numeric()
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->visible(fn(Get $get) => $get('../../moeda_id') === 1)
+                                    ->reactive(),
+
+                                TextInput::make('preco_total_produto_negociacao_us')
+                                    ->label('Valor Total na Negociação')
+                                    ->prefix('USS')
+                                    ->numeric()
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->visible(fn(Get $get) => $get('../../moeda_id') === 2)
+                                    ->reactive(),
 
                     Auth::user()?->hasAnyRole(['vendedor', 'gerente_comercial'])
                     ? DetalhesProdutoHidden::section()
