@@ -156,7 +156,7 @@ class NegociacaoProdutoForm
                                     ->visible(fn(Get $get) => $get('../../moeda_id') === 2)
                                     ->reactive(),
 
-                    Auth::user()?->hasAnyRole(['vendedor', 'gerente_comercial'])
+                    Auth::user()?->hasAnyRole(['vendedor', 'Gerente Comercial'])
                     ? DetalhesProdutoHidden::section()
                     : DetalhesProdutoVisible::section(),
 
