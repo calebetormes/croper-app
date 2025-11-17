@@ -41,13 +41,8 @@ class DetalhesProdutoVisible
                         NegociacaoProdutoLogic::volumeAfterStateUpdated($get, $set)
                     ),
 
-
-
-
-
-
                 TextInput::make('snap_produto_custo_rs')
-                    ->label('Custo do Produto')
+                    ->label('Custo do Produto ')
                     ->prefix('BRL')
                     ->numeric()
                     ->disabled()
