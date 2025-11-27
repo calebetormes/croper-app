@@ -16,30 +16,39 @@ class DetalhesProdutoVisible
         return Section::make('Detalhes do Produto')
             ->columns(3)
             ->schema([
+// Índice de valorização aplicado ao produto
+                            TextInput::make('indice_valorizacao')
+                                    ->label('Índice de Valorização')
+                                    ->numeric()
+                                    ->placeholder('0.10 para 10%')
+                                    ->live()
+                                    ->default(0)
+                                    ->required()
+                                    ->dehydrated()
+                                    ->afterStateHydrated(
+                                        fn(Get $get, Set $set) =>
+                                        NegociacaoProdutoLogic::indiceValorizacaoAfterStateUpdated($get, $set)
+                                    )
+                                    ->afterStateUpdated(
+                                        fn(Get $get, Set $set) =>
+                                        NegociacaoProdutoLogic::indiceValorizacaoAfterStateUpdated($get, $set)
+                                    ),
+                           
+                           TextInput::make('preco_produto_valorizado_rs')
+                                    ->label('Preço do Produto Valorizado')
+                                    ->prefix('BRL')
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->visible(fn(Get $get) => $get('../../moeda_id') === 1),
 
-                TextInput::make('snap_produto_preco_rs')
-                    ->label('Preço do Produto (sem índice valorização)')
-                    ->prefix('BRL')
-                    ->numeric()
-                    ->dehydrated()
-                    ->visible(fn(Get $get) => $get('../../moeda_id') === 1)
-                    ->reactive()
-                    ->afterStateUpdated(
-                        fn(Get $get, Set $set) =>
-                        NegociacaoProdutoLogic::volumeAfterStateUpdated($get, $set)
-                    ),
+                            TextInput::make('preco_produto_valorizado_us')
+                                    ->label('Preço do Produto Valorizado')
+                                    ->prefix('USS')
+                                    ->numeric()
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->visible(fn(Get $get) => $get('../../moeda_id') === 2),
 
-                TextInput::make('snap_produto_preco_us')
-                    ->label('Preço do Produto (sem índice valorização)')
-                    ->prefix('USS')
-                    ->numeric()
-                    ->dehydrated()
-                    ->visible(fn(Get $get) => $get('../../moeda_id') === 2)
-                    ->reactive()
-                    ->afterStateUpdated(
-                        fn(Get $get, Set $set) =>
-                        NegociacaoProdutoLogic::volumeAfterStateUpdated($get, $set)
-                    ),
 
                 TextInput::make('snap_produto_custo_rs')
                     ->label('Custo do Produto ')

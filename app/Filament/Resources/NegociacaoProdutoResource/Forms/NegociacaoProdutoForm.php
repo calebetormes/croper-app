@@ -23,7 +23,10 @@ class NegociacaoProdutoForm
     public static function make(): array
     {
         return [
+            // Repeater para gerenciar lista de produtos na negociação
             Repeater::make('negociacaoProdutos')
+
+            // Define relacionamento com a tabela negociacaoProdutos
                 ->relationship('negociacaoProdutos')
                 ->reactive() // re-render repeater when moeda_id changes
                 ->label('Produtos')
@@ -32,7 +35,6 @@ class NegociacaoProdutoForm
                 ->createItemButtonLabel('Adicionar Produto')
                 ->reorderable()
                 ->grid(1)
-                ->reactive()
                 ->itemLabel(
                     fn(array $state): ?string =>
                     Produto::find($state['produto_id'])?->nome_composto
@@ -42,6 +44,8 @@ class NegociacaoProdutoForm
                     Section::make('')
                         ->columns(2)
                         ->schema([
+                            
+                            // Campo de seleção do produto
                             Select::make('produto_id')
                                 ->label('Produto')
                                 //->searchable()
@@ -77,6 +81,7 @@ class NegociacaoProdutoForm
                                     NegociacaoProdutoLogic::produtoSelectAfterStateUpdated($get, $set)
                                 ),
 
+                                // Campo para informar volume do produto
                             TextInput::make('volume')
                                 ->label('Volume')
                                 ->numeric()
@@ -96,73 +101,68 @@ class NegociacaoProdutoForm
                                     // Sua lógica de totais
                                     NegociacaoProdutoLogic::volumeAfterStateUpdated($get, $set);
                                 }),
+                            
+                            //Preço original do produto em USD
+                            // Preço do produto em BRL
+                            TextInput::make('snap_produto_preco_rs')
+                                ->label('Preço do Produto')
+                                ->prefix('BRL')
+                                ->numeric()
+                                ->dehydrated()
+                                ->visible(fn(Get $get) => $get('../../moeda_id') === 1)
+                                ->afterStateUpdated(
+                                    fn(Get $get, Set $set) =>
+                                    NegociacaoProdutoLogic::volumeAfterStateUpdated($get, $set)
+                                ),
+                            
+                            //Preço original do produto em USD
+                            // Preço do produto em USD
+                            TextInput::make('snap_produto_preco_us')
+                                ->label('Preço do Produto')
+                                ->prefix('USS')
+                                ->numeric()
+                                ->dehydrated()
+                                ->visible(fn(Get $get) => $get('../../moeda_id') === 2)
+                                ->afterStateUpdated(
+                                    fn(Get $get, Set $set) =>
+                                    NegociacaoProdutoLogic::volumeAfterStateUpdated($get, $set)
+                                ),
 
-                                TextInput::make('indice_valorizacao')
-                                    ->label('Índice de Valorização')
-                                    ->numeric()
-                                    ->placeholder('0.10 para 10%')
-                                    ->live()
-                                    ->default(0)
-                                    ->required()
-                                    ->dehydrated()
-                                    ->afterStateHydrated(
-                                        fn(Get $get, Set $set) =>
-                                        NegociacaoProdutoLogic::indiceValorizacaoAfterStateUpdated($get, $set)
-                                    )
-                                    ->afterStateUpdated(
-                                        fn(Get $get, Set $set) =>
-                                        NegociacaoProdutoLogic::indiceValorizacaoAfterStateUpdated($get, $set)
-                                    ),
+                            
 
-                                                    TextInput::make('preco_produto_valorizado_rs')
-                                    ->label('Preço do Produto ')
+
+
+                            TextInput::make('preco_total_produto_negociacao_rs')
+                                    ->label('Valor Total na Negociação')
                                     ->prefix('BRL')
+                                    ->numeric()
                                     ->disabled()
                                     ->dehydrated()
-                                    ->visible(fn(Get $get) => $get('../../moeda_id') === 1)
-                                    ->reactive(),
+                                    ->visible(fn(Get $get) => $get('../../moeda_id') === 1),
 
-                                TextInput::make('preco_produto_valorizado_us')
-                                    ->label('Preço do Produto')
+                            TextInput::make('preco_total_produto_negociacao_us')
+                                    ->label('Valor Total na Negociação')
                                     ->prefix('USS')
                                     ->numeric()
                                     ->disabled()
                                     ->dehydrated()
-                                    ->visible(fn(Get $get) => $get('../../moeda_id') === 2)
-                                    ->reactive(),
-                                            ]),
+                                    ->visible(fn(Get $get) => $get('../../moeda_id') === 2),
 
-                                            DatePicker::make('data_atualizacao_snap_precos_produtos')
+
+                            // Data da última atualização dos preços
+                            DatePicker::make('data_atualizacao_snap_precos_produtos')
                                     ->label('Data Atualização dos Preços do Produto')
                                     ->default(fn(): \DateTime => now())
                                     ->disabled()
                                     ->dehydrated(),
+                          ]),
 
-                                TextInput::make('preco_total_produto_negociacao_rs')
-                                    ->label('Valor Total na Negociação')
-                                    ->prefix('BRL')
-                                    ->numeric()
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->visible(fn(Get $get) => $get('../../moeda_id') === 1)
-                                    ->reactive(),
+                        Auth::user()?->hasAnyRole(['vendedor', 'Gerente Comercial'])
+                        ? DetalhesProdutoHidden::section()
+                        : DetalhesProdutoVisible::section(),
 
-                                TextInput::make('preco_total_produto_negociacao_us')
-                                    ->label('Valor Total na Negociação')
-                                    ->prefix('USS')
-                                    ->numeric()
-                                    ->disabled()
-                                    ->dehydrated()
-                                    ->visible(fn(Get $get) => $get('../../moeda_id') === 2)
-                                    ->reactive(),
-
-                    Auth::user()?->hasAnyRole(['vendedor', 'Gerente Comercial'])
-                    ? DetalhesProdutoHidden::section()
-                    : DetalhesProdutoVisible::section(),
-
-
-
-                ])
+                    ])
+                
                 ->afterStateUpdated(
                     fn(Get $get, Set $set) =>
                     NegociacaoProdutoLogic::repeaterAfterStateUpdated($get, $set)
