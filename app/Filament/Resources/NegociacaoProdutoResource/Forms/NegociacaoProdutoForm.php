@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Hidden;
 use App\Filament\Resources\NegociacaoProdutoResource\Forms\Sections\DetalhesProdutoHidden;
 use App\Filament\Resources\NegociacaoProdutoResource\Forms\Sections\DetalhesProdutoVisible;
+use Filament\Support\RawJs;
 
 
 class NegociacaoProdutoForm
@@ -108,6 +109,7 @@ class NegociacaoProdutoForm
                                 ->label('Preço do Produto')
                                 ->prefix('BRL')
                                 ->numeric()
+                                ->live(onBlur: true) 
                                 ->dehydrated()
                                 ->visible(fn(Get $get) => $get('../../moeda_id') === 1)
                                 ->afterStateUpdated(
@@ -121,6 +123,7 @@ class NegociacaoProdutoForm
                                 ->label('Preço do Produto')
                                 ->prefix('USS')
                                 ->numeric()
+                                ->live(onBlur: true) 
                                 ->dehydrated()
                                 ->visible(fn(Get $get) => $get('../../moeda_id') === 2)
                                 ->afterStateUpdated(
